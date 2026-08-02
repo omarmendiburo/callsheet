@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { getProfileByUserId } from "@/app/talent/_data";
+import { getDisciplines, getProfileByUserId } from "@/app/talent/_data";
 import { DISCIPLINES, PROJECT_TYPES } from "@/lib/taxonomy";
 import { haversineMiles } from "@/lib/geo";
+import { recommendProjectIds } from "@/lib/ai/recommend";
 import { Rule } from "@/components/ui";
 import { FilterRow } from "@/components/marketplace/FilterRow";
 import { ProjectCard } from "@/components/marketplace/ProjectCard";
@@ -38,9 +39,10 @@ export default async function JobsPage({
   const params = await searchParams;
 
   const profile = await getProfileByUserId(user.id);
-  const [projects, appMap] = await Promise.all([
+  const [projects, appMap, myDisciplines] = await Promise.all([
     getOpenProjects(),
     profile ? getApplicationMap(profile.id) : Promise.resolve(new Map()),
+    profile ? getDisciplines(profile.id) : Promise.resolve([]),
   ]);
 
   const fDiscipline = one(params, "discipline");
@@ -82,6 +84,21 @@ export default async function JobsPage({
   const anyFilter = Boolean(
     fDiscipline || fType || fRadius || fMinRate,
   );
+
+  // Recommendations ride the unfiltered view only — once the talent filters,
+  // they are driving. The heuristic's score stays server-side; the talent
+  // side never shows a number (owner's standing rule).
+  const recommendedIds =
+    !anyFilter && profile && myDisciplines.length > 0
+      ? recommendProjectIds(
+          profile,
+          myDisciplines.map((d) => ({ type: d.type, level: d.level })),
+          projects.map(({ project }: ProjectWithOrg) => project),
+        )
+      : [];
+  const recommended = recommendedIds
+    .map((id) => projects.find((p: ProjectWithOrg) => p.project.id === id))
+    .filter((p): p is ProjectWithOrg => p != null);
 
   return (
     <div className="mx-auto w-full max-w-[1440px]">
@@ -153,6 +170,27 @@ export default async function JobsPage({
           ) : null}
         </div>
       </section>
+
+      {/* ---------- BAND — RECOMMENDED (unfiltered view only) ---------- */}
+      {recommended.length > 0 ? (
+        <section className="mt-10">
+          <Rule />
+          <h2 className="fact-secondary mt-4">recommended for you</h2>
+          <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-secondary">
+            Picked against your crafts, level, distance, and rate. A person
+            still reads every application.
+          </p>
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {recommended.map((p) => (
+              <ProjectCard
+                key={p.project.id}
+                data={p}
+                application={appMap.get(p.project.id) ?? null}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {/* ---------- BAND — RESULTS ---------- */}
       <section className="mt-10">
