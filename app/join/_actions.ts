@@ -8,6 +8,7 @@ import { newId } from "@/lib/id";
 import { geocodeCity } from "@/lib/geo";
 import { DISCIPLINES, LEVELS } from "@/lib/taxonomy";
 import { notifyTalentWelcome } from "@/lib/notify";
+import { recordAcceptance } from "@/lib/legal";
 import type { JoinState } from "./messages";
 
 const LEVEL_IDS = LEVELS.map((l) => l.id) as readonly string[];
@@ -108,6 +109,7 @@ export async function join(
     })),
   );
 
+  await recordAcceptance(userId);
   await notifyTalentWelcome(email, name.split(" ")[0] || name);
 
   await createSession(userId);

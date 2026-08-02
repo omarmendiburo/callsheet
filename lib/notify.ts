@@ -115,6 +115,47 @@ export async function notifyTalentApplicationStatus(
   await sendEmail(email, subject, `${body}\n\n${APP_URL()}/talent${SIGN}`);
 }
 
+/* When a booking lands, every OTHER applicant still in play hears the role
+ * was filled (owner's ask 2026-08-02). No names, no counts, and terminal
+ * applications (booked, declined) are left alone. */
+export async function notifyOtherApplicantsFilled(
+  projectId: string,
+  bookedTalentId: string,
+  projectTitle: string,
+) {
+  const db = await getDb();
+  type Row = { talentId: string; status: string; email: string };
+  const rows: Row[] = await db
+    .select({
+      talentId: schema.applications.talentId,
+      status: schema.applications.status,
+      email: schema.users.email,
+    })
+    .from(schema.applications)
+    .innerJoin(
+      schema.talentProfiles,
+      eq(schema.applications.talentId, schema.talentProfiles.id),
+    )
+    .innerJoin(schema.users, eq(schema.talentProfiles.userId, schema.users.id))
+    .where(eq(schema.applications.projectId, projectId));
+  const emails = rows
+    .filter(
+      (r: Row) =>
+        r.talentId !== bookedTalentId &&
+        r.status !== "booked" &&
+        r.status !== "declined",
+    )
+    .map((r: Row) => r.email);
+  if (emails.length === 0) return;
+  await sendEmail(
+    emails,
+    `Update on ${projectTitle}`,
+    `The team behind ${projectTitle} filled the role this time. Your application closes with it, and your work stays on the wall where the next project will find it.
+
+${APP_URL()}/talent${SIGN}`,
+  );
+}
+
 export async function notifyTalentInvited(
   talentId: string,
   projectTitle: string,

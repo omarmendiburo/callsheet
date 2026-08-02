@@ -614,8 +614,17 @@ export default function Flow() {
         ) : null}
 
         <p className="mt-10 text-[13px] leading-relaxed text-secondary">
-          by joining you agree to{" "}
-          {/* new tab on purpose: this flow keeps your answers in memory */}
+          by joining you agree to the{" "}
+          {/* new tabs on purpose: this flow keeps your answers in memory */}
+          <a
+            className="text-ink underline underline-offset-4"
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            terms of use
+          </a>{" "}
+          and{" "}
           <a
             className="text-ink underline underline-offset-4"
             href="/privacy"

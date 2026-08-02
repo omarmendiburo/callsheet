@@ -61,9 +61,9 @@ export default function PrivacyPage() {
         <h1 className="headline mt-6 text-6xl">Your data, plainly.</h1>
         <p className="mt-6 max-w-xl text-[16px] leading-relaxed">
           This is the pilot's plain-English notice: what we collect, where it
-          shows, and who decides. Full terms of use and a formal privacy
-          policy are being prepared with counsel; when they are ready, you
-          will be asked to read and accept them.
+          shows, and who decides. The working rules of the product live in
+          the terms of use. Formal documents are being prepared with counsel;
+          when they are ready, you will be asked to read and accept them.
         </p>
 
         <div className="mt-10">

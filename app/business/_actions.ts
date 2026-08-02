@@ -6,7 +6,10 @@ import { and, eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { requireOrgRole } from "@/lib/tenancy";
-import { notifyTalentApplicationStatus } from "@/lib/notify";
+import {
+  notifyOtherApplicantsFilled,
+  notifyTalentApplicationStatus,
+} from "@/lib/notify";
 import { newId } from "@/lib/id";
 import { geocodeCity } from "@/lib/geo";
 import { DISCIPLINES, LEVELS, PROJECT_TYPES } from "@/lib/taxonomy";
@@ -213,6 +216,9 @@ export async function transitionApplication(formData: FormData) {
     target === "declined"
   ) {
     await notifyTalentApplicationStatus(app.talentId, projRows[0].title, target);
+  }
+  if (target === "booked") {
+    await notifyOtherApplicantsFilled(projectId, app.talentId, projRows[0].title);
   }
 
   revalidatePath(`/business/${orgId}/projects/${projectId}`);

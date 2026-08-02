@@ -97,6 +97,10 @@ export default function Home() {
         <footer className="flex flex-col gap-2 py-6 sm:flex-row sm:items-baseline sm:justify-between">
           <p className="fact-secondary">
             San Diego · pilot ·{" "}
+            <Link className="underline underline-offset-2" href="/terms">
+              terms
+            </Link>{" "}
+            ·{" "}
             <Link className="underline underline-offset-2" href="/privacy">
               data notice
             </Link>

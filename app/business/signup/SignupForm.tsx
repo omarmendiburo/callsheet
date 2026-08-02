@@ -150,7 +150,15 @@ export function SignupForm() {
       ) : null}
 
       <p className="text-[13px] leading-relaxed text-secondary">
-        by creating the organization you agree to{" "}
+        by creating the organization you agree to the{" "}
+        <Link
+          className="text-ink underline underline-offset-4"
+          href="/terms"
+          target="_blank"
+        >
+          terms of use
+        </Link>{" "}
+        and{" "}
         <Link
           className="text-ink underline underline-offset-4"
           href="/privacy"

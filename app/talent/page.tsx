@@ -7,6 +7,7 @@ import {
   getMedia,
   getProfileByUserId,
 } from "./_data";
+import { getProfileOpenStats } from "@/lib/views";
 
 /*
  * §4.2/§4.4 dashboard home. The shell (sidebar) owns all chrome — logo, nav,
@@ -37,6 +38,7 @@ export default async function TalentHome() {
 
   const media = await getMedia(profile.id);
   const applications = await getApplications(profile.id);
+  const opens = await getProfileOpenStats(profile.id);
   const steps = completeness(profile, media);
   const empty = steps.filter((s) => !s.done);
   const doneCount = steps.length - empty.length;
@@ -51,6 +53,28 @@ export default async function TalentHome() {
         This is your side of the callsheet. Employers see your reel first and
         your name last. Keep the work up front.
       </p>
+
+      {/* ---------- BAND — PROFILE OPENS ---------- */}
+      <section className="mt-10">
+        <Rule />
+        <h2 className="fact-secondary mt-4">profile opens</h2>
+        {opens.total === 0 ? (
+          <p className="mt-4 text-[15px] leading-relaxed text-secondary">
+            No employer has opened your full profile yet. They browse the wall
+            name-blind first; opens land here the moment they happen.
+          </p>
+        ) : (
+          <p className="mt-4 text-[15px] leading-relaxed">
+            Employers opened your full profile{" "}
+            <span className="fact">{opens.total}</span>{" "}
+            {opens.total === 1 ? "time" : "times"}
+            {opens.lastOpenedAt
+              ? `, most recently ${opens.lastOpenedAt.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              : ""}
+            . Who stays private, on both sides, until they reach out.
+          </p>
+        )}
+      </section>
 
       {/* ---------- BAND — PROFILE COMPLETENESS ---------- */}
       <section className="mt-10">

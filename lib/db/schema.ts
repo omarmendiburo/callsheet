@@ -2,6 +2,7 @@ import {
   boolean,
   doublePrecision,
   integer,
+  index,
   jsonb,
   pgEnum,
   pgTable,
@@ -275,4 +276,36 @@ export const certifications = pgTable("certifications", {
     .notNull()
     .references(() => users.id),
   grantedAt: timestamp("granted_at").notNull().defaultNow(),
+});
+
+/* Profile-view events (owner's ask 2026-08-02): recorded when a business
+ * user opens a talent's reveal. The org is stored for dedupe and future
+ * analytics but is NEVER surfaced to talent — their side only ever sees
+ * that an open happened and when. */
+export const profileViews = pgTable(
+  "profile_views",
+  {
+    id: text("id").primaryKey(),
+    talentId: text("talent_id")
+      .notNull()
+      .references(() => talentProfiles.id),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("profile_views_talent_idx").on(t.talentId, t.createdAt)],
+);
+
+/* Versioned acceptance records (audit H-7 layer 2 mechanics): who agreed to
+ * which document version, when. Counsel's final text will bump the version;
+ * the plumbing does not change. */
+export const acceptances = pgTable("acceptances", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  doc: text("doc").notNull(),
+  version: text("version").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });

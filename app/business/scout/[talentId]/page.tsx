@@ -14,6 +14,7 @@ import {
 import { one } from "@/components/marketplace/filters";
 import { trackTalent } from "../_actions";
 import { resolveScoutOrg } from "../_org";
+import { recordProfileView } from "@/lib/views";
 
 /*
  * §5.4 the reveal. The ONE surface in the product where a creative's name
@@ -95,6 +96,10 @@ export default async function RevealPage({
 
   // No approved media -> was never on the wall -> not viewable here.
   if (!reveal || reveal.media.length === 0) notFound();
+
+  // The reveal is THE profile-open moment: record it (deduped per org+hour).
+  // Talent only ever learns that an open happened, never which org.
+  await recordProfileView(talentId, org.id);
 
   const { profile, disciplines, media, certLevel } = reveal;
   const prompts = (profile.prompts ?? []).slice(0, 3);

@@ -8,6 +8,7 @@ import { newId } from "@/lib/id";
 import { geocodeCity } from "@/lib/geo";
 import { WORK_TYPES } from "@/lib/taxonomy";
 import { notifyAdminsNewOrg, notifyBusinessWelcome } from "@/lib/notify";
+import { recordAcceptance } from "@/lib/legal";
 
 /*
  * §5.1 org signup. Creates, in one submission: the owner's user (role
@@ -105,6 +106,7 @@ export async function signup(
     role: "owner",
   });
 
+  await recordAcceptance(userId);
   await notifyBusinessWelcome(email, name.split(" ")[0] || name, orgName);
   await notifyAdminsNewOrg(orgName);
 
