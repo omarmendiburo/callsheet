@@ -38,12 +38,24 @@ const SYNONYMS: { terms: string[]; discipline: string }[] = [
   { terms: ["production coordinator", "coordinator", "prod coord"], discipline: "Production coordinator" },
   { terms: ["pa", "production assistant", "runner"], discipline: "PA" },
   { terms: ["writer", "screenwriter", "scriptwriter", "copywriter"], discipline: "Writer" },
-  { terms: ["designer", "graphic designer", "art director"], discipline: "Designer" },
+  { terms: ["designer", "graphic designer"], discipline: "Designer" },
+  { terms: ["art director", "ad creative"], discipline: "Art Director" },
   { terms: ["illustrator", "illustration"], discipline: "Illustrator" },
-  { terms: ["shortform creator", "short form", "short-form", "shortform", "reels creator", "tiktok creator", "content creator", "ugc creator"], discipline: "Shortform creator" },
+  { terms: ["muralist", "mural artist", "fine artist", "painter"], discipline: "Fine Artist / Muralist" },
+  { terms: ["shortform creator", "short form", "short-form", "shortform", "reels creator", "tiktok creator", "content creator"], discipline: "Shortform creator" },
+  { terms: ["ugc", "ugc creator", "user generated content", "user-generated content"], discipline: "UGC Creator" },
+  { terms: ["3d", "3d artist", "3d modeler", "3d model", "3d generalist", "cgi artist", "blender artist"], discipline: "3D Artist" },
+  { terms: ["storyboard", "storyboard artist", "storyboards"], discipline: "Storyboard Artist" },
+  { terms: ["vo", "vo artist", "voice over", "voice-over", "voiceover", "voice actor", "voice artist", "narrator"], discipline: "Voice / VO Artist" },
+  { terms: ["drone", "drone pilot", "drone operator", "fpv pilot", "aerial"], discipline: "Drone Op" },
+  { terms: ["sound designer", "sound design", "re-recording mixer", "mix engineer", "audio post", "dialogue editor"], discipline: "Sound Design / Mix" },
+  { terms: ["production designer", "set designer", "set design", "set dresser"], discipline: "Production Designer" },
+  { terms: ["actor", "actress", "acting", "on camera talent", "on-camera talent", "cast"], discipline: "Actor" },
+  { terms: ["model", "fashion model", "photo model", "runway model"], discipline: "Model" },
+  { terms: ["host", "presenter", "tv host", "mc", "emcee", "on camera host", "spokesperson"], discipline: "Host / Presenter" },
   { terms: ["hair", "makeup", "mua", "hmu", "hair and makeup", "hair/makeup"], discipline: "Hair / Makeup" },
   { terms: ["wardrobe", "stylist", "costume", "wardrobe stylist"], discipline: "Wardrobe / Stylist" },
-  { terms: ["composer", "music", "sound designer", "score"], discipline: "Composer / Music" },
+  { terms: ["composer", "music", "score", "musician"], discipline: "Composer / Music" },
 ];
 
 /* Level synonyms -> canonical level id. */
@@ -69,22 +81,29 @@ const AVAILABILITY_TERMS = [
  * $-amount, city, and level extraction. Deterministic, no API.
  */
 export function parseQueryHeuristic(query: string): RecruiterFilters {
-  const q = ` ${query.toLowerCase()} `;
+  // Punctuation becomes spaces so "an editor, san diego" still matches terms;
+  // $, /, and - survive for rates and terms like "hair/makeup".
+  const q = ` ${query.toLowerCase().replace(/[.,;:!?()]/g, " ")} `;
 
-  // Disciplines — match longest phrases first so "camera op" doesn't get
-  // shadowed by a bare "camera".
+  // Disciplines — longest needle first, and every match CONSUMES its text so
+  // a phrase cannot re-match through its parts ("art director" must not also
+  // read as Director; "sound designer" must not also read as Sound).
   const disciplines = new Set<string>();
-  const allTerms = SYNONYMS.flatMap((s) =>
-    s.terms.map((t) => ({ term: t, discipline: s.discipline })),
-  ).sort((a, b) => b.term.length - a.term.length);
-  for (const { term, discipline } of allTerms) {
-    if (q.includes(` ${term} `) || q.includes(` ${term}s `)) {
+  const needles: { needle: string; discipline: string }[] = [
+    ...SYNONYMS.flatMap((s) =>
+      s.terms.map((t) => ({ needle: t, discipline: s.discipline })),
+    ),
+    // Exact canonical names typed directly count too.
+    ...DISCIPLINES.map((d) => ({ needle: d.toLowerCase(), discipline: d as string })),
+  ].sort((a, b) => b.needle.length - a.needle.length);
+  let working = q;
+  for (const { needle, discipline } of needles) {
+    const single = ` ${needle} `;
+    const plural = ` ${needle}s `;
+    if (working.includes(single) || working.includes(plural)) {
       disciplines.add(discipline);
+      working = working.split(plural).join("  ").split(single).join("  ");
     }
-  }
-  // Also catch exact canonical names typed directly.
-  for (const d of DISCIPLINES) {
-    if (q.includes(d.toLowerCase())) disciplines.add(d);
   }
 
   const filters: RecruiterFilters = { disciplines: [...disciplines] };
