@@ -23,7 +23,7 @@ const ERRORS: Record<string, string> = {
   city: "which city does the organization work out of?",
   password: "password must be at least 8 characters.",
   email: "that email address doesn't look right.",
-  website: "the website must start with http:// or https://.",
+  website: "that website doesn't look right. just the domain is fine, like harborlight.org.",
   dupe: "an account with that email already exists.",
   agree: "please confirm you read the terms and the data notice.",
 };
@@ -59,8 +59,8 @@ export function SignupForm() {
           <Field label="ein" hint="nine digits, dash optional">
             <TextInput name="ein" placeholder="12-3456789" required />
           </Field>
-          <Field label="website" hint="optional">
-            <TextInput name="website" type="url" placeholder="https://" />
+          <Field label="website" hint="optional · just the domain is fine">
+            <TextInput name="website" placeholder="harborlight.org" />
           </Field>
         </div>
 

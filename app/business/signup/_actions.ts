@@ -25,6 +25,21 @@ import { recordAcceptance } from "@/lib/legal";
 
 export type SignupState = { code: string | null };
 
+/* Accept a bare domain and return a full https URL, or null if it is not even
+ * a plausible domain. "harborlight.org" -> "https://harborlight.org". */
+function normalizeWebsite(raw: string): string | null {
+  if (!raw) return null;
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const u = new URL(withScheme);
+    // host must have a dot and a letter TLD (rules out "foo", "http://x").
+    if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(u.hostname)) return null;
+    return u.toString();
+  } catch {
+    return null;
+  }
+}
+
 export async function signup(
   _prev: SignupState,
   formData: FormData,
@@ -58,12 +73,11 @@ export async function signup(
   if (password.length < 8) return { code: "password" };
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { code: "email" };
 
-  // Website is optional but if given must be a real http(s) URL.
-  let website: string | null = null;
-  if (websiteRaw) {
-    if (!/^https?:\/\/\S+$/i.test(websiteRaw)) return { code: "website" };
-    website = websiteRaw;
-  }
+  // Website is optional and forgiving (owner's ask 2026-08-02): people type
+  // "harborlight.org", not "https://www.harborlight.org". Add the scheme
+  // ourselves; only reject something that isn't a plausible domain at all.
+  const website = normalizeWebsite(websiteRaw);
+  if (websiteRaw && website === null) return { code: "website" };
 
   const db = await getDb();
   const existing = await db
