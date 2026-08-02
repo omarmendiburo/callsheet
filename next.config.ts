@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // PGlite ships its own WASM runtime — bundling it breaks path resolution
+  // and takes down every DB-touching server action. Keep it external.
+  serverExternalPackages: ["@electric-sql/pglite"],
 };
 
 export default nextConfig;
