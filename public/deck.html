@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Callsheet — the story</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B0B0C; --paper:#FFFFFF; --yellow:#fddb32; --grey:#8A8A8E;
+    --line:#26262A; --panel:#141416;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ink); color:var(--paper);
+    font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+    line-height:1.55; overflow-x:hidden}
+  .anton{font-family:Anton,Impact,sans-serif; font-weight:400;
+    line-height:.92; letter-spacing:-.01em; text-transform:uppercase}
+  .mono{font-family:'Space Mono',monospace; text-transform:uppercase;
+    letter-spacing:.14em; font-size:11px; color:var(--grey)}
+  .yellow{color:var(--yellow)}
+  a{color:inherit}
+
+  section{min-height:100vh; padding:9vh 7vw; display:flex; flex-direction:column;
+    justify-content:center; border-bottom:1px solid var(--line); position:relative}
+  @media(max-width:640px){section{padding:8vh 7vw; min-height:auto}}
+
+  .eyebrow{display:flex; gap:14px; align-items:center; margin-bottom:34px}
+  .eyebrow .n{color:var(--yellow)}
+  .rule{height:1px; background:var(--line); border:0; margin:34px 0}
+
+  h1.cover{font-size:clamp(64px,13vw,190px)}
+  h2{font-size:clamp(38px,6.4vw,86px)}
+  .lead{font-size:clamp(18px,2.4vw,27px); line-height:1.5; max-width:20ch;
+    color:#EDEDEF}
+  p.body{font-size:clamp(15px,1.5vw,18px); color:#C7C7CB; max-width:60ch;
+    line-height:1.65}
+  .dim{color:var(--grey)}
+
+  /* stat grid */
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    background:var(--line); border:1px solid var(--line); margin-top:46px}
+  .stat{background:var(--ink); padding:34px 26px}
+  .stat .num{font-family:Anton,sans-serif; font-size:clamp(48px,7vw,92px);
+    line-height:.9; color:var(--yellow)}
+  .stat .lab{margin-top:12px; font-size:14px; color:#C7C7CB; line-height:1.4}
+  @media(max-width:720px){.stats{grid-template-columns:1fr}}
+
+  .two{display:grid; grid-template-columns:1.15fr 1fr; gap:8vw; align-items:start}
+  @media(max-width:820px){.two{grid-template-columns:1fr; gap:38px}}
+
+  ul.list{list-style:none; margin-top:8px}
+  ul.list li{padding:18px 0; border-top:1px solid var(--line);
+    display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:baseline}
+  ul.list li .k{font-family:'Space Mono',monospace; color:var(--yellow);
+    font-size:13px; letter-spacing:.06em; white-space:nowrap}
+  ul.list li .v{font-size:clamp(15px,1.6vw,18px); color:#DADADC}
+  ul.list li .v b{color:#fff; font-weight:600}
+
+  .pill{display:inline-block; border:1px solid var(--line); border-radius:0;
+    padding:8px 14px; margin:6px 8px 0 0; font-family:'Space Mono',monospace;
+    font-size:12px; letter-spacing:.08em; color:#DADADC}
+  .pill.on{border-color:var(--yellow); color:var(--yellow)}
+
+  .big-quote{font-size:clamp(26px,4.4vw,60px); line-height:1.12; max-width:18ch}
+  .big-quote .anton{display:inline}
+
+  .cols3{display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    background:var(--line); border:1px solid var(--line); margin-top:44px}
+  .cols3 .c{background:var(--ink); padding:30px 26px}
+  .cols3 .c .h{font-family:Anton,sans-serif; font-size:22px; color:#fff;
+    text-transform:uppercase; letter-spacing:.01em}
+  .cols3 .c .w{margin-top:8px; font-size:11px; letter-spacing:.14em;
+    font-family:'Space Mono',monospace; color:var(--yellow)}
+  .cols3 .c p{margin-top:14px; font-size:14.5px; color:#C7C7CB; line-height:1.6}
+  @media(max-width:820px){.cols3{grid-template-columns:1fr}}
+
+  .foot{padding:7vh 7vw; display:flex; flex-wrap:wrap; gap:20px;
+    justify-content:space-between; align-items:baseline}
+  .brand{font-family:Anton,sans-serif; letter-spacing:.02em; font-size:20px}
+  .tag{position:fixed; top:0; left:0; right:0; z-index:20;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 7vw; font-family:'Space Mono',monospace; font-size:11px;
+    letter-spacing:.14em; color:var(--grey);
+    background:linear-gradient(var(--ink),rgba(11,11,12,0)); pointer-events:none}
+  .tag .b{color:#fff}
+</style>
+</head>
+<body>
+
+<div class="tag"><span class="b">CALLSHEET</span><span>HMNTY STUDIOS · SAN DIEGO</span></div>
+
+<!-- COVER -->
+<section>
+  <p class="mono" style="margin-bottom:26px">The story · August 2026</p>
+  <h1 class="cover anton">Nobody should<br>need an inside<br><span class="yellow">connection.</span></h1>
+  <p class="lead" style="margin-top:40px">Callsheet finds paid film and creative work for the people breaking in. First credit, not fifth.</p>
+</section>
+
+<!-- MISSION -->
+<section>
+  <div class="eyebrow"><span class="mono n">01</span><span class="mono">The mission</span></div>
+  <div class="two">
+    <div>
+      <h2 class="anton">Dignified work<br>in the creative<br>economy.</h2>
+    </div>
+    <div>
+      <p class="body">Creative jobs move through private channels: referrals, group chats, who you already know. If you are first-generation, entry-level, or between gigs, you never hear the work existed.</p>
+      <p class="body" style="margin-top:22px">Callsheet replaces the connection with the work itself. You show what you can make. Employers react to the reel first and the name last. A real person reviews everything before it goes public. The result is a shot that used to require an inside track.</p>
+      <p class="body" style="margin-top:22px"><span class="yellow">Free to join. No reel required. No film school required.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section>
+  <div class="eyebrow"><span class="mono n">02</span><span class="mono">Impact, already</span></div>
+  <h2 class="anton">Not committed.<br><span class="yellow">In.</span></h2>
+  <p class="body" style="margin-top:26px">These are not letters of intent or a waitlist. On day one of being live, real creatives and real organizations signed up and are on the platform right now, with real projects posted and real work moving through review.</p>
+  <div class="stats">
+    <div class="stat"><div class="num">28</div><div class="lab">people on the platform, live</div></div>
+    <div class="stat"><div class="num">19</div><div class="lab">creatives building profiles</div></div>
+    <div class="stat"><div class="num">6</div><div class="lab">organizations hiring crews</div></div>
+  </div>
+  <p class="body dim" style="margin-top:26px">Live projects posted by verified organizations. Real work in the moderation queue awaiting the HMNTY team's first approvals. Growing hour over hour on launch day.</p>
+</section>
+
+<!-- USE OF AI -->
+<section>
+  <div class="eyebrow"><span class="mono n">03</span><span class="mono">Use of AI</span></div>
+  <div class="two">
+    <div>
+      <h2 class="anton">AI that<br>suggests.<br>People who<br><span class="yellow">decide.</span></h2>
+    </div>
+    <div>
+      <p class="body">Anthropic's Claude powers the matching. It ranks creative-to-project fit and reads plain-language hiring requests, and it explains every suggestion in facts a human can check.</p>
+      <ul class="list">
+        <li><span class="k">NAME-BLIND</span><span class="v">The AI reads craft, level, rates, distance, and availability. <b>It never sees a name.</b></span></li>
+        <li><span class="k">NEVER DECIDES</span><span class="v">It ranks and explains. It never books, rejects, or contacts anyone. <b>Humans decide.</b></span></li>
+        <li><span class="k">HONEST</span><span class="v">Every screen labels the live engine. A suggestion is labeled a suggestion, <b>not a verdict.</b></span></li>
+        <li><span class="k">BOUNDED</span><span class="v">A daily call cap backstops cost; a heuristic engine covers any outage. <b>No surprises.</b></span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- EXECUTION -->
+<section>
+  <div class="eyebrow"><span class="mono n">04</span><span class="mono">Execution</span></div>
+  <h2 class="anton">Built and live.</h2>
+  <p class="body" style="margin-top:24px">A complete three-sided product shipped and running on its own domain: creatives, hiring organizations, and an HMNTY back office — with real payments-grade infrastructure behind it.</p>
+  <div class="cols3">
+    <div class="c"><div class="h">The creative side</div><div class="w">talent</div><p>Ten-minute profile, ZIP-simple. Upload your ten-second pitch straight from your phone. Draft-safe signup. Edit anything, anytime.</p></div>
+    <div class="c"><div class="h">The hiring side</div><div class="w">business</div><p>Post a project in plain words. Scout a name-blind wall. Reveal, shortlist, book. A pipeline from applicant to hired.</p></div>
+    <div class="c"><div class="h">The back office</div><div class="w">hmnty staff</div><p>Human moderation on every piece. Verify organizations. Manage accounts and profiles. Board and wall previews of the live network.</p></div>
+  </div>
+  <hr class="rule">
+  <p class="mono" style="margin-bottom:14px">Production infrastructure, connected launch day</p>
+  <div>
+    <span class="pill on">Neon · Postgres data</span>
+    <span class="pill on">Anthropic Claude · AI</span>
+    <span class="pill on">Resend · email</span>
+    <span class="pill on">Vercel Blob · video uploads</span>
+    <span class="pill">Terms + privacy + recorded consent</span>
+    <span class="pill">In-house auth</span>
+  </div>
+</section>
+
+<!-- 30 DAYS -->
+<section>
+  <div class="eyebrow"><span class="mono n">05</span><span class="mono">The next 30 days</span></div>
+  <div class="two">
+    <div>
+      <h2 class="anton">Handed over,<br>set up to<br><span class="yellow">win.</span></h2>
+      <p class="body" style="margin-top:24px">The platform is built. The next month is not engineering — it is operating what already works.</p>
+    </div>
+    <div>
+      <p class="mono" style="margin-bottom:6px">What HMNTY does</p>
+      <ul class="list">
+        <li><span class="k">WEEK 1</span><span class="v"><b>Approve the queue.</b> Review the real submissions already waiting; each approval fills the wall with a real creative.</span></li>
+        <li><span class="k">WEEK 1</span><span class="v"><b>Verify the orgs.</b> One click each; verified organizations reach every matching creative.</span></li>
+        <li><span class="k">WEEK 1</span><span class="v"><b>Flip email on.</b> Verify a sending domain; every notification then delivers for real.</span></li>
+        <li><span class="k">WEEKS 2–4</span><span class="v"><b>Run the loop.</b> Post projects, shortlist, and make the first off-platform introductions. Book the first paid gig.</span></li>
+        <li><span class="k">ONGOING</span><span class="v"><b>Finalize the legal docs</b> with counsel; the acceptance machinery is already recording consent.</span></li>
+      </ul>
+    </div>
+  </div>
+  <hr class="rule">
+  <p class="body"><span class="yellow">How we set them up:</span> every one of those is a button, not a build. Human moderation, org verification, the full hiring pipeline, honest AI, uploads, and a recorded legal surface are already shipped and documented. The team inherits a working product with real users on it, not a prototype.</p>
+</section>
+
+<div class="foot">
+  <span class="brand">CALLSHEET</span>
+  <span class="mono">HMNTY Studios · dignified jobs in the creative economy · San Diego</span>
+</div>
+
+</body>
+</html>
