@@ -14,10 +14,14 @@ import {
 import { one, RADIUS_OPTIONS, RATE_OPTIONS } from "@/components/marketplace/filters";
 
 /*
- * §4.3 job board. Every open project, newest first, as cards. Filters are chip
- * rows driven by GET params: discipline, radius from the talent's own city
- * (25/50/100 mi via haversine when both ends are geocoded), min day rate, and
- * project type. The talent's own application status shows on each card in mono.
+ * §4.3 job board. The shell (sidebar) owns all chrome. This page opens with the
+ * uniform header (context line, Anton headline, one sub-line), then a filters
+ * band and a results band — each a fact-secondary label under a Rule.
+ *
+ * Every open project, newest first, as cards. Filters are chip rows driven by
+ * GET params: discipline, radius from the talent's own city (25/50/100 mi via
+ * haversine when both ends are geocoded), min day rate, and project type. The
+ * talent's own application status shows on each card.
  *
  * One primary button per screen: the "apply" button lives on cards (one per
  * un-applied card), and the page headline is Anton with no competing primary.
@@ -80,108 +84,103 @@ export default async function JobsPage({
   );
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-10 sm:px-10">
-      <header className="flex items-baseline justify-between">
-        <p className="fact">
-          <Link href="/talent">Callsheet</Link>
-        </p>
-        <Link className="fact-secondary" href="/talent">
-          dashboard
-        </Link>
-      </header>
-
-      <h1 className="headline mt-10 text-6xl">Open work.</h1>
-      <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
+    <div className="mx-auto w-full max-w-[1440px]">
+      <p className="fact-secondary">talent · open work</p>
+      <h1 className="headline mt-4 text-4xl sm:text-5xl">Open work.</h1>
+      <p className="mt-6 max-w-xl text-[15px] leading-relaxed">
         Every open project on the network, newest first. Filter by craft,
         distance from your city, rate, and type. One tap to apply. A person
         reads every application.
       </p>
 
-      <div className="mt-8">
+      {/* ---------- BAND — FILTERS ---------- */}
+      <section className="mt-10">
         <Rule />
-      </div>
-
-      {/* Filter chip rows — GET params, no search input. */}
-      <section className="mt-6 flex flex-col gap-4">
-        <FilterRow
-          label="discipline"
-          base={BASE}
-          params={params}
-          paramKey="discipline"
-          activeValue={fDiscipline}
-          options={DISCIPLINES.map((d) => ({ value: d, label: d }))}
-        />
-        <FilterRow
-          label="type"
-          base={BASE}
-          params={params}
-          paramKey="type"
-          activeValue={fType}
-          options={PROJECT_TYPES.map((t) => ({ value: t, label: t }))}
-        />
-        <FilterRow
-          label="within"
-          base={BASE}
-          params={params}
-          paramKey="radius"
-          activeValue={fRadius}
-          options={RADIUS_OPTIONS.map((r) => ({
-            value: String(r),
-            label: `${r} mi`,
-          }))}
-        />
-        <FilterRow
-          label="min day rate"
-          base={BASE}
-          params={params}
-          paramKey="minRate"
-          activeValue={fMinRate}
-          options={RATE_OPTIONS.map((r) => ({
-            value: String(r),
-            label: `$${r}+`,
-          }))}
-        />
-        {radiusMi != null && !talentGeo ? (
-          <p className="fact-secondary">
-            add a city to your profile to filter by distance
-          </p>
-        ) : null}
-        {anyFilter ? (
-          <p>
-            <Link className="fact-secondary underline underline-offset-4" href={BASE}>
-              clear filters
-            </Link>
-          </p>
-        ) : null}
+        <h2 className="fact-secondary mt-4">filter</h2>
+        <div className="mt-4 flex flex-col gap-4">
+          <FilterRow
+            label="discipline"
+            base={BASE}
+            params={params}
+            paramKey="discipline"
+            activeValue={fDiscipline}
+            options={DISCIPLINES.map((d) => ({ value: d, label: d }))}
+          />
+          <FilterRow
+            label="type"
+            base={BASE}
+            params={params}
+            paramKey="type"
+            activeValue={fType}
+            options={PROJECT_TYPES.map((t) => ({ value: t, label: t }))}
+          />
+          <FilterRow
+            label="within"
+            base={BASE}
+            params={params}
+            paramKey="radius"
+            activeValue={fRadius}
+            options={RADIUS_OPTIONS.map((r) => ({
+              value: String(r),
+              label: `${r} mi`,
+            }))}
+          />
+          <FilterRow
+            label="min day rate"
+            base={BASE}
+            params={params}
+            paramKey="minRate"
+            activeValue={fMinRate}
+            options={RATE_OPTIONS.map((r) => ({
+              value: String(r),
+              label: `$${r}+`,
+            }))}
+          />
+          {radiusMi != null && !talentGeo ? (
+            <p className="fact-secondary">
+              add a city to your profile to filter by distance
+            </p>
+          ) : null}
+          {anyFilter ? (
+            <p>
+              <Link
+                className="fact-secondary underline underline-offset-4"
+                href={BASE}
+              >
+                clear filters
+              </Link>
+            </p>
+          ) : null}
+        </div>
       </section>
 
-      <div className="mt-8">
+      {/* ---------- BAND — RESULTS ---------- */}
+      <section className="mt-10">
         <Rule />
-      </div>
+        <h2 className="fact-secondary mt-4">
+          {filtered.length} {filtered.length === 1 ? "project" : "projects"}
+        </h2>
 
-      <p className="fact-secondary mt-6">
-        {filtered.length} {filtered.length === 1 ? "project" : "projects"}
-      </p>
-
-      {filtered.length === 0 ? (
-        <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-secondary">
-          Nothing matches these filters yet.{" "}
-          <Link className="underline underline-offset-4" href={BASE}>
-            clear them
-          </Link>{" "}
-          to see all open work.
-        </p>
-      ) : (
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((p) => (
-            <ProjectCard
-              key={p.project.id}
-              data={p}
-              application={appMap.get(p.project.id) ?? null}
-            />
-          ))}
-        </div>
-      )}
-    </main>
+        {filtered.length === 0 ? (
+          <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-secondary">
+            Nothing matches these filters yet.{" "}
+            <Link className="underline underline-offset-4" href={BASE}>
+              clear them
+            </Link>{" "}
+            to see all open work.
+          </p>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((p) => (
+              <ProjectCard
+                key={p.project.id}
+                data={p}
+                application={appMap.get(p.project.id) ?? null}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
