@@ -203,16 +203,27 @@ export default async function OnboardingPage({
             <ul className="mt-6 flex flex-col gap-6">
               {work.map((m) => (
                 <li key={m.id}>
-                  <div className={m.vertical ? "max-w-56" : ""}>
-                    <MediaFrame
-                      url={m.url}
-                      vertical={m.vertical}
-                      label={`${m.kind} · ${m.status}`}
-                      interactive
-                    />
-                  </div>
+                  {m.url.startsWith("placeholder:") ? null : (
+                    <div className={m.vertical ? "max-w-56" : ""}>
+                      <MediaFrame
+                        url={m.url}
+                        vertical={m.vertical}
+                        label={`${m.kind} · ${m.status}`}
+                        interactive
+                      />
+                    </div>
+                  )}
                   <div className="mt-2 flex items-baseline justify-between gap-4">
-                    <span className="text-[15px]">{m.title}</span>
+                    <span className="text-[15px]">
+                      {m.title}
+                      <span className="fact-secondary">
+                        {" "}
+                        · {m.kind} · {m.status}
+                        {m.url.startsWith("placeholder:")
+                          ? " · no link yet"
+                          : ""}
+                      </span>
+                    </span>
                     <form action={deleteMedia}>
                       <input type="hidden" name="id" value={m.id} />
                       <input type="hidden" name="next" value={stepHref(2)} />
@@ -249,16 +260,27 @@ export default async function OnboardingPage({
             <ul className="mt-6 flex flex-col gap-6">
               {pitches.map((m) => (
                 <li key={m.id}>
-                  <div className="max-w-56">
-                    <MediaFrame
-                      url={m.url}
-                      vertical
-                      label={`pitch · ${m.status}`}
-                      interactive
-                    />
-                  </div>
+                  {m.url.startsWith("placeholder:") ? null : (
+                    <div className="max-w-56">
+                      <MediaFrame
+                        url={m.url}
+                        vertical
+                        label={`pitch · ${m.status}`}
+                        interactive
+                      />
+                    </div>
+                  )}
                   <div className="mt-2 flex items-baseline justify-between gap-4">
-                    <span className="text-[15px]">{m.title}</span>
+                    <span className="text-[15px]">
+                      {m.title}
+                      <span className="fact-secondary">
+                        {" "}
+                        · {m.status}
+                        {m.url.startsWith("placeholder:")
+                          ? " · no clip yet"
+                          : ""}
+                      </span>
+                    </span>
                     <form action={deleteMedia}>
                       <input type="hidden" name="id" value={m.id} />
                       <input type="hidden" name="next" value={stepHref(3)} />

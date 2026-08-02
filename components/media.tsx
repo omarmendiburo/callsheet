@@ -95,6 +95,28 @@ export function MediaFrame({
     );
   }
 
+  if (source.kind === "video") {
+    if (interactive) {
+      return (
+        <div className={frame}>
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video
+            src={source.url}
+            controls
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-contain"
+          />
+        </div>
+      );
+    }
+    return (
+      <div className={frame}>
+        <span className="fact text-paper opacity-60">{label}</span>
+      </div>
+    );
+  }
+
   if (source.kind === "vimeo" || source.kind === "instagram") {
     if (interactive) {
       return (

@@ -11,6 +11,7 @@ export type MediaSource =
   | { kind: "youtube"; id: string; embedUrl: string; thumbUrl: string }
   | { kind: "vimeo"; id: string; embedUrl: string }
   | { kind: "instagram"; embedUrl: string; pageUrl: string }
+  | { kind: "video"; url: string }
   | { kind: "link"; url: string; host: string };
 
 export function isRealMediaUrl(url: string | null | undefined): boolean {
@@ -66,6 +67,14 @@ export function classifyMediaUrl(url: string | null | undefined): MediaSource {
         embedUrl: `https://player.vimeo.com/video/${m[1]}`,
       };
     }
+  }
+
+  // Uploaded (or directly linked) video files play in a native player.
+  if (
+    /\.blob\.vercel-storage\.com$/.test(host) ||
+    /\.(mp4|mov|webm|m4v)$/i.test(u.pathname)
+  ) {
+    return { kind: "video", url: url as string };
   }
 
   if (host === "instagram.com") {

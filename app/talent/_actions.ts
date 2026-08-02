@@ -293,3 +293,44 @@ export async function saveBasics(formData: FormData) {
 
   redirect(String(formData.get("next") ?? "/talent/profile"));
 }
+
+/* Registers an already-uploaded pitch/work video (Blob URL) as a pending
+ * media row. The upload itself happens browser-to-Blob with a token from
+ * /api/pitch-upload; this action re-derives the talent from the session and
+ * only accepts URLs on our own store, so a forged path cannot register
+ * arbitrary links as uploads. Same moderation gate as everything else. */
+export async function registerUploadedMedia(
+  _prev: AddMediaState,
+  formData: FormData,
+): Promise<AddMediaState> {
+  const talentId = await currentTalentId();
+  const url = String(formData.get("url") ?? "").trim();
+  const rawKind = String(formData.get("kind") ?? "pitch");
+  const kind: WorkKind | "pitch" =
+    rawKind === "pitch"
+      ? "pitch"
+      : MEDIA_KINDS.includes(rawKind as WorkKind)
+        ? (rawKind as WorkKind)
+        : "reel";
+  const rawTitle = String(formData.get("title") ?? "").trim();
+
+  let host = "";
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    return { code: "upload" };
+  }
+  if (!/\.blob\.vercel-storage\.com$/.test(host)) return { code: "upload" };
+
+  const db = await getDb();
+  await db.insert(schema.media).values({
+    id: newId("m"),
+    talentId,
+    kind,
+    url,
+    title: (rawTitle || DEFAULT_TITLES[kind]).slice(0, 120),
+    vertical: kind === "pitch" ? true : formData.get("vertical") === "on",
+    status: "pending",
+  });
+  redirect(String(formData.get("next") ?? "/talent/onboarding?step=3"));
+}
