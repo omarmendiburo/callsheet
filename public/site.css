@@ -376,64 +376,101 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 
 /* ------------------------------------------------------------ testimonials */
 /* Sits directly under the partner band, so it goes back to the page black —
-   the white band ends the moment the logos do. */
-.quotes{background:var(--bg);padding:clamp(48px,6vw,110px) var(--pad)}
+   the white band ends the moment the logos do. The section itself is unpadded
+   so the deck can run to the screen edges and the arrows can sit on them. */
+.quotes{background:var(--bg);padding:clamp(48px,6vw,110px) 0}
+.quotes .label,.quotes .h2{padding:0 var(--pad)}
 .quotes .label{display:block;margin-bottom:clamp(12px,1.3vw,24px)}
 
-.qbox{margin-top:clamp(30px,3.2vw,58px)}
+.qbox{position:relative;margin-top:clamp(30px,3.2vw,58px)}
+/* clips the deck at the screen edges. Above 720 a mask dissolves the cards on
+   the way out so there is no hard cut; below it the card is nearly the full
+   width and the mask would eat the edges of the one you are reading. */
+.qviewport{overflow:hidden;padding:clamp(14px,1.6vw,30px) 0;
+  /* we take the horizontal axis for swipe; the page keeps the vertical one, so
+     scrolling down through the section is never intercepted */
+  touch-action:pan-y}
+@media (min-width:721px){
+  .qviewport{
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 13%,#000 87%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 13%,#000 87%,transparent)}
+}
 
-/* Every quote occupies the SAME grid cell, so slides never push each other
-   around. align-items:start keeps each one content-sized rather than stretched
-   to the tallest — site.js then eases the stage to the active slide's height,
-   which kills the dead space a short quote would otherwise sit in (220px of it
-   on a phone) without the page snapping under the reader. */
-.qstage{display:grid;align-items:start;overflow:hidden;
-  transition:height .5s var(--ease)}
-.q{grid-area:1/1;margin:0;
-  display:grid;grid-template-columns:auto 1fr;
+/* Every card occupies the SAME cell, so they cannot push each other around and
+   the deck reads as depth rather than a row. site.js eases the stage to fit
+   whichever cards are showing. */
+.qstage{position:relative;display:grid;align-items:start;
+  transition:height .55s var(--ease)}
+
+.q{grid-area:1/1;justify-self:center;margin:0;
+  width:min(100% - clamp(96px,14vw,320px), 780px);
+  background:#141416;border:var(--border) solid var(--line);
+  padding:clamp(24px,2.9vw,56px);
+  display:grid;grid-template-columns:auto 1fr;align-content:start;
   gap:clamp(12px,1.8vw,34px);align-items:start;
-  /* every slide stretches to the tallest one's cell; without this, grid's
-     default align-content:stretch pumps the leftover height INTO the rows and
-     opens a canyon between the mark and the quote on a phone */
-  align-content:start;
-  opacity:0;visibility:hidden;transform:translateY(14px);
-  transition:opacity .6s var(--ease),transform .6s var(--ease),visibility 0s linear .6s}
-.q.on{opacity:1;visibility:visible;transform:none;transition-delay:0s,0s,0s}
+  opacity:0;visibility:hidden;transform:scale(.8);
+  transition:transform .6s var(--ease),opacity .6s var(--ease),
+             border-color .6s var(--ease),filter .6s var(--ease),
+             visibility 0s linear .6s}
 
-/* the mark is the one flourish in the section */
-.qmark{font-size:clamp(56px,7.4vw,124px);line-height:.78;font-weight:800;
+/* the one you are reading is lifted off the page; the shadow is what makes it
+   a card sitting ON the black rather than a panel cut into it */
+.q.on{opacity:1;visibility:visible;transform:none;z-index:3;filter:none;
+  border-color:rgba(252,190,17,.5);
+  box-shadow:0 clamp(14px,1.6vw,30px) clamp(40px,4.4vw,84px) rgba(0,0,0,.72);
+  transition-delay:0s,0s,0s,0s,0s}
+/* The ones either side are scenery, not reading material. At .22 and sharp
+   they competed with the card in front — dimmer and softened, they read as
+   depth instead of as three quotes fighting for the same eye. */
+.q.side{opacity:.13;visibility:visible;z-index:2;filter:blur(3px);
+  box-shadow:none;border-color:var(--line-soft)}
+.q.prev{transform:translateX(-58%) scale(.88)}
+.q.next{transform:translateX(58%) scale(.88)}
+
+.qmark{font-size:clamp(50px,6.4vw,110px);line-height:.78;font-weight:800;
   color:var(--accent);user-select:none}
-
-.q blockquote{font-size:var(--h3);line-height:1.45;font-weight:400;color:#E4E4DE;
-  max-width:52ch}
+.q blockquote{font-size:var(--h3);line-height:1.45;font-weight:400;color:#E4E4DE}
 /* name, role and city are the bold part, right-aligned under the quote */
 .q figcaption{margin-top:clamp(16px,1.7vw,30px);text-align:right;
   font-size:var(--h3);line-height:1.35;color:var(--ink)}
 .q figcaption b{font-weight:700}
 .q figcaption .dash{margin-right:.7em;color:var(--dim);font-weight:400}
 
-/* controls — arrows plus a call-sheet counter rather than dots */
-.qnav{margin-top:clamp(24px,2.6vw,46px);
-  display:flex;align-items:center;gap:clamp(12px,1.2vw,20px)}
-.qbtn{width:clamp(48px,3.6vw,58px);height:clamp(48px,3.6vw,58px);flex:0 0 auto;
+/* arrows live on the screen edges, flanking the deck */
+.qbtn{position:absolute;top:50%;transform:translateY(-50%);z-index:4;
+  width:clamp(48px,3.6vw,60px);height:clamp(48px,3.6vw,60px);
   display:inline-flex;align-items:center;justify-content:center;
-  background:none;border:var(--border) solid var(--line);color:var(--ink);
+  background:rgba(11,11,12,.72);border:var(--border) solid var(--line);color:var(--ink);
   font-size:clamp(17px,1.4vw,23px);line-height:1;cursor:pointer;
   transition:background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease)}
 .qbtn:hover,.qbtn:focus-visible{background:var(--accent);color:#0B0B0C;border-color:var(--accent)}
-.qcount{font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
+.qprev{left:clamp(10px,1.8vw,34px)}
+.qnext{right:clamp(10px,1.8vw,34px)}
+
+.qcount{display:block;margin-top:clamp(16px,1.7vw,28px);text-align:center;
+  font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
   letter-spacing:.2em;color:var(--dim)}
 .qcount b{color:var(--accent);font-weight:400}
 
 @media (max-width:720px){
-  /* the mark stops being a column and becomes a lead-in above the quote */
-  .q{grid-template-columns:1fr;gap:0}
-  .qmark{font-size:clamp(48px,15vw,72px);margin-bottom:-.12em}
+  /* A phone cannot spare the width for edge arrows AND a readable card, so the
+     arrows sit below it. Same controls, same order, still 48px. */
+  .q{width:min(100% - clamp(36px,10vw,64px),780px);grid-template-columns:1fr;gap:0}
+  .qmark{font-size:clamp(44px,13vw,66px);margin-bottom:-.1em}
   .q figcaption{text-align:left}
+  .q.prev{transform:translateX(-84%) scale(.9)}
+  .q.next{transform:translateX(84%) scale(.9)}
+  .qbtn{position:static;transform:none}
+  .qbox{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:clamp(12px,3vw,20px)}
+  .qviewport{flex:1 1 100%;order:1}
+  .qprev{order:2}
+  .qcount{order:3;margin-top:0}
+  .qnext{order:4}
 }
 
 @media (prefers-reduced-motion:reduce){
-  .q{transform:none!important;transition:none!important}
+  .q{transition:none!important}
   .qstage{transition:none!important}
 }
 

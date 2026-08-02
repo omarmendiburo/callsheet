@@ -129,8 +129,9 @@
   })();
 
   /* --------------------------------------------------------- testimonials
-     One at a time, 10s each, arrows either way. Auto-advance is content that
-     moves on its own for longer than 5s, so it MUST be stoppable (WCAG 2.2.2):
+     One at a time, 8s each, arrows either way plus swipe. Auto-advance is
+     content that moves on its own for longer than 5s, so it MUST be stoppable
+     (WCAG 2.2.2):
      it pauses on hover, pauses while anything inside has keyboard focus, stops
      in a background tab, and never starts at all under reduced motion. */
   (function(){
@@ -141,22 +142,50 @@
     if (slides.length < 2) return;
 
     var stage = box.querySelector(".qstage");
-    var i = 0, held = false, tick = 0;
-    var DWELL = 10000;
+    var i = 0, dragging = false, tick = 0;
+    var DWELL = 8000;
 
-    // The stage follows the active slide's own height. Without it the box is
-    // stuck at the tallest quote and a short one floats in a lake of black.
+    // Must match .q.prev / .q.next in site.css. A side card scales about its
+    // CENTRE, so a card of layout height H paints from 0.06H to 0.94H — its
+    // bottom edge sits at 0.94H, not 0.88H. Sizing the stage to 0.88 clipped
+    // every neighbour taller than the active card.
+    var SIDE_SCALE = 0.88;
+    var SIDE_SPAN  = 1 - (1 - SIDE_SCALE) / 2;   // 0.94
+
+    // The stage follows the deck that is actually showing — the active card, or
+    // a taller neighbour peeking past it. offsetHeight is the UNtransformed
+    // height; getBoundingClientRect would already have the scale baked in and
+    // would feed itself a shrinking number every pass.
     function fit(){
-      var h = slides[i].getBoundingClientRect().height;
+      var h = slides[i].offsetHeight;
+      // Below 721 the neighbours are shoved 84% aside and blurred to nothing —
+      // letting a tall one set the height there parked the arrows 600px under a
+      // short card. Only count them where they actually peek.
+      if (matchMedia("(min-width: 721px)").matches){
+        [prevOf(i), nextOf(i)].forEach(function(n){
+          if (n !== i) h = Math.max(h, slides[n].offsetHeight * SIDE_SPAN);
+        });
+      }
       if (h) stage.style.height = h + "px";
     }
 
+    function prevOf(n){ return (n - 1 + slides.length) % slides.length; }
+    function nextOf(n){ return (n + 1) % slides.length; }
+
     function show(next){
       i = (next + slides.length) % slides.length;
+      var p = prevOf(i), nx = nextOf(i);
       slides.forEach(function(s, n){
         var on = n === i;
+        // with only two cards, prev and next are the same one — let next win so
+        // it does not get both transforms and land at translateX(0)
+        var isNext = !on && n === nx;
+        var isPrev = !on && !isNext && n === p;
         s.classList.toggle("on", on);
-        // hide the inactive ones from assistive tech, or all four are read out
+        s.classList.toggle("next", isNext);
+        s.classList.toggle("prev", isPrev);
+        s.classList.toggle("side", isPrev || isNext);
+        // the ones behind are decoration; a screen reader reads the active card
         if (on) s.removeAttribute("aria-hidden");
         else s.setAttribute("aria-hidden", "true");
       });
@@ -164,29 +193,71 @@
       fit();
     }
 
+    /* The timer runs continuously and SKIPS ticks while paused, rather than
+       being stopped and restarted by pointer events.
+
+       This is not a style preference. show() mutates the DOM under the pointer,
+       and the browser answers with a storm of synthetic pointerleave/enter on
+       the box — the trailing "enter" landed after go() had already restarted
+       the timer, set held = true and killed it. Auto-advance then never came
+       back until you moved the mouse right out of the section. Deriving the
+       state on each tick cannot be fooled by that, because there is nothing to
+       get out of sync. */
+    var canHover = matchMedia("(hover: hover)").matches;
+    // :focus-visible, NOT :focus-within / activeElement. Clicking an arrow with
+    // a mouse focuses the button, and holding on that meant auto-advance never
+    // came back after a single click. focus-visible is the keyboard case only,
+    // which is the one that actually needs holding.
+    var FOCUS_SEL = ":focus-visible";
+    try { document.querySelector(FOCUS_SEL); } catch (e) { FOCUS_SEL = null; }
+
+    function paused(){
+      if (document.hidden || dragging) return true;
+      // :hover sticks after a tap on touch platforms, so only trust it where
+      // the device genuinely hovers — dragging already covers swipe
+      if (canHover && box.matches(":hover")) return true;
+      return !!(FOCUS_SEL && box.querySelector(FOCUS_SEL));
+    }
     function stop(){ if (tick) { clearInterval(tick); tick = 0; } }
     function start(){
-      if (reduced || held || tick) return;
-      tick = setInterval(function(){
-        if (document.hidden) return;
-        show(i + 1);
-      }, DWELL);
+      if (reduced || tick) return;
+      tick = setInterval(function(){ if (!paused()) show(i + 1); }, DWELL);
       timers.push(tick);
     }
-    // any manual move restarts the dwell, so a click never leaves you with
-    // 200ms before it jumps again
+    // a manual move gets a full dwell, so a click never leaves you 200ms before
+    // it jumps again
     function go(step){ show(i + step); stop(); start(); }
 
     box.querySelectorAll(".qbtn").forEach(function(b){
       on(b, "click", function(){ go(parseInt(b.getAttribute("data-step"), 10)); });
     });
-    on(box, "pointerenter", function(){ held = true;  stop(); });
-    on(box, "pointerleave", function(){ held = false; start(); });
-    on(box, "focusin",      function(){ held = true;  stop(); });
-    on(box, "focusout",     function(){
-      if (!box.contains(document.activeElement)) { held = false; start(); }
-    });
-    on(document, "visibilitychange", function(){ if (document.hidden) stop(); else start(); });
+
+    /* Swipe / drag, so the deck can be moved by hand whenever the reader wants
+       rather than only by the arrows. touch-action:pan-y on the viewport gives
+       us the horizontal axis and leaves the vertical one to the page, so a
+       normal downward scroll through the section is never intercepted. */
+    (function(){
+      var view = box.querySelector(".qviewport");
+      if (!view) return;
+      var x0 = 0, y0 = 0, id = null;
+      var THRESHOLD = 45;
+
+      on(view, "pointerdown", function(e){
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        id = e.pointerId; x0 = e.clientX; y0 = e.clientY;
+        dragging = true;                           // don't advance mid-drag
+      });
+      on(view, "pointerup", function(e){
+        if (id === null || e.pointerId !== id) return;
+        var dx = e.clientX - x0, dy = e.clientY - y0;
+        id = null;
+        dragging = false;
+        // only act on a mostly-horizontal move, or a vertical flick that
+        // happens to drift sideways would flip the card
+        if (Math.abs(dx) > THRESHOLD && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1);
+      });
+      on(view, "pointercancel", function(){ id = null; dragging = false; });
+    })();
 
     // a reflow changes every slide's height, so re-fit rather than keep a stale
     // pixel value; webfonts landing late do the same thing
