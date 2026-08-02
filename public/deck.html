@@ -15,10 +15,34 @@
     --line:#26262A; --panel:#141416;
   }
   *{box-sizing:border-box; margin:0; padding:0}
-  html{scroll-behavior:smooth}
+  html,body{height:100%; overflow:hidden}
   body{background:var(--ink); color:var(--paper);
     font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased;
-    line-height:1.55; overflow-x:hidden}
+    line-height:1.55}
+
+  /* Deck: one slide visible at a time, press/click/arrow/swipe to advance. */
+  .slides{height:100%; position:relative}
+  section{position:absolute; inset:0; opacity:0; visibility:hidden;
+    transition:opacity .32s ease; pointer-events:none; overflow-y:auto}
+  section.active{opacity:1; visibility:visible; pointer-events:auto}
+
+  /* progress + controls */
+  .dots{position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
+    z-index:30; display:flex; gap:10px}
+  .dots button{width:9px; height:9px; border:1px solid var(--grey);
+    background:transparent; border-radius:0; padding:0; cursor:pointer;
+    transition:all .2s}
+  .dots button.on{background:var(--yellow); border-color:var(--yellow)}
+  .arrows{position:fixed; bottom:20px; right:7vw; z-index:30; display:flex;
+    gap:8px}
+  .arrows button{font-family:'Space Mono',monospace; font-size:16px;
+    color:var(--grey); background:transparent; border:1px solid var(--line);
+    width:44px; height:44px; cursor:pointer; transition:all .2s}
+  .arrows button:hover{color:var(--yellow); border-color:var(--yellow)}
+  .hint{position:fixed; bottom:28px; left:7vw; z-index:30;
+    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.14em;
+    color:var(--grey)}
+  @media(max-width:640px){.hint{display:none} .arrows{right:5vw}}
   .anton{font-family:Anton,Impact,sans-serif; font-weight:400;
     line-height:.92; letter-spacing:-.01em; text-transform:uppercase}
   .mono{font-family:'Space Mono',monospace; text-transform:uppercase;
@@ -26,9 +50,9 @@
   .yellow{color:var(--yellow)}
   a{color:inherit}
 
-  section{min-height:100vh; padding:9vh 7vw; display:flex; flex-direction:column;
-    justify-content:center; border-bottom:1px solid var(--line); position:relative}
-  @media(max-width:640px){section{padding:8vh 7vw; min-height:auto}}
+  section{padding:11vh 7vw; display:flex; flex-direction:column;
+    justify-content:center}
+  @media(max-width:640px){section{padding:12vh 7vw 16vh; justify-content:flex-start}}
 
   .eyebrow{display:flex; gap:14px; align-items:center; margin-bottom:34px}
   .eyebrow .n{color:var(--yellow)}
@@ -95,6 +119,7 @@
 
 <div class="tag"><span class="b">CALLSHEET</span><span>HMNTY STUDIOS · SAN DIEGO</span></div>
 
+<div class="slides">
 <!-- COVER -->
 <section>
   <p class="mono" style="margin-bottom:26px">The story · August 2026</p>
@@ -194,10 +219,73 @@
   <p class="body"><span class="yellow">How we set them up:</span> every one of those is a button, not a build. Human moderation, org verification, the full hiring pipeline, honest AI, uploads, and a recorded legal surface are already shipped and documented. The team inherits a working product with real users on it, not a prototype.</p>
 </section>
 
-<div class="foot">
-  <span class="brand">CALLSHEET</span>
-  <span class="mono">HMNTY Studios · dignified jobs in the creative economy · San Diego</span>
+<!-- CLOSE -->
+<section>
+  <div class="eyebrow"><span class="mono n">✦</span><span class="mono">Callsheet</span></div>
+  <h2 class="anton">Dignified jobs<br>in the creative<br><span class="yellow">economy.</span></h2>
+  <p class="body" style="margin-top:26px">A working product, real users on it, built for the people breaking in.</p>
+  <p class="mono" style="margin-top:40px">HMNTY Studios · San Diego · 2026</p>
+</section>
+</div><!-- /.slides -->
+
+<div class="hint">← → or click / space to advance</div>
+<div class="dots" id="dots"></div>
+<div class="arrows">
+  <button id="prev" aria-label="previous slide">←</button>
+  <button id="next" aria-label="next slide">→</button>
 </div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slides > section'));
+  var dotsWrap = document.getElementById('dots');
+  var i = 0;
+  slides.forEach(function(_, n){
+    var b = document.createElement('button');
+    b.setAttribute('aria-label','slide '+(n+1));
+    b.addEventListener('click', function(e){ e.stopPropagation(); go(n); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+  function render(){
+    slides.forEach(function(s,n){ s.classList.toggle('active', n===i); });
+    dots.forEach(function(d,n){ d.classList.toggle('on', n===i); });
+    if(slides[i]) slides[i].scrollTop = 0;
+    location.hash = 'slide-' + (i+1);
+  }
+  function go(n){ i = Math.max(0, Math.min(slides.length-1, n)); render(); }
+  function next(){ if(i < slides.length-1) go(i+1); }
+  function prev(){ if(i > 0) go(i-1); }
+
+  document.getElementById('next').addEventListener('click', function(e){ e.stopPropagation(); next(); });
+  document.getElementById('prev').addEventListener('click', function(e){ e.stopPropagation(); prev(); });
+
+  // click anywhere advances (right half = next, left third = prev); links/buttons excluded
+  document.addEventListener('click', function(e){
+    if(e.target.closest('a,button')) return;
+    var x = e.clientX / window.innerWidth;
+    if(x < 0.28) prev(); else next();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight' || e.key===' ' || e.key==='PageDown'){ e.preventDefault(); next(); }
+    if(e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); prev(); }
+    if(e.key==='Home') go(0);
+    if(e.key==='End') go(slides.length-1);
+  });
+  // swipe on touch
+  var sx=0;
+  document.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - sx;
+    if(Math.abs(dx) > 50){ if(dx < 0) next(); else prev(); }
+  }, {passive:true});
+
+  // deep-link support (#slide-N)
+  var m = (location.hash.match(/slide-(\d+)/));
+  if(m){ i = Math.max(0, Math.min(slides.length-1, parseInt(m[1],10)-1)); }
+  render();
+})();
+</script>
 
 </body>
 </html>
