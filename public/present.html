@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Callsheet — presenter</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#0B0B0C;--paper:#FFF;--yellow:#fddb32;--grey:#8A8A8E;--line:#26262A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  body{background:var(--ink);color:var(--paper);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .anton{font-family:Anton,Impact,sans-serif;font-weight:400;line-height:.9;letter-spacing:-.01em;text-transform:uppercase}
+  .mono{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.16em;color:var(--grey)}
+  .y{color:var(--yellow)}
+
+  .slides{height:100%;position:relative}
+  section{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .25s ease;
+    pointer-events:none;display:flex;flex-direction:column;justify-content:center;
+    padding:8vh 7vw;overflow-y:auto}
+  section.active{opacity:1;visibility:visible;pointer-events:auto}
+
+  .tag{margin-bottom:5vh;font-size:clamp(13px,1.5vw,17px)}
+  .tag .t{color:var(--grey)}
+  h1{font-size:clamp(52px,10.5vw,150px)}
+  .big{font-size:clamp(40px,8vw,118px)}
+  .mid{font-size:clamp(30px,5.5vw,74px)}
+  ul{list-style:none;margin-top:4vh;display:flex;flex-direction:column;gap:2.4vh}
+  li{font-family:Anton,sans-serif;text-transform:uppercase;letter-spacing:-.005em;
+    line-height:1;font-size:clamp(26px,5vw,62px);color:#EDEDEF}
+  li .d{color:var(--yellow);margin-right:.4em}
+  .lead{margin-top:5vh;font-size:clamp(22px,3.4vw,44px);line-height:1.15;max-width:20ch;color:#EDEDEF}
+  .quote{font-size:clamp(34px,6.6vw,92px);line-height:1.05;max-width:16ch}
+
+  .bar{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;align-items:center;
+    justify-content:space-between;padding:14px 7vw;font-family:'Space Mono',monospace;
+    font-size:11px;letter-spacing:.14em;color:var(--grey)}
+  .dots{display:flex;gap:7px}
+  .dots i{width:8px;height:8px;background:transparent;border:1px solid var(--grey);display:block}
+  .dots i.on{background:var(--yellow);border-color:var(--yellow)}
+  .arrows button{font-family:'Space Mono',monospace;font-size:15px;color:var(--grey);
+    background:transparent;border:1px solid var(--line);width:42px;height:42px;cursor:pointer;margin-left:6px}
+  .arrows button:hover{color:var(--yellow);border-color:var(--yellow)}
+</style>
+</head>
+<body>
+<div class="slides">
+
+<!-- ===== 1. MISSION & PEOPLE ===== -->
+<section>
+  <p class="tag"><span class="y">01 · MISSION</span> <span class="t">&nbsp; ~1 min</span></p>
+  <h1 class="anton">We're<br>HMNTY<br><span class="y">Studios.</span></h1>
+  <p class="lead">We make creative hiring more human.</p>
+</section>
+
+<section>
+  <p class="tag"><span class="y">01 · THE PROBLEM</span></p>
+  <ul>
+    <li><span class="d">→</span>Breaking in is brutal</li>
+    <li><span class="d">→</span>It's who you know</li>
+    <li><span class="d">→</span>Resumes &amp; schools beat talent</li>
+    <li><span class="d">→</span>Great work never gets seen</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">01 · WHY WE KNOW</span></p>
+  <ul>
+    <li><span class="d">→</span>We talked to both sides</li>
+    <li><span class="d">→</span>Businesses can't find talent</li>
+    <li><span class="d">→</span>Creatives can't get noticed</li>
+    <li><span class="d">→</span>Same story every time</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">01 · PERSONAL</span></p>
+  <ul>
+    <li><span class="d">→</span>I come from events</li>
+    <li><span class="d">→</span>COVID killed the work overnight</li>
+    <li><span class="d">→</span>I watched it happen</li>
+    <li><span class="d">→</span>That's why this matters to me</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">01 → 02</span></p>
+  <p class="quote anton">What if hiring started with the <span class="y">work?</span></p>
+</section>
+
+<!-- ===== 2. WHAT WE BUILT ===== -->
+<section>
+  <p class="tag"><span class="y">02 · WHAT WE BUILT</span> <span class="t">&nbsp; ~2 min</span></p>
+  <h1 class="anton"><span class="y">Callsheet.</span></h1>
+  <p class="lead">Talent meets businesses. Lead with the work, not the resume.</p>
+</section>
+
+<section>
+  <p class="tag"><span class="y">02 · CREATIVES</span></p>
+  <ul>
+    <li><span class="d">→</span>One profile</li>
+    <li><span class="d">→</span>10-second intro + real work</li>
+    <li><span class="d">→</span>Straight from your phone</li>
+    <li><span class="d">→</span>Personality speaks first</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">02 · BUSINESSES</span></p>
+  <ul>
+    <li><span class="d">→</span>Describe the project</li>
+    <li><span class="d">→</span>Claude ranks a shortlist</li>
+    <li><span class="d">→</span>React to reels first</li>
+    <li><span class="d">→</span>Names come after. Bias gone.</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">02 · THE AI</span></p>
+  <p class="big anton">AI recommends.<br>AI explains.<br><span class="y">AI never decides.</span></p>
+</section>
+
+<section>
+  <p class="tag"><span class="y">02 · ADMIN</span></p>
+  <ul>
+    <li><span class="d">→</span>A person reviews everything</li>
+    <li><span class="d">→</span>Approve · moderate · quality</li>
+    <li><span class="d">→</span>Building a real community</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">02 · HUMAN FIRST</span></p>
+  <p class="big anton">Not an AI hiring platform.<br>A <span class="y">human</span> one<br>that uses AI.</p>
+</section>
+
+<section>
+  <p class="tag"><span class="y">02 → 03</span></p>
+  <p class="quote anton">But did anyone <span class="y">want it?</span></p>
+</section>
+
+<!-- ===== 3. TRACTION ===== -->
+<section>
+  <p class="tag"><span class="y">03 · TRACTION</span> <span class="t">&nbsp; ~1 min</span></p>
+  <ul>
+    <li><span class="d">→</span>We validated before building</li>
+    <li><span class="d">→</span>Both sides. Real conversations.</li>
+    <li><span class="d">→</span>Testimonials throughout</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">03 · TODAY</span></p>
+  <h1 class="anton"><span class="y">20</span> users.<br>2 agencies.</h1>
+  <p class="lead">Every big decision came from real feedback, not guessing.</p>
+</section>
+
+<!-- ===== 4. LEARNED & NEXT ===== -->
+<section>
+  <p class="tag"><span class="y">04 · THE LESSON</span> <span class="t">&nbsp; ~1 min</span></p>
+  <p class="big anton">Nobody wants another job board.<br>They want <span class="y">trust.</span></p>
+</section>
+
+<section>
+  <p class="tag"><span class="y">04 · WHAT WE WON'T DO</span></p>
+  <ul>
+    <li><span class="d">→</span>Won't automate hiring</li>
+    <li><span class="d">→</span>Won't remove the human</li>
+    <li><span class="d">→</span>AI assists. People decide.</li>
+  </ul>
+</section>
+
+<section>
+  <p class="tag"><span class="y">04 · NEXT 30 DAYS</span></p>
+  <ul>
+    <li><span class="d">→</span>Grow both sides</li>
+    <li><span class="d">→</span>Agencies · production · freelancers</li>
+    <li><span class="d">→</span>Students · creative communities</li>
+    <li><span class="d">→</span>Learn every single week</li>
+  </ul>
+</section>
+
+<section>
+  <h1 class="anton">Creative hiring,<br>made <span class="y">human.</span></h1>
+  <p class="lead mono" style="margin-top:6vh">Callsheet · HMNTY Studios</p>
+</section>
+
+</div>
+
+<div class="bar">
+  <span>← → / click / space</span>
+  <span class="dots" id="dots"></span>
+  <span class="arrows"><button id="prev">←</button><button id="next">→</button></span>
+</div>
+
+<script>
+(function(){
+  var S=[].slice.call(document.querySelectorAll('.slides > section'));
+  var dw=document.getElementById('dots'),i=0;
+  S.forEach(function(_,n){var d=document.createElement('i');d.addEventListener('click',function(e){e.stopPropagation();go(n)});dw.appendChild(d)});
+  var D=[].slice.call(dw.children);
+  function render(){S.forEach(function(s,n){s.classList.toggle('active',n===i)});D.forEach(function(d,n){d.classList.toggle('on',n===i)});if(S[i])S[i].scrollTop=0;location.hash='s'+(i+1)}
+  function go(n){i=Math.max(0,Math.min(S.length-1,n));render()}
+  function nx(){if(i<S.length-1)go(i+1)} function pv(){if(i>0)go(i-1)}
+  document.getElementById('next').addEventListener('click',function(e){e.stopPropagation();nx()});
+  document.getElementById('prev').addEventListener('click',function(e){e.stopPropagation();pv()});
+  document.addEventListener('click',function(e){if(e.target.closest('button,i'))return;(e.clientX/innerWidth<0.28?pv:nx)()});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();nx()}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();pv()}
+    if(e.key==='Home')go(0); if(e.key==='End')go(S.length-1);
+  });
+  var sx=0;document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)(dx<0?nx:pv)()},{passive:true});
+  var m=location.hash.match(/s(\d+)/);if(m)i=Math.max(0,Math.min(S.length-1,parseInt(m[1],10)-1));
+  render();
+})();
+</script>
+</body>
+</html>
