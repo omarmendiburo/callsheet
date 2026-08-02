@@ -93,11 +93,11 @@ export function SignupForm() {
               placeholder="e.g. 100 harbor dr"
             />
           </Field>
-          <Field label="city">
+          <Field label="city or zip">
             <TextInput
               name="city"
-              autoComplete="address-level2"
-              placeholder="san diego"
+              autoComplete="postal-code"
+              placeholder="92101"
               required
             />
           </Field>

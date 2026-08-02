@@ -7,7 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { newId } from "@/lib/id";
 import { isRealMediaUrl, looksVertical } from "@/lib/media";
 import { DISCIPLINES, LEVELS, PROFILE_PROMPTS } from "@/lib/taxonomy";
-import { geocodeCity } from "@/lib/geo";
+import { resolveLocation } from "@/lib/geo";
 import { getProfileByUserId } from "./_data";
 
 /*
@@ -200,10 +200,10 @@ export async function saveBasics(formData: FormData) {
   };
   if (displayName) patch.displayName = displayName;
   if (city && city !== profile.city) {
-    patch.city = city;
-    const geo = geocodeCity(city);
-    patch.lat = geo?.lat ?? null;
-    patch.lng = geo?.lng ?? null;
+    const loc = resolveLocation(city);
+    patch.city = loc.city;
+    patch.lat = loc.lat;
+    patch.lng = loc.lng;
   }
 
   // Availability: "now" and "unavailable" always apply; "from_date" only with

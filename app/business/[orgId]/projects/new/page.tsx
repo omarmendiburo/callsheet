@@ -106,7 +106,7 @@ export default async function NewProjectPage({
           </Field>
         </div>
 
-        <Field label="shooting location (city)">
+        <Field label="shooting location (city or zip)">
           <TextInput name="location" placeholder="san diego" required />
         </Field>
 

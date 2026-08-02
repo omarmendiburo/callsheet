@@ -480,7 +480,7 @@ export default function Flow() {
         n={index + 1}
         total={total}
         title="where are you based?"
-        sub="san diego area is where the work starts."
+        sub="your zip code is easiest. a city name works too."
         onBack={back}
         onNext={advance}
         canAdvance={canAdvance("city")}
@@ -489,8 +489,8 @@ export default function Flow() {
         <AutoInput
           value={city}
           onChange={setCity}
-          placeholder="san diego"
-          autoComplete="address-level2"
+          placeholder="92101"
+          autoComplete="postal-code"
         />
       </Question>,
     );

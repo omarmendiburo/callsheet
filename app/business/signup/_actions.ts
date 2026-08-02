@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { createSession, hashPassword } from "@/lib/auth";
 import { newId } from "@/lib/id";
-import { geocodeCity } from "@/lib/geo";
+import { resolveLocation } from "@/lib/geo";
 import { WORK_TYPES } from "@/lib/taxonomy";
 import { notifyAdminsNewOrg, notifyBusinessWelcome } from "@/lib/notify";
 import { recordAcceptance } from "@/lib/legal";
@@ -75,8 +75,8 @@ export async function signup(
 
   const userId = newId("u");
   const orgId = newId("org");
-  const geo = geocodeCity(city);
-  const fullAddress = address ? `${address}, ${city}` : city;
+  const loc = resolveLocation(city);
+  const fullAddress = address ? `${address}, ${loc.city}` : loc.city;
 
   await db.insert(schema.users).values({
     id: userId,
@@ -92,8 +92,8 @@ export async function signup(
     name: orgName,
     ein,
     address: fullAddress,
-    lat: geo?.lat,
-    lng: geo?.lng,
+    lat: loc.lat,
+    lng: loc.lng,
     workTypes,
     website,
     verified: false,

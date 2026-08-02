@@ -416,10 +416,10 @@ export default async function OnboardingPage({
                   defaultValue={profile.displayName}
                 />
               </Field>
-              <Field label="city">
+              <Field label="city or zip">
                 <TextInput
                   name="city"
-                  autoComplete="address-level2"
+                  autoComplete="postal-code"
                   defaultValue={profile.city}
                 />
               </Field>

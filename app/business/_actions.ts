@@ -11,7 +11,7 @@ import {
   notifyTalentApplicationStatus,
 } from "@/lib/notify";
 import { newId } from "@/lib/id";
-import { geocodeCity } from "@/lib/geo";
+import { resolveLocation } from "@/lib/geo";
 import { DISCIPLINES, LEVELS, PROJECT_TYPES } from "@/lib/taxonomy";
 
 /*
@@ -126,7 +126,7 @@ export async function createProject(formData: FormData) {
   if (rolesNeeded.length === 0) err("roles");
   if (start && end && end < start) err("timeline");
 
-  const geo = geocodeCity(location);
+  const loc = resolveLocation(location);
   const projectId = newId("p");
 
   const db = await getDb();
@@ -138,9 +138,9 @@ export async function createProject(formData: FormData) {
     description: description ? description.slice(0, 4000) : null,
     timelineStart: start,
     timelineEnd: end,
-    location,
-    lat: geo?.lat,
-    lng: geo?.lng,
+    location: loc.city,
+    lat: loc.lat,
+    lng: loc.lng,
     remoteOk,
     dayRateOnset: null,
     hourlyPostprod: null,

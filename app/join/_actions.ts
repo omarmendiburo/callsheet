@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { createSession, hashPassword } from "@/lib/auth";
 import { newId } from "@/lib/id";
-import { geocodeCity } from "@/lib/geo";
+import { resolveLocation } from "@/lib/geo";
 import { DISCIPLINES, LEVELS } from "@/lib/taxonomy";
 import { notifyTalentWelcome } from "@/lib/notify";
 import { recordAcceptance } from "@/lib/legal";
@@ -78,7 +78,7 @@ export async function join(
 
   const userId = newId("u");
   const talentId = newId("t");
-  const geo = geocodeCity(city);
+  const loc = resolveLocation(city);
 
   await db.insert(schema.users).values({
     id: userId,
@@ -93,9 +93,9 @@ export async function join(
     id: talentId,
     userId,
     displayName: name,
-    city,
-    lat: geo?.lat,
-    lng: geo?.lng,
+    city: loc.city,
+    lat: loc.lat,
+    lng: loc.lng,
     willingToTravel: travel,
     travelRadiusMiles: radius,
     isPlaceholder: false,
