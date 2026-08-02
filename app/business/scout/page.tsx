@@ -18,6 +18,9 @@ import {
 } from "@/components/marketplace/filters";
 import { ChipLink } from "@/components/marketplace/FilterRow";
 import { resolveScoutOrg } from "./_org";
+import { rankTalentForProject } from "@/lib/ai/match";
+import { recruiterSearch } from "@/lib/ai/recruiter";
+import type { Match } from "@/lib/ai/types";
 
 /*
  * §5.4 talent scouting. A masonry wall of creatives who have APPROVED work,
@@ -118,6 +121,40 @@ export default async function ScoutPage({
     c.media.find((m) => m.kind === "reel" || m.kind === "shortform") ??
     c.media[0];
 
+  /*
+   * AI layer (spec §8) — suggestion, never a verdict. A recruiter query (?q=)
+   * or the "suggested order" toggle (?rank=1 with a project selected) ranks
+   * the wall and annotates each card with a score + written why. Low scores
+   * rank low; nobody disappears. The engine label is honest about which
+   * engine produced the ordering.
+   */
+  const q = one(params, "q")?.trim() ?? "";
+  const rankActive = one(params, "rank") === "1" && Boolean(selectedProject);
+
+  let aiNotes: Map<string, Match> | null = null;
+  let aiHeading: string | null = null;
+  let aiEngine: string | null = null;
+
+  if (q) {
+    const rr = await recruiterSearch(q);
+    aiNotes = new Map(rr.results.map((m) => [m.talentId, m]));
+    aiHeading = rr.explanation;
+    aiEngine = rr.engineUsed;
+  } else if (rankActive && selectedProject) {
+    const ranked = await rankTalentForProject(selectedProject.id);
+    aiNotes = new Map(ranked.map((m) => [m.talentId, m]));
+    aiHeading = `Suggested order for "${selectedProject.title}". You decide.`;
+    aiEngine = ranked[0]?.engine ?? "heuristic";
+  }
+
+  const ordered = aiNotes
+    ? [...filtered].sort(
+        (a, b) =>
+          (aiNotes.get(b.talentId)?.score ?? -1) -
+          (aiNotes.get(a.talentId)?.score ?? -1),
+      )
+    : filtered;
+
   const anyFilter = Boolean(
     fDiscipline ||
       fLevel ||
@@ -147,6 +184,25 @@ export default async function ScoutPage({
       <div className="mt-8">
         <Rule />
       </div>
+
+      {/* Creative Recruiter — plain-English search, reasoning shown back. */}
+      <form action={BASE} method="get" className="mt-6 flex items-end gap-3">
+        {orgParam ? <input type="hidden" name="org" value={org.id} /> : null}
+        <label className="flex-1">
+          <span className="fact-secondary mb-2 block">
+            describe the hire in plain english
+          </span>
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="documentary dp in san diego under $700 a day"
+            className="w-full border border-rule bg-transparent px-3 py-3 text-[15px] placeholder:lowercase placeholder:text-secondary focus:border-ink focus:outline-none"
+          />
+        </label>
+        <button type="submit" className="fact shrink-0 border border-ink px-4 py-3 transition-opacity duration-150 hover:opacity-70">
+          ask
+        </button>
+      </form>
 
       <section className="mt-6 flex flex-col gap-4">
         <FilterRow
@@ -221,6 +277,14 @@ export default async function ScoutPage({
             >
               certified only
             </ChipLink>
+            {selectedProject ? (
+              <ChipLink
+                href={toggleHref(BASE, params, "rank", "1", rankActive)}
+                active={rankActive}
+              >
+                suggested order
+              </ChipLink>
+            ) : null}
           </div>
         </div>
 
@@ -240,6 +304,19 @@ export default async function ScoutPage({
         <Rule />
       </div>
 
+      {aiHeading ? (
+        <div className="mt-6 border-l border-ink pl-4">
+          <p className="text-[15px] leading-relaxed">{aiHeading}</p>
+          <p className="fact-secondary mt-1">
+            engine: {aiEngine}
+            {aiEngine === "heuristic"
+              ? " · claude activates when the api key lands"
+              : ""}
+            {" · a suggestion, not a verdict"}
+          </p>
+        </div>
+      ) : null}
+
       <p className="fact-secondary mt-6">
         {filtered.length} {filtered.length === 1 ? "creative" : "creatives"}
       </p>
@@ -257,9 +334,19 @@ export default async function ScoutPage({
         </p>
       ) : (
         <div className="mt-6 columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4 [&>*]:mb-4">
-          {filtered.map((c) => (
-            <WorkCard key={c.talentId} creative={c} media={cardMedia(c)} />
-          ))}
+          {ordered.map((c) => {
+            const note = aiNotes?.get(c.talentId);
+            return (
+              <div key={c.talentId} className="break-inside-avoid">
+                <WorkCard creative={c} media={cardMedia(c)} />
+                {note ? (
+                  <p className="fact-secondary mt-1 normal-case tracking-normal">
+                    [{note.score}] {note.rationale}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       )}
     </main>
