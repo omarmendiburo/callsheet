@@ -7,9 +7,11 @@ import { MediaFrame } from "@/components/media";
 import { FilterRow } from "@/components/marketplace/FilterRow";
 import {
   getBrowsePool,
+  getOrgTrackForTalent,
   type BrowseCreative,
 } from "@/components/marketplace/_data";
 import { one } from "@/components/marketplace/filters";
+import { trackTalent } from "../_actions";
 import { resolveScoutOrg } from "../_org";
 import { ReelKeys } from "./ReelKeys";
 
@@ -61,6 +63,12 @@ export default async function ReelsPage({
   const frame =
     creative?.media.find((m) => m.kind === "reel" || m.kind === "shortform") ??
     creative?.media[0];
+
+  // Scouting-tracker state for the creative on screen (name-blind: the state
+  // never introduces a name; it just says whether eyes are already on them).
+  const track = creative
+    ? await getOrgTrackForTalent(org.id, creative.talentId)
+    : null;
 
   const common = { org: orgParam ? org.id : undefined, discipline: fDiscipline };
   const prevHref = withParams(BASE, { ...common, i: String(i - 1) });
@@ -168,6 +176,41 @@ export default async function ReelsPage({
             <Link className="fact underline underline-offset-4" href={nextHref}>
               next →
             </Link>
+          </div>
+
+          {/* Scouting tracker — no name, just whether eyes are on them. */}
+          <div className="mx-auto mt-6 w-full max-w-3xl text-center">
+            {track ? (
+              <p>
+                <span className="fact border border-ink px-2 py-1.5">
+                  tracking · {track.status}
+                </span>
+                <Link
+                  className="fact-secondary ml-4 underline underline-offset-4"
+                  href={withParams("/business/crm", { org: common.org })}
+                >
+                  manage in crm
+                </Link>
+              </p>
+            ) : (
+              <form action={trackTalent}>
+                <input
+                  type="hidden"
+                  name="talentId"
+                  value={creative.talentId}
+                />
+                <input type="hidden" name="orgId" value={org.id} />
+                <button
+                  type="submit"
+                  className="fact underline underline-offset-4"
+                >
+                  track this creative
+                </button>
+                <span className="fact-secondary ml-3">
+                  adds them to your scouting list
+                </span>
+              </form>
+            )}
           </div>
         </section>
       )}

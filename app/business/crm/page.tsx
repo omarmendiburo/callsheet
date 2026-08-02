@@ -1,26 +1,39 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { Rule } from "@/components/ui";
+import { getOpenProjectsForOrg } from "@/components/marketplace/_data";
 import { transitionApplication } from "../_actions";
+import {
+  advanceTrack,
+  inviteTrackedToProject,
+  removeTrack,
+} from "../scout/_actions";
 import { resolveScoutOrg } from "../scout/_org";
 import {
   getOrgPipeline,
+  getOrgTracks,
   projectsInPipeline,
   type PipelineRow,
   type PipelineStatus,
+  type TrackRow,
+  type TrackStatus,
 } from "./_data";
 
 /*
- * The CRM view (spec §5) — the org's whole talent pipeline in one place. Every
- * application across every project the org owns, grouped into ruled status
- * bands (NOT kanban columns; this design language is bands). applied → viewed
- * → shortlisted → booked, then a collapsed declined band. Each row offers the
- * legal next transition(s) via the EXISTING transitionApplication action —
- * advancing a row moves it to the next band on the next render.
+ * The CRM view (spec §5 + owner's call 2026-08-01) — two band-sets:
  *
+ *   SCOUTING (top): the org's private watchlist over the pool. watching →
+ *   contacted → invited; invite creates/updates the real application row to
+ *   "shortlisted", so an invited creative appears in the inbound set too.
+ *
+ *   INBOUND (below): every application across every project the org owns.
+ *   applied → viewed → shortlisted → booked, then a collapsed declined band.
+ *
+ * Ruled status bands, NOT kanban columns; this design language is bands.
  * Isolation: single gate is resolveScoutOrg (membership in ?org or the sole
- * org), then getOrgPipeline filters to projects owned by that org. A member of
- * one org can never see another org's applicants.
+ * org); getOrgPipeline and getOrgTracks filter by that orgId. A member of one
+ * org can never see another org's applicants or watchlist. Names are correct
+ * on this surface; the wall stays name-blind.
  */
 
 const BASE = "/business/crm";
@@ -42,6 +55,33 @@ const FORWARD: Record<string, { target: PipelineStatus; label: string } | null> 
     booked: null,
     declined: null,
   };
+
+/* Scouting bands, in tracker order. */
+const TRACK_BANDS: { status: TrackStatus; label: string }[] = [
+  { status: "watching", label: "watching" },
+  { status: "contacted", label: "contacted" },
+  { status: "invited", label: "invited" },
+];
+
+/* "open to work" / "booked til Sep 12" / "unavailable" from the profile's
+ * availability facts. Honest availability, mockup vocabulary. */
+function availabilityFact(row: TrackRow): string {
+  if (row.availability === "now") return "open to work";
+  if (row.availability === "from_date") {
+    if (!row.availableFrom) return "avail. soon";
+    const d =
+      typeof row.availableFrom === "string"
+        ? new Date(row.availableFrom)
+        : row.availableFrom;
+    if (Number.isNaN(d.getTime())) return "avail. soon";
+    const label = d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+    return `booked til ${label}`;
+  }
+  return "unavailable";
+}
 
 function one(
   params: Record<string, string | string[] | undefined>,
@@ -111,8 +151,13 @@ export default async function CrmPage({
     (o) => o.org.id === org.id && (o.role === "owner" || o.role === "manager"),
   );
 
-  const all = await getOrgPipeline(org.id);
+  const [all, tracks, openProjects] = await Promise.all([
+    getOrgPipeline(org.id),
+    getOrgTracks(org.id),
+    getOpenProjectsForOrg(org.id),
+  ]);
   const projects = projectsInPipeline(all);
+  const inviteTargets = openProjects.map((p) => ({ id: p.id, title: p.title }));
 
   const fProject = one(params, "project");
   const showDeclined = one(params, "declined") === "1";
@@ -132,10 +177,69 @@ export default async function CrmPage({
 
       <h1 className="headline mt-4 text-4xl sm:text-5xl">The pipeline.</h1>
       <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
-        Every application to this org, from applied to booked, in one place. The
-        work is browsed without names; here they have names, because they came
-        to you. Move a row forward, or let it go.
+        Two lists, one desk. Scouting is the pool you are building: creatives
+        you tracked from the wall, moved from watching to contacted to invited.
+        Inbound is every application to your projects, applied to booked. Names
+        live here; the wall stays name-blind.
       </p>
+
+      {/* ---------- BAND-SET 1 — SCOUTING (the watchlist) ---------- */}
+      <section className="mt-10">
+        <h2 className="fact">scouting · {tracks.length}</h2>
+        <div className="mt-4">
+          <Rule />
+        </div>
+        {tracks.length === 0 ? (
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-secondary">
+            Nobody tracked yet. Open the{" "}
+            <Link
+              className="text-ink underline underline-offset-4"
+              href={withOrg("/business/scout", orgParam)}
+            >
+              wall
+            </Link>{" "}
+            or the{" "}
+            <Link
+              className="text-ink underline underline-offset-4"
+              href={withOrg("/business/scout/reels", orgParam)}
+            >
+              reels view
+            </Link>{" "}
+            and track the creatives you want to keep eyes on.
+          </p>
+        ) : (
+          <div className="mt-6 flex flex-col gap-10">
+            {TRACK_BANDS.map(({ status, label }) => {
+              const band = tracks.filter((t) => t.status === status);
+              return (
+                <Band key={status} label={label} count={band.length}>
+                  {band.length === 0 ? (
+                    <p className="fact-secondary py-4">nobody here yet.</p>
+                  ) : (
+                    <ul className="flex flex-col divide-y divide-rule border-t border-b border-rule">
+                      {band.map((t) => (
+                        <TrackItem
+                          key={t.trackId}
+                          row={t}
+                          orgId={org.id}
+                          orgParam={orgParam}
+                          canManage={canManage}
+                          inviteTargets={inviteTargets}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </Band>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* ---------- BAND-SET 2 — INBOUND (applications) ---------- */}
+      <div className="mt-12">
+        <h2 className="fact">inbound · {all.length}</h2>
+      </div>
 
       {/* Booked is the celebration state — plain, per DESIGN voice. */}
       {booked.length > 0 ? (
@@ -376,6 +480,112 @@ function PipelineItem({
         >
           view profile
         </Link>
+      </div>
+    </li>
+  );
+}
+
+/* A scouting row: name, facts (disciplines · city · availability · rate),
+ * the note, then text-link actions. Invite is a plain GET-free form: a select
+ * of open projects + a text button — no client JS, same as every other
+ * mutation on this page. */
+function TrackItem({
+  row,
+  orgId,
+  orgParam,
+  canManage,
+  inviteTargets,
+}: {
+  row: TrackRow;
+  orgId: string;
+  orgParam?: string;
+  canManage: boolean;
+  inviteTargets: { id: string; title: string }[];
+}) {
+  const profileHref = withOrg(`/business/scout/${row.talentId}`, orgParam);
+  const facts = [
+    row.disciplines.length > 0 ? row.disciplines.slice(0, 3).join(" · ") : null,
+    row.city,
+    availabilityFact(row),
+    row.dayRate != null ? `$${row.dayRate}` : null,
+  ]
+    .filter(Boolean)
+    .join("  ·  ");
+
+  return (
+    <li className="flex flex-col gap-3 py-4">
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="text-[15px]">{row.displayName}</span>
+        <span className="fact-secondary shrink-0">{daysAgo(row.createdAt)}</span>
+      </div>
+
+      <p className="fact-secondary">{facts}</p>
+
+      {row.note ? (
+        <p className="max-w-2xl text-[15px] leading-relaxed">{row.note}</p>
+      ) : null}
+
+      <div className="mt-1 flex flex-wrap items-center gap-x-6 gap-y-3">
+        {canManage && row.status === "watching" ? (
+          <form action={advanceTrack}>
+            <input type="hidden" name="trackId" value={row.trackId} />
+            <input type="hidden" name="orgId" value={orgId} />
+            <button type="submit" className="fact underline underline-offset-4">
+              mark contacted
+            </button>
+          </form>
+        ) : null}
+
+        {canManage && row.status !== "invited" ? (
+          inviteTargets.length > 0 ? (
+            <form
+              action={inviteTrackedToProject}
+              className="flex flex-wrap items-center gap-3"
+            >
+              <input type="hidden" name="trackId" value={row.trackId} />
+              <input type="hidden" name="orgId" value={orgId} />
+              <select
+                name="projectId"
+                defaultValue={inviteTargets[0].id}
+                className="fact-secondary border border-rule bg-transparent px-2 py-1.5 focus:border-ink focus:outline-none"
+              >
+                {inviteTargets.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.title.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                className="fact underline underline-offset-4"
+              >
+                invite to project
+              </button>
+            </form>
+          ) : (
+            <span className="fact-secondary">no open project to invite to</span>
+          )
+        ) : null}
+
+        <Link
+          className="fact-secondary underline underline-offset-4"
+          href={profileHref}
+        >
+          view profile
+        </Link>
+
+        {canManage ? (
+          <form action={removeTrack}>
+            <input type="hidden" name="trackId" value={row.trackId} />
+            <input type="hidden" name="orgId" value={orgId} />
+            <button
+              type="submit"
+              className="fact-secondary underline underline-offset-4"
+            >
+              stop tracking
+            </button>
+          </form>
+        ) : null}
       </div>
     </li>
   );

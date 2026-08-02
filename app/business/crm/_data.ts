@@ -106,6 +106,78 @@ export async function getOrgPipeline(orgId: string): Promise<PipelineRow[]> {
   );
 }
 
+/* ---- Scouting tracker (owner's call 2026-08-01) ---- */
+
+export type TrackStatus =
+  (typeof schema.talentTracks.status.enumValues)[number];
+
+export type TrackRow = {
+  trackId: string;
+  status: TrackStatus;
+  note: string | null;
+  createdAt: Date;
+  talentId: string;
+  displayName: string;
+  isPlaceholder: boolean;
+  city: string;
+  availability: string;
+  availableFrom: Date | null;
+  dayRate: number | null;
+  disciplines: string[];
+};
+
+/* The org's private watchlist, newest first. Same isolation shape as the
+ * pipeline: rows only enter through their orgId. Names are correct here. */
+export async function getOrgTracks(orgId: string): Promise<TrackRow[]> {
+  const db = await getDb();
+  const rows = await db
+    .select({
+      trackId: schema.talentTracks.id,
+      status: schema.talentTracks.status,
+      note: schema.talentTracks.note,
+      createdAt: schema.talentTracks.createdAt,
+      talentId: schema.talentProfiles.id,
+      displayName: schema.talentProfiles.displayName,
+      isPlaceholder: schema.talentProfiles.isPlaceholder,
+      city: schema.talentProfiles.city,
+      availability: schema.talentProfiles.availability,
+      availableFrom: schema.talentProfiles.availableFrom,
+      dayRate: schema.talentProfiles.dayRate,
+    })
+    .from(schema.talentTracks)
+    .innerJoin(
+      schema.talentProfiles,
+      eq(schema.talentTracks.talentId, schema.talentProfiles.id),
+    )
+    .where(eq(schema.talentTracks.orgId, orgId))
+    .orderBy(desc(schema.talentTracks.createdAt));
+
+  if (rows.length === 0) return [];
+
+  const talentIds = Array.from(
+    new Set(rows.map((r: { talentId: string }) => r.talentId)),
+  );
+  const discRows = await db
+    .select({
+      talentId: schema.disciplines.talentId,
+      type: schema.disciplines.type,
+    })
+    .from(schema.disciplines)
+    .where(sql`${schema.disciplines.talentId} in ${talentIds}`);
+
+  const byTalent = new Map<string, string[]>();
+  for (const d of discRows as { talentId: string; type: string }[]) {
+    const list = byTalent.get(d.talentId) ?? [];
+    list.push(d.type);
+    byTalent.set(d.talentId, list);
+  }
+
+  return rows.map((r: Omit<TrackRow, "disciplines">) => ({
+    ...r,
+    disciplines: byTalent.get(r.talentId) ?? [],
+  }));
+}
+
 /* The org's projects that have at least one application, for the filter chip
  * row. Newest first (rows already arrive newest-activity first). Derived from
  * the pipeline so the chips only ever offer a project that has rows. */

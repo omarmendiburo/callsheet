@@ -237,6 +237,29 @@ export async function getOrgShortlistForTalent(
   return rows[0] ?? null;
 }
 
+/* The org's scouting-tracker row for one creative, if any — drives the
+ * track/tracked state on the reveal and reels surfaces. Org-scoped read. */
+export async function getOrgTrackForTalent(
+  orgId: string,
+  talentId: string,
+): Promise<{ trackId: string; status: string } | null> {
+  const db = await getDb();
+  const rows = await db
+    .select({
+      trackId: schema.talentTracks.id,
+      status: schema.talentTracks.status,
+    })
+    .from(schema.talentTracks)
+    .where(
+      and(
+        eq(schema.talentTracks.orgId, orgId),
+        eq(schema.talentTracks.talentId, talentId),
+      ),
+    )
+    .limit(1);
+  return rows[0] ?? null;
+}
+
 /* ---- The reveal (scout detail page) -------------------------------------- */
 
 export type RevealCreative = {

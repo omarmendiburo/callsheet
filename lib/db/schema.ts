@@ -221,6 +221,33 @@ export const applications = pgTable(
   ],
 );
 
+export const trackStatus = pgEnum("track_status", [
+  "watching",
+  "contacted",
+  "invited",
+]);
+
+/* Talent scouting tracker (owner's call 2026-08-01, mockup parity): an org's
+ * private watchlist over the pool — who we're watching, who we've contacted,
+ * who we've invited to a project — independent of any inbound application.
+ * One row per org+talent; org-isolated like every business-owned table. */
+export const talentTracks = pgTable(
+  "talent_tracks",
+  {
+    id: text("id").primaryKey(),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => orgs.id),
+    talentId: text("talent_id")
+      .notNull()
+      .references(() => talentProfiles.id),
+    status: trackStatus("status").notNull().default("watching"),
+    note: text("note"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("talent_tracks_org_talent_idx").on(t.orgId, t.talentId)],
+);
+
 export const matches = pgTable("matches", {
   id: text("id").primaryKey(),
   projectId: text("project_id")

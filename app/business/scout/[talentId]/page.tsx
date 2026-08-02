@@ -9,8 +9,10 @@ import {
   getRevealCreative,
   getOpenProjectsForOrg,
   getOrgShortlistForTalent,
+  getOrgTrackForTalent,
 } from "@/components/marketplace/_data";
 import { one } from "@/components/marketplace/filters";
+import { trackTalent } from "../_actions";
 import { resolveScoutOrg } from "../_org";
 
 /*
@@ -79,10 +81,11 @@ export default async function RevealPage({
 
   const org = resolution.org;
 
-  const [reveal, projects, shortlist] = await Promise.all([
+  const [reveal, projects, shortlist, track] = await Promise.all([
     getRevealCreative(talentId),
     getOpenProjectsForOrg(org.id),
     getOrgShortlistForTalent(talentId, org.id),
+    getOrgTrackForTalent(org.id, talentId),
   ]);
 
   // No approved media -> was never on the wall -> not viewable here.
@@ -234,6 +237,43 @@ export default async function RevealPage({
           ) : null}
 
           <div className="mt-8">
+            <Rule />
+          </div>
+
+          {/* Scouting tracker — keep eyes on this creative without a project.
+              Text action, not the primary (the shortlist button is). */}
+          <section className="mt-6">
+            <h2 className="fact-secondary">scouting</h2>
+            {track ? (
+              <p className="mt-3 text-[15px] leading-relaxed">
+                <span className="fact border border-ink px-2 py-1.5">
+                  tracking · {track.status}
+                </span>
+                <Link
+                  className="fact-secondary ml-4 underline underline-offset-4"
+                  href={orgParam ? `/business/crm?org=${org.id}` : "/business/crm"}
+                >
+                  manage in crm
+                </Link>
+              </p>
+            ) : (
+              <form action={trackTalent} className="mt-3">
+                <input type="hidden" name="talentId" value={talentId} />
+                <input type="hidden" name="orgId" value={org.id} />
+                <button
+                  type="submit"
+                  className="fact underline underline-offset-4"
+                >
+                  track this creative
+                </button>
+                <span className="fact-secondary ml-3">
+                  adds them to your scouting list in the crm
+                </span>
+              </form>
+            )}
+          </section>
+
+          <div className="mt-6">
             <Rule />
           </div>
 
