@@ -94,8 +94,11 @@ export default async function RevealPage({
     getOrgTrackForTalent(org.id, talentId),
   ]);
 
-  // No approved media -> was never on the wall -> not viewable here.
-  if (!reveal || reveal.media.length === 0) notFound();
+  // Profile must exist; approved media is NOT required (owner's report
+  // 2026-08-02: an applicant whose work is still in review 404'd from the
+  // project pipeline). The wall still lists only approved-media creatives;
+  // here the work section says honestly when nothing has cleared review.
+  if (!reveal) notFound();
 
   // The reveal is THE profile-open moment: record it (deduped per org+hour).
   // Talent only ever learns that an open happened, never which org.
@@ -122,6 +125,13 @@ export default async function RevealPage({
       <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_1fr]">
         {/* Left: the work, stacked large in native aspect ratios. */}
         <div>
+          {media.length === 0 ? (
+            <p className="max-w-md text-[15px] leading-relaxed text-secondary">
+              No approved work yet. Every piece is reviewed by a person before
+              it shows anywhere; this creative's submissions are still in that
+              queue (or none are registered).
+            </p>
+          ) : null}
           <div className="columns-1 gap-4 sm:columns-2 [&>*]:mb-4">
             {media.map((m) => (
               <figure key={m.id} className="break-inside-avoid">
