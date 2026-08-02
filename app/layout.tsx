@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anton, Lora } from "next/font/google";
+import { Anton, Inter } from "next/font/google";
 import "./globals.css";
 
 const anton = Anton({
@@ -8,9 +8,9 @@ const anton = Anton({
   variable: "--font-anton",
 });
 
-const lora = Lora({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-lora",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${lora.variable} h-full antialiased`}
+      className={`${anton.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

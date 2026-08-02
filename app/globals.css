@@ -15,11 +15,13 @@
   --color-frame: #0a0a0a;
   --color-error: #b23b2e;
 
-  /* Two voices only (owner's call, 2026-08-01): Anton for statements,
-   * Lora serif for everything else. Monospace is retired. */
+  /* Two voices only (owner's call, 2026-08-01, revised 9:06 PM): Anton for
+   * statements, Helvetica-lineage sans (Inter) for everything else.
+   * Monospace is retired. --font-serif aliases to the sans so existing
+   * font-serif utility classes resolve without a sweep. */
   --font-display: var(--font-anton);
-  --font-sans: var(--font-lora);
-  --font-serif: var(--font-lora);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-inter);
 
   --radius-none: 0px;
   --radius-sm: 0px;
@@ -59,17 +61,17 @@ body {
   text-transform: uppercase;
 }
 
-/* Metadata voice: facts are serif caps now — tracked, quiet, editorial. */
+/* Metadata voice: sans caps — tracked, quiet, call-sheet plain. */
 .fact {
-  font-family: var(--font-serif);
-  font-size: 12px;
+  font-family: var(--font-sans);
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .fact-secondary {
-  font-family: var(--font-serif);
-  font-size: 12px;
+  font-family: var(--font-sans);
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-secondary);

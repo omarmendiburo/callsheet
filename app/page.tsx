@@ -61,7 +61,7 @@ export default function Home() {
               src="/dashboard-talent.png"
               alt="The dashboard a creative sees: matched jobs, profile, applications"
               width={1280}
-              height={860}
+              height={720}
               priority
               className="w-full"
             />
