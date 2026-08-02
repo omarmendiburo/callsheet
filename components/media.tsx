@@ -36,6 +36,7 @@ export function MediaFrame({
   interactive?: boolean;
 }) {
   const [playing, setPlaying] = useState(false);
+  const [previewFailed, setPreviewFailed] = useState(false);
   const source = classifyMediaUrl(url);
   const frame = `relative flex w-full items-center justify-center overflow-hidden bg-frame ${
     vertical ? "aspect-9/16" : "aspect-video"
@@ -141,16 +142,29 @@ export function MediaFrame({
     );
   }
 
-  // Plain link: the work lives somewhere we cannot inline. Interactive
-  // surfaces get a real anchor out; walls just name the host.
+  // Plain link: the work lives somewhere we cannot inline. The unfurler
+  // fetches the page's own og:image so a Google Photos / Drive / portfolio
+  // link still shows a real preview; if none exists, the labelled letterbox
+  // is the honest fallback. Interactive surfaces keep the anchor out.
+  const preview = !previewFailed ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/api/link-preview?u=${encodeURIComponent(source.url)}`}
+      alt={label}
+      loading="lazy"
+      onError={() => setPreviewFailed(true)}
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+  ) : null;
   if (interactive) {
     return (
       <div className={frame}>
+        {preview}
         <a
           href={source.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="fact text-paper underline underline-offset-4 opacity-80 transition-opacity duration-150 hover:opacity-100"
+          className="fact relative bg-ink px-3 py-2 text-paper underline underline-offset-4 opacity-90 transition-opacity duration-150 hover:opacity-100"
         >
           open work at {source.host}
         </a>
@@ -159,7 +173,8 @@ export function MediaFrame({
   }
   return (
     <div className={frame}>
-      <span className="fact text-paper opacity-60">
+      {preview}
+      <span className="fact relative bg-ink px-2 py-1 text-paper opacity-80">
         {source.host} · {label}
       </span>
     </div>
