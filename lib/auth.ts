@@ -38,7 +38,10 @@ export async function createSession(userId: string) {
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // Secure only on the real deployment (same gate as secret() above): the
+    // local production build is demoed over plain-http LAN URLs, where
+    // browsers refuse Secure cookies and every login silently evaporates.
+    secure: process.env.NODE_ENV === "production" && !!process.env.VERCEL,
     path: "/",
     maxAge: SESSION_DAYS * 24 * 60 * 60,
   });
