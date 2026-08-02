@@ -49,11 +49,9 @@ export default async function ScoutPage({
   // Multiple orgs and none chosen — a plain org switcher (org is a query param).
   if (resolution.kind === "choose") {
     return (
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16 sm:px-10">
-        <p className="fact">
-          <Link href="/business">Callsheet</Link>
-        </p>
-        <h1 className="headline mt-10 text-5xl">Which org?</h1>
+      <div className="mx-auto w-full max-w-3xl">
+        <p className="fact-secondary">scout · pick an org</p>
+        <h1 className="headline mt-4 text-4xl sm:text-5xl">Which org?</h1>
         <p className="mt-4 max-w-lg text-[15px] leading-relaxed">
           You scout on behalf of an organisation. Pick which one.
         </p>
@@ -70,7 +68,7 @@ export default async function ScoutPage({
             </li>
           ))}
         </ul>
-      </main>
+      </div>
     );
   }
 
@@ -166,15 +164,13 @@ export default async function ScoutPage({
   );
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-10 sm:px-10">
-      <header className="flex items-baseline justify-between">
-        <p className="fact">
-          <Link href="/business">Callsheet</Link>
-        </p>
-        <span className="fact-secondary">{org.name}</span>
-      </header>
+    <div className="mx-auto w-full max-w-[1440px]">
+      <p className="fact-secondary">
+        scout · {org.name}
+        {selectedProject ? ` · for ${selectedProject.title}` : ""}
+      </p>
 
-      <h1 className="headline mt-10 text-6xl">Scout the wall.</h1>
+      <h1 className="headline mt-4 text-4xl sm:text-5xl">Scout the wall.</h1>
       <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         The work is the résumé. React to the reel first. Names, cities, and
         rates are here, but no headshots and no schools. Open a card to see who
@@ -350,6 +346,6 @@ export default async function ScoutPage({
           })}
         </div>
       )}
-    </main>
+    </div>
   );
 }

@@ -52,23 +52,20 @@ export default async function ProjectDetailPage({
   const booked = applications.filter((a) => a.status === "booked");
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
-      <header className="flex items-baseline justify-between">
-        <p className="fact">
-          <Link href={`/business/${org.id}`}>{org.name}</Link>
-        </p>
+    <div className="mx-auto w-full max-w-3xl">
+      <p className="fact-secondary">
+        business · {org.name} · {project.type} · {project.status}
+      </p>
+      <p className="mt-3">
         <Link
           className="fact-secondary underline underline-offset-4"
           href={`/business/${org.id}`}
         >
-          back to org
+          all projects
         </Link>
-      </header>
-
-      <p className="fact-secondary mt-12">
-        {project.type} · {project.status}
       </p>
-      <h1 className="headline mt-3 text-5xl">{project.title}</h1>
+
+      <h1 className="headline mt-4 text-4xl sm:text-5xl">{project.title}</h1>
 
       {/* Booked is the celebration state — plain, per DESIGN voice. */}
       {booked.length > 0 ? (
@@ -77,7 +74,12 @@ export default async function ProjectDetailPage({
         </p>
       ) : null}
 
-      <dl className="mt-8 flex flex-col divide-y divide-rule border-t border-b border-rule">
+      <section className="mt-10">
+        <p className="fact-secondary">the facts</p>
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <dl className="mt-4 flex flex-col divide-y divide-rule border-t border-b border-rule">
         <Fact label="location">
           {project.location}
           {project.remoteOk ? " · remote ok" : ""}
@@ -102,28 +104,26 @@ export default async function ProjectDetailPage({
                 .join(" · ")
             : "—"}
         </Fact>
-      </dl>
+        </dl>
+      </section>
 
       {project.description ? (
-        <>
-          <div className="mt-10">
+        <section className="mt-10">
+          <p className="fact-secondary">brief</p>
+          <div className="mt-4">
             <Rule />
           </div>
-          <section className="mt-8">
-            <h2 className="fact-secondary">brief</h2>
-            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed whitespace-pre-line">
-              {project.description}
-            </p>
-          </section>
-        </>
+          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed whitespace-pre-line">
+            {project.description}
+          </p>
+        </section>
       ) : null}
 
-      <div className="mt-10">
-        <Rule />
-      </div>
-
-      <section className="mt-8">
-        <h2 className="fact-secondary">applications · {applications.length}</h2>
+      <section className="mt-10">
+        <p className="fact-secondary">applications · {applications.length}</p>
+        <div className="mt-4">
+          <Rule />
+        </div>
         {applications.length === 0 ? (
           <p className="mt-4 text-[15px] leading-relaxed">
             No applications yet.{" "}
@@ -146,23 +146,7 @@ export default async function ProjectDetailPage({
           </ul>
         )}
       </section>
-
-      <div className="mt-10">
-        <Rule />
-      </div>
-
-      <nav className="mt-8 flex flex-wrap gap-x-8 gap-y-3">
-        <Link className="fact underline underline-offset-4" href="/business/scout">
-          find more talent
-        </Link>
-        <Link
-          className="fact underline underline-offset-4"
-          href={`/business/${org.id}`}
-        >
-          back to projects
-        </Link>
-      </nav>
-    </main>
+    </div>
   );
 }
 
