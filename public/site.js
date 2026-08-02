@@ -128,6 +128,76 @@
     });
   })();
 
+  /* --------------------------------------------------------- testimonials
+     One at a time, 10s each, arrows either way. Auto-advance is content that
+     moves on its own for longer than 5s, so it MUST be stoppable (WCAG 2.2.2):
+     it pauses on hover, pauses while anything inside has keyboard focus, stops
+     in a background tab, and never starts at all under reduced motion. */
+  (function(){
+    var box = document.querySelector(".qbox");
+    if (!box) return;
+    var slides = Array.prototype.slice.call(box.querySelectorAll(".q"));
+    var count  = box.querySelector(".qcount b");
+    if (slides.length < 2) return;
+
+    var stage = box.querySelector(".qstage");
+    var i = 0, held = false, tick = 0;
+    var DWELL = 10000;
+
+    // The stage follows the active slide's own height. Without it the box is
+    // stuck at the tallest quote and a short one floats in a lake of black.
+    function fit(){
+      var h = slides[i].getBoundingClientRect().height;
+      if (h) stage.style.height = h + "px";
+    }
+
+    function show(next){
+      i = (next + slides.length) % slides.length;
+      slides.forEach(function(s, n){
+        var on = n === i;
+        s.classList.toggle("on", on);
+        // hide the inactive ones from assistive tech, or all four are read out
+        if (on) s.removeAttribute("aria-hidden");
+        else s.setAttribute("aria-hidden", "true");
+      });
+      if (count) count.textContent = ("0" + (i + 1)).slice(-2);
+      fit();
+    }
+
+    function stop(){ if (tick) { clearInterval(tick); tick = 0; } }
+    function start(){
+      if (reduced || held || tick) return;
+      tick = setInterval(function(){
+        if (document.hidden) return;
+        show(i + 1);
+      }, DWELL);
+      timers.push(tick);
+    }
+    // any manual move restarts the dwell, so a click never leaves you with
+    // 200ms before it jumps again
+    function go(step){ show(i + step); stop(); start(); }
+
+    box.querySelectorAll(".qbtn").forEach(function(b){
+      on(b, "click", function(){ go(parseInt(b.getAttribute("data-step"), 10)); });
+    });
+    on(box, "pointerenter", function(){ held = true;  stop(); });
+    on(box, "pointerleave", function(){ held = false; start(); });
+    on(box, "focusin",      function(){ held = true;  stop(); });
+    on(box, "focusout",     function(){
+      if (!box.contains(document.activeElement)) { held = false; start(); }
+    });
+    on(document, "visibilitychange", function(){ if (document.hidden) stop(); else start(); });
+
+    // a reflow changes every slide's height, so re-fit rather than keep a stale
+    // pixel value; webfonts landing late do the same thing
+    on(window, "resize", fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+
+    show(0);
+    requestAnimationFrame(fit);
+    start();
+  })();
+
   /* ------------------------------------------------------------ the rows
      Each "who it's for" line opens onto the reason underneath it. The panel
      height is animated by CSS (0fr -> 1fr); this only owns the state. More

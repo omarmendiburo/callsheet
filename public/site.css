@@ -377,35 +377,65 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 /* ------------------------------------------------------------ testimonials */
 /* Sits directly under the partner band, so it goes back to the page black —
    the white band ends the moment the logos do. */
-.quotes{background:var(--bg);padding:clamp(48px,6vw,110px) 0}
-.quotes .label,.quotes .h2{padding:0 var(--pad)}
+.quotes{background:var(--bg);padding:clamp(48px,6vw,110px) var(--pad)}
 .quotes .label{display:block;margin-bottom:clamp(12px,1.3vw,24px)}
 
-/* The list scrolls inside its own box because there are more testimonials than
-   a section should ever be tall. Scroll chaining is left ON — the page keeps
-   moving once the list bottoms out, which is what stops a thumb getting stuck
-   in it. Do not add overscroll-behavior:contain here. */
-.qscroll{
-  margin-top:clamp(26px,2.8vw,52px);
-  max-height:clamp(400px,56vh,640px);
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
-  border-top:var(--border) solid var(--line);
-  border-bottom:var(--border) solid var(--line);
-  scrollbar-width:thin;scrollbar-color:var(--line) transparent;
-}
-.qscroll::-webkit-scrollbar{width:6px}
-.qscroll::-webkit-scrollbar-track{background:transparent}
-.qscroll::-webkit-scrollbar-thumb{background:var(--line)}
-.qscroll:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.qbox{margin-top:clamp(30px,3.2vw,58px)}
 
-.q{padding:clamp(22px,2.4vw,44px) var(--pad);margin:0}
-.q + .q{border-top:var(--border) solid var(--line-soft)}
-.q blockquote{font-size:clamp(17px,1.6vw,27px);line-height:1.4;font-weight:600;
-  letter-spacing:-.012em;color:#E4E4DE;max-width:44ch}
-.q figcaption{margin-top:clamp(10px,1vw,18px);
-  font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
-  letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.q figcaption b{color:var(--accent);font-weight:400}
+/* Every quote occupies the SAME grid cell, so slides never push each other
+   around. align-items:start keeps each one content-sized rather than stretched
+   to the tallest — site.js then eases the stage to the active slide's height,
+   which kills the dead space a short quote would otherwise sit in (220px of it
+   on a phone) without the page snapping under the reader. */
+.qstage{display:grid;align-items:start;overflow:hidden;
+  transition:height .5s var(--ease)}
+.q{grid-area:1/1;margin:0;
+  display:grid;grid-template-columns:auto 1fr;
+  gap:clamp(12px,1.8vw,34px);align-items:start;
+  /* every slide stretches to the tallest one's cell; without this, grid's
+     default align-content:stretch pumps the leftover height INTO the rows and
+     opens a canyon between the mark and the quote on a phone */
+  align-content:start;
+  opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .6s var(--ease),transform .6s var(--ease),visibility 0s linear .6s}
+.q.on{opacity:1;visibility:visible;transform:none;transition-delay:0s,0s,0s}
+
+/* the mark is the one flourish in the section */
+.qmark{font-size:clamp(56px,7.4vw,124px);line-height:.78;font-weight:800;
+  color:var(--accent);user-select:none}
+
+.q blockquote{font-size:var(--h3);line-height:1.45;font-weight:400;color:#E4E4DE;
+  max-width:52ch}
+/* name, role and city are the bold part, right-aligned under the quote */
+.q figcaption{margin-top:clamp(16px,1.7vw,30px);text-align:right;
+  font-size:var(--h3);line-height:1.35;color:var(--ink)}
+.q figcaption b{font-weight:700}
+.q figcaption .dash{margin-right:.7em;color:var(--dim);font-weight:400}
+
+/* controls — arrows plus a call-sheet counter rather than dots */
+.qnav{margin-top:clamp(24px,2.6vw,46px);
+  display:flex;align-items:center;gap:clamp(12px,1.2vw,20px)}
+.qbtn{width:clamp(48px,3.6vw,58px);height:clamp(48px,3.6vw,58px);flex:0 0 auto;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:none;border:var(--border) solid var(--line);color:var(--ink);
+  font-size:clamp(17px,1.4vw,23px);line-height:1;cursor:pointer;
+  transition:background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease)}
+.qbtn:hover,.qbtn:focus-visible{background:var(--accent);color:#0B0B0C;border-color:var(--accent)}
+.qcount{font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
+  letter-spacing:.2em;color:var(--dim)}
+.qcount b{color:var(--accent);font-weight:400}
+
+@media (max-width:720px){
+  /* the mark stops being a column and becomes a lead-in above the quote */
+  .q{grid-template-columns:1fr;gap:0}
+  .qmark{font-size:clamp(48px,15vw,72px);margin-bottom:-.12em}
+  .q figcaption{text-align:left}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .q{transform:none!important;transition:none!important}
+  .qstage{transition:none!important}
+}
 
 /* ------------------------------------------------------- what you get: 3 up */
 .offers{display:grid;gap:var(--border);margin-top:clamp(34px,3.6vw,68px);
