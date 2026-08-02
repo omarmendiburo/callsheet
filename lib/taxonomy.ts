@@ -14,25 +14,25 @@ export const DISCIPLINE_DEPARTMENTS = [
   {
     name: "Direction & Production",
     members: [
-      "Director",
-      "Assistant Director",
       "2nd AD",
+      "Assistant Director",
+      "Director",
+      "Key PA",
+      "PA",
       "Producer",
       "Production coordinator",
-      "PA",
-      "Key PA",
     ],
   },
   {
     name: "Camera",
     members: [
-      "Cinematographer / DP",
-      "Camera Op",
       "1st AC",
       "2nd AC",
-      "Videographer",
-      "Drone Op",
       "BTS Photographer",
+      "Camera Op",
+      "Cinematographer / DP",
+      "Drone Op",
+      "Videographer",
     ],
   },
   {
@@ -41,18 +41,23 @@ export const DISCIPLINE_DEPARTMENTS = [
   },
   {
     name: "Sound & Music",
-    members: ["Sound", "Sound Design / Mix", "Composer / Music"],
+    members: [
+      "Composer / Music",
+      "Sound",
+      "Sound Design / Mix",
+      "Sound Engineer",
+    ],
   },
   {
     name: "Art & Design",
     members: [
-      "Production Designer",
+      "3D Artist",
       "Art Director",
       "Designer",
-      "Illustrator",
-      "Storyboard Artist",
       "Fine Artist / Muralist",
-      "3D Artist",
+      "Illustrator",
+      "Production Designer",
+      "Storyboard Artist",
     ],
   },
   {
@@ -61,7 +66,7 @@ export const DISCIPLINE_DEPARTMENTS = [
   },
   {
     name: "Post-Production",
-    members: ["Editor", "Colorist", "Motion / Animation", "VFX", "Retoucher"],
+    members: ["Colorist", "Editor", "Motion / Animation", "Retoucher", "VFX"],
   },
   {
     name: "Photography",
@@ -69,11 +74,11 @@ export const DISCIPLINE_DEPARTMENTS = [
   },
   {
     name: "Talent & Voice",
-    members: ["Actor", "Model", "Host / Presenter", "Voice / VO Artist"],
+    members: ["Actor", "Host / Presenter", "Model", "Voice / VO Artist"],
   },
   {
     name: "Writing & Content",
-    members: ["Writer", "UGC Creator", "Shortform creator"],
+    members: ["Shortform creator", "UGC Creator", "Writer"],
   },
 ] as const;
 

@@ -356,5 +356,14 @@ fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).
   if(me && me.role){
     document.querySelectorAll('[data-auth="out"]').forEach(function(el){el.hidden=true});
     document.querySelectorAll('[data-auth="in"]').forEach(function(el){el.hidden=false});
+    /* Content CTAs opt in with data-talent-href: a signed-in creative goes
+       straight to the app surface (e.g. See remote roles -> open work)
+       instead of back through /join. Per-element, not a blanket rewrite;
+       the nav destination is left exactly as the markup sets it. */
+    if(me.role === 'talent'){
+      document.querySelectorAll('[data-talent-href]').forEach(function(el){
+        el.setAttribute('href', el.getAttribute('data-talent-href'));
+      });
+    }
   }
 }).catch(function(){});
