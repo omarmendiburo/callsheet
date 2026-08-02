@@ -31,7 +31,7 @@ check "gradients" 'bg-gradient|linear-gradient|radial-gradient|conic-gradient|fr
 check "icon libraries other than lucide" "from ['\"](react-icons|@heroicons|@radix-ui/react-icons|@tabler/icons|@phosphor-icons|react-feather)"
 check "accent colours" '(text|bg|border|ring|fill|stroke)-(indigo|violet|purple|blue|teal|pink|rose|amber|emerald|cyan|fuchsia|sky|lime|orange|yellow|green|red)-[0-9]'
 check "transform motion" 'hover:(scale|translate|rotate)|animate-(bounce|spin|pulse|ping)|transition-transform'
-check "monospace (retired 2026-08-01 — serif or Anton only)" 'JetBrains|font-mono|font-jetbrains'
+check "monospace (retired 2026-08-01 — Inter sans + Anton only)" 'JetBrains|font-mono|font-jetbrains'
 # Emoji check via perl — BSD grep has no \x{} ranges.
 emoji_hits=$(find "${existing[@]}" -type f \( -name '*.tsx' -o -name '*.ts' \) \
   -exec perl -CSD -ne 'print "$ARGV:$.: $_" if /[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]/' {} + 2>/dev/null || true)

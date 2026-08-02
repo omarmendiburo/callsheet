@@ -118,6 +118,19 @@ components:
 
 # HMNTY Creative Network — DESIGN.md
 
+> **OVERRIDES IN FORCE — owner's calls, 2026-08-01.** Two rulings supersede
+> anything below or in the frontmatter tokens:
+>
+> 1. **Monospace is retired.** No mono, no serif. Anton carries statements
+>    (≥32px, `.headline`); Inter carries everything else, including the
+>    call-sheet metadata style (`.fact` / `.fact-secondary`: sans caps,
+>    tracked). Ignore every `JetBrains Mono` token and every "set in
+>    monospace" line in this document.
+> 2. **Icons are allowed, lucide-react ONLY.** Used sparingly, where a word
+>    won't do. No other icon set may be imported.
+>
+> `pnpm check:design` enforces both. The rest of this document stands.
+
 ## Overview
 
 HMNTY Studios is a social enterprise film studio. This product is its talent
