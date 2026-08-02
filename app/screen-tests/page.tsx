@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { DISCIPLINES } from "@/lib/taxonomy";
-import { Rule, WorkFrame } from "@/components/ui";
+import { Rule } from "@/components/ui";
+import { MediaFrame } from "@/components/media";
 import { FilterRow } from "@/components/marketplace/FilterRow";
 import {
   getBrowsePool,
@@ -128,7 +129,7 @@ export default async function ScreenTestsPage({
                 className="block transition-opacity duration-150 hover:opacity-90"
               >
                 {/* Full-width 9:16 pitch frame — always vertical. */}
-                <WorkFrame vertical label="pitch" />
+                <MediaFrame url={pitch?.url} vertical label="pitch" />
                 <div className="mt-3 flex items-start justify-between gap-3">
                   <span className="fact">{disciplineLine(c)}</span>
                   <span className="fact-secondary">{c.city}</span>

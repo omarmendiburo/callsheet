@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { DISCIPLINES } from "@/lib/taxonomy";
-import { Rule, WorkFrame } from "@/components/ui";
+import { Rule } from "@/components/ui";
+import { MediaFrame } from "@/components/media";
 import { FilterRow } from "@/components/marketplace/FilterRow";
 import {
   getBrowsePool,
@@ -132,9 +133,11 @@ export default async function ReelsPage({
                 : "mx-auto w-full max-w-3xl"
             }
           >
-            <WorkFrame
+            <MediaFrame
+              url={frame?.url}
               vertical={frame?.vertical}
               label={frame?.title ?? "reel"}
+              interactive
             />
           </div>
 

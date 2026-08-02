@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { LEVELS } from "@/lib/taxonomy";
-import { Rule, WorkFrame } from "@/components/ui";
+import { Rule } from "@/components/ui";
+import { MediaFrame } from "@/components/media";
 import { ShortlistForm } from "@/components/marketplace/ShortlistForm";
 import {
   getRevealCreative,
@@ -111,7 +112,12 @@ export default async function RevealPage({
           <div className="columns-1 gap-4 sm:columns-2 [&>*]:mb-4">
             {media.map((m) => (
               <figure key={m.id} className="break-inside-avoid">
-                <WorkFrame vertical={m.vertical} label={m.kind} />
+                <MediaFrame
+                  url={m.url}
+                  vertical={m.vertical}
+                  label={m.kind}
+                  interactive
+                />
                 {m.title ? (
                   <figcaption className="fact-secondary mt-2">
                     {m.title}

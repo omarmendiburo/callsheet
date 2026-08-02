@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { LEVELS } from "@/lib/taxonomy";
-import { Rule, WorkFrame } from "@/components/ui";
+import { Rule } from "@/components/ui";
+import { MediaFrame } from "@/components/media";
 import {
   getDisciplines,
   getMedia,
@@ -83,7 +84,7 @@ export default async function ProfilePage() {
         </div>
         <div className="mt-4 max-w-64">
           {pitch ? (
-            <WorkFrame vertical label="pitch" />
+            <MediaFrame url={pitch.url} vertical label="pitch" interactive />
           ) : (
             <p className="text-[15px] text-secondary">
               No pitch registered yet.
@@ -108,7 +109,12 @@ export default async function ProfilePage() {
             {work.map((m) => (
               <figure key={m.id}>
                 <div className={m.vertical ? "mx-auto max-w-56" : ""}>
-                  <WorkFrame vertical={m.vertical} label={m.kind} />
+                  <MediaFrame
+                    url={m.url}
+                    vertical={m.vertical}
+                    label={m.kind}
+                    interactive
+                  />
                 </div>
                 {m.title ? (
                   <figcaption className="mt-2 text-[15px]">

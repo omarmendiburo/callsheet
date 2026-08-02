@@ -7,8 +7,8 @@ import {
   Rule,
   TextArea,
   TextInput,
-  WorkFrame,
 } from "@/components/ui";
+import { MediaFrame } from "@/components/media";
 import { getMedia, getProfileByUserId } from "../_data";
 import {
   addMedia,
@@ -40,14 +40,14 @@ const STEPS = [
     key: "media",
     label: "work",
     title: "Register your work.",
-    sub: "No uploads tonight. Title each piece and mark its shape. It shows on your profile as a frame until real files land.",
+    sub: "Paste a link to each piece: YouTube, Vimeo, or Instagram. It plays right on your profile once approved. No link yet? Title it now and add the link later.",
   },
   {
     n: 3,
     key: "pitch",
     label: "pitch",
     title: "Your ten-second pitch.",
-    sub: "One vertical clip, ten seconds, you talking. Register it now with a title; the file comes later. This is the first thing a curator plays.",
+    sub: "One vertical clip, ten seconds, you talking. Paste a link to it and it plays here once approved. This is the first thing a curator plays.",
   },
   {
     n: 4,
@@ -186,9 +186,11 @@ export default async function OnboardingPage({
               {work.map((m) => (
                 <li key={m.id}>
                   <div className={m.vertical ? "max-w-56" : ""}>
-                    <WorkFrame
+                    <MediaFrame
+                      url={m.url}
                       vertical={m.vertical}
                       label={`${m.kind} · ${m.status}`}
+                      interactive
                     />
                   </div>
                   <div className="mt-2 flex items-baseline justify-between gap-4">
@@ -210,6 +212,13 @@ export default async function OnboardingPage({
             <input type="hidden" name="next" value={stepHref(2)} />
             <Field label="title">
               <TextInput name="title" placeholder="e.g. costera spring spot" />
+            </Field>
+            <Field label="link (youtube / vimeo / instagram)" hint="optional">
+              <TextInput
+                name="url"
+                type="url"
+                placeholder="https://youtube.com/watch?v=..."
+              />
             </Field>
             <Field label="kind">
               <select
@@ -257,7 +266,12 @@ export default async function OnboardingPage({
               {pitches.map((m) => (
                 <li key={m.id}>
                   <div className="max-w-56">
-                    <WorkFrame vertical label={`pitch · ${m.status}`} />
+                    <MediaFrame
+                      url={m.url}
+                      vertical
+                      label={`pitch · ${m.status}`}
+                      interactive
+                    />
                   </div>
                   <div className="mt-2 flex items-baseline justify-between gap-4">
                     <span className="text-[15px]">{m.title}</span>
@@ -279,6 +293,13 @@ export default async function OnboardingPage({
             <input type="hidden" name="kind" value="pitch" />
             <Field label="title">
               <TextInput name="title" placeholder="e.g. who i am in 10 seconds" />
+            </Field>
+            <Field label="link to the clip" hint="optional">
+              <TextInput
+                name="url"
+                type="url"
+                placeholder="https://youtube.com/shorts/..."
+              />
             </Field>
             <PrimaryButton type="submit">REGISTER PITCH</PrimaryButton>
           </form>

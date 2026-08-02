@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { WorkFrame } from "@/components/ui";
+import { MediaFrame } from "@/components/media";
 import type { BrowseCreative } from "./_data";
 
 /*
@@ -44,7 +44,9 @@ export function WorkCard({
       href={`/business/scout/${creative.talentId}`}
       className="block break-inside-avoid transition-opacity duration-150 hover:opacity-90"
     >
-      <WorkFrame vertical={media.vertical} label={media.kind} />
+      {/* Non-interactive on the wall: the whole card is the click, and it
+          goes to the reveal. Real links still show as real thumbnails. */}
+      <MediaFrame url={media.url} vertical={media.vertical} label={media.kind} />
       <div className="mt-2 flex items-start justify-between gap-3">
         <span className="fact">{disciplineLine(creative)}</span>
         <span className="fact-secondary text-right">{factLine(creative)}</span>

@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { newId } from "@/lib/id";
+import { isRealMediaUrl, looksVertical } from "@/lib/media";
 import { PROFILE_PROMPTS } from "@/lib/taxonomy";
 import { getProfileByUserId } from "./_data";
 
@@ -53,7 +54,10 @@ export async function saveLinks(formData: FormData) {
 }
 
 /* Step 2 & 3 — register a work sample or a pitch as a titled media row.
- * No real upload tonight: url is "placeholder:user", status "pending". */
+ * No uploads tonight: a pasted YouTube / Vimeo / Instagram / web link becomes
+ * the row's url and renders as a real embed once approved; without a link the
+ * row keeps the "placeholder:user" scheme and renders as a letterbox. Either
+ * way status starts "pending" — nothing goes public before moderation. */
 export async function addMedia(formData: FormData) {
   const talentId = await currentTalentId();
   const rawKind = String(formData.get("kind") ?? "");
@@ -70,14 +74,24 @@ export async function addMedia(formData: FormData) {
   // Nothing to register without a title — skippable, so just bounce back.
   if (!title) redirect(next);
 
+  // Link is optional; only a well-formed http(s) URL is stored. Anything else
+  // registers the piece as a plain frame (fail closed, keep the title).
+  const rawUrl = String(formData.get("url") ?? "").trim();
+  const url =
+    rawUrl && rawUrl.length <= 500 && isRealMediaUrl(rawUrl)
+      ? rawUrl
+      : "placeholder:user";
+
   const db = await getDb();
   await db.insert(schema.media).values({
     id: newId("m"),
     talentId,
     kind,
-    url: "placeholder:user",
+    url,
     title: title.slice(0, 120),
-    vertical: isPitch ? true : vertical,
+    // Shorts/reels links are vertical by nature; the checkbox still wins for
+    // everything else. Pitches are always vertical (spec §4.2).
+    vertical: isPitch ? true : vertical || looksVertical(url),
     status: "pending",
   });
 
