@@ -59,7 +59,20 @@ export async function saveLinks(formData: FormData) {
  * the row's url and renders as a real embed once approved; without a link the
  * row keeps the "placeholder:user" scheme and renders as a letterbox. Either
  * way status starts "pending" — nothing goes public before moderation. */
-export async function addMedia(formData: FormData) {
+export type AddMediaState = { code: string | null };
+
+const DEFAULT_TITLES: Record<WorkKind | "pitch", string> = {
+  reel: "Reel",
+  shortform: "Shortform piece",
+  headshot: "Headshot",
+  still: "Still",
+  pitch: "Ten-second pitch",
+};
+
+export async function addMedia(
+  _prev: AddMediaState,
+  formData: FormData,
+): Promise<AddMediaState> {
   const talentId = await currentTalentId();
   const rawKind = String(formData.get("kind") ?? "");
   const isPitch = rawKind === "pitch";
@@ -68,20 +81,23 @@ export async function addMedia(formData: FormData) {
     : MEDIA_KINDS.includes(rawKind as WorkKind)
       ? (rawKind as WorkKind)
       : "reel";
-  const title = String(formData.get("title") ?? "").trim();
+  const rawTitle = String(formData.get("title") ?? "").trim();
   const vertical = formData.get("vertical") === "on";
   const next = String(formData.get("next") ?? "/talent/onboarding?step=2");
 
-  // Nothing to register without a title — skippable, so just bounce back.
-  if (!title) redirect(next);
-
-  // Link is optional; only a well-formed http(s) URL is stored. Anything else
-  // registers the piece as a plain frame (fail closed, keep the title).
   const rawUrl = String(formData.get("url") ?? "").trim();
-  const url =
-    rawUrl && rawUrl.length <= 500 && isRealMediaUrl(rawUrl)
-      ? rawUrl
-      : "placeholder:user";
+  // A wholly empty submission has nothing to add: say so instead of the old
+  // silent bounce (owner's bug report 2026-08-02: "the videos aren't
+  // working" was this exact no-op).
+  if (!rawTitle && !rawUrl) return { code: "empty" };
+  // A link that is present but malformed gets a visible error, never a
+  // silently dead placeholder row.
+  if (rawUrl && (rawUrl.length > 500 || !isRealMediaUrl(rawUrl)))
+    return { code: "url" };
+
+  // Title is optional: a URL-only add gets a sensible name for its kind.
+  const title = rawTitle || DEFAULT_TITLES[kind];
+  const url = rawUrl || "placeholder:user";
 
   const db = await getDb();
   await db.insert(schema.media).values({

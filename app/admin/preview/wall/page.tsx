@@ -35,13 +35,17 @@ export default async function AdminWallPreview() {
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {pool.map((c) => {
-              const lead = c.media[0];
+              // Uniform tiles (owner's ask 2026-08-02): prefer a horizontal
+              // piece as the lead and render every frame 16:9, so vertical
+              // pitches pillarbox instead of towering over the grid.
+              const lead =
+                c.media.find((m) => !m.vertical) ?? c.media[0];
               return (
                 <figure key={c.talentId}>
                   {lead ? (
                     <MediaFrame
                       url={lead.url}
-                      vertical={lead.vertical}
+                      vertical={false}
                       label={lead.kind}
                     />
                   ) : null}

@@ -11,13 +11,13 @@ import {
 import { MediaFrame } from "@/components/media";
 import { getDisciplines, getMedia, getProfileByUserId } from "../_data";
 import {
-  addMedia,
   deleteMedia,
   saveBasics,
   saveLinks,
   savePrompts,
   saveRates,
 } from "../_actions";
+import { AddPieceForm } from "./AddPieceForm";
 
 /*
  * §4.2 guided, skippable onboarding. The shell (sidebar) owns all chrome. This
@@ -41,14 +41,14 @@ const STEPS = [
     key: "media",
     label: "work",
     title: "Register your work.",
-    sub: "Paste a link to each piece: YouTube, Vimeo, or Instagram. It plays right on your profile once approved. No link yet? Title it now and add the link later.",
+    sub: "Paste a link per piece: YouTube (shorts count), Vimeo, or Instagram. It plays on your profile once a person approves it. No link yet? Add a title now and the link later.",
   },
   {
     n: 3,
     key: "pitch",
     label: "pitch",
     title: "Your ten-second pitch.",
-    sub: "One vertical clip, ten seconds, you talking. Paste a link to it and it plays here once approved. This is the first thing a curator plays.",
+    sub: "One vertical clip, ten seconds, you talking. Paste the link and go. This is the first thing a curator plays once it clears review.",
   },
   {
     n: 4,
@@ -194,6 +194,10 @@ export default async function OnboardingPage({
         <section className="mt-10">
           <Rule />
           <h2 className="fact-secondary mt-4">your work</h2>
+          <p className="mt-2 text-[13px] leading-relaxed text-secondary">
+            New pieces show as pending until a person approves them; approved
+            pieces play on your profile and the wall.
+          </p>
 
           {work.length > 0 ? (
             <ul className="mt-6 flex flex-col gap-6">
@@ -222,41 +226,7 @@ export default async function OnboardingPage({
             </ul>
           ) : null}
 
-          <form action={addMedia} className="mt-6 flex flex-col gap-6">
-            <input type="hidden" name="next" value={stepHref(2)} />
-            <Field label="title">
-              <TextInput name="title" placeholder="e.g. costera spring spot" />
-            </Field>
-            <Field label="link (youtube / vimeo / instagram)" hint="optional">
-              <TextInput
-                name="url"
-                type="url"
-                placeholder="https://youtube.com/watch?v=..."
-              />
-            </Field>
-            <Field label="kind">
-              <select
-                name="kind"
-                defaultValue="reel"
-                className="fact-secondary w-full border border-rule bg-transparent px-3 py-3 focus:border-ink focus:outline-none"
-              >
-                {WORK_KINDS.map((k) => (
-                  <option key={k.id} value={k.id}>
-                    {k.label.toUpperCase()}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <label className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                name="vertical"
-                className="h-4 w-4 accent-ink"
-              />
-              <span className="text-[15px]">This piece is vertical (9:16).</span>
-            </label>
-            <PrimaryButton type="submit">ADD THIS PIECE</PrimaryButton>
-          </form>
+          <AddPieceForm mode="work" next={stepHref(2)} />
 
           <p className="mt-6">
             <Link
@@ -302,21 +272,7 @@ export default async function OnboardingPage({
             </ul>
           ) : null}
 
-          <form action={addMedia} className="mt-6 flex flex-col gap-6">
-            <input type="hidden" name="next" value={stepHref(3)} />
-            <input type="hidden" name="kind" value="pitch" />
-            <Field label="title">
-              <TextInput name="title" placeholder="e.g. who i am in 10 seconds" />
-            </Field>
-            <Field label="link to the clip" hint="optional">
-              <TextInput
-                name="url"
-                type="url"
-                placeholder="https://youtube.com/shorts/..."
-              />
-            </Field>
-            <PrimaryButton type="submit">REGISTER PITCH</PrimaryButton>
-          </form>
+          <AddPieceForm mode="pitch" next={stepHref(3)} />
 
           <p className="mt-6">
             <Link
