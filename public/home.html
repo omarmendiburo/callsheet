@@ -430,8 +430,9 @@ h1,h2,h3,p,figure,blockquote{margin:0}
     <nav class="nav" aria-label="Main">
       <a class="link" href="#how">HOW IT WORKS</a>
       <a class="link" href="#who">WHO IT'S FOR</a>
-      <a class="link login" href="/login">LOG IN</a>
-      <a class="btn" href="/signup">JOIN FREE</a>
+      <a class="link login" href="/login" data-auth="out">LOG IN</a>
+      <a class="btn" href="/signup" data-auth="out">JOIN FREE</a>
+      <a class="btn" href="/login" data-auth="in" hidden>MY CALLSHEET →</a>
     </nav>
   </div>
 
@@ -1721,6 +1722,19 @@ h1,h2,h3,p,figure,blockquote{margin:0}
     requestAnimationFrame(function(){ document.body.classList.add("ready"); });
   });
 })();
+</script>
+<script>
+/* Auth-aware nav for the static landing: logged-in visitors get one
+   MY CALLSHEET button to their own portal. Fails open to the default
+   logged-out nav on any error. */
+fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(me){
+  if(me && me.role){
+    document.querySelectorAll('[data-auth="out"]').forEach(function(el){el.hidden=true});
+    var inBtn=document.querySelector('[data-auth="in"]');
+    inBtn.href='/'+me.role;
+    inBtn.hidden=false;
+  }
+}).catch(function(){});
 </script>
 </body>
 </html>
