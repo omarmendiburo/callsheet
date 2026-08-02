@@ -128,6 +128,36 @@
     });
   })();
 
+  /* ------------------------------------------------------------ the rows
+     Each "who it's for" line opens onto the reason underneath it. The panel
+     height is animated by CSS (0fr -> 1fr); this only owns the state. More
+     than one may be open — these are five separate recognitions, not tabs, so
+     opening the fourth should not close the one you are still reading. */
+  document.querySelectorAll(".rows .rowhead").forEach(function(btn){
+    on(btn, "click", function(){
+      var li = btn.parentNode;
+      var open = li.classList.toggle("open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+
+  /* -------------------------------------------------- filmstrip hover origin
+     The accent rule under each frame wipes in from the edge the pointer
+     actually crossed. Pointer-guarded to match the CSS — a touch device never
+     runs this, and the strip is fully readable without it.
+
+     The rect is read once per enter, never inside a move handler, so this
+     costs one layout read per hover rather than one per frame. */
+  if (!reduced && matchMedia("(hover: hover) and (pointer: fine)").matches){
+    document.querySelectorAll(".frame").forEach(function(f){
+      on(f, "pointerenter", function(e){
+        var r = f.getBoundingClientRect();
+        // which vertical edge was the pointer nearer when it crossed in
+        f.style.setProperty("--ox", (e.clientX - r.left) < r.width / 2 ? "0%" : "100%");
+      });
+    });
+  }
+
   /* ------------------------------------------------------- marquee throttle
      The partner row animates a transform forever. Off-screen that is a pure
      tax — it keeps a phone's compositor awake for a band nobody is looking at.

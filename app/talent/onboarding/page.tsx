@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { DISCIPLINES, LEVELS, PROFILE_PROMPTS } from "@/lib/taxonomy";
+import { DISCIPLINES_AZ, LEVELS, PROFILE_PROMPTS } from "@/lib/taxonomy";
 import {
   Field,
   PrimaryButton,
@@ -457,7 +457,7 @@ export default async function OnboardingPage({
                 crafts · check what you work in, set the level that fits each
               </legend>
               <div className="flex flex-col divide-y divide-rule border-t border-b border-rule">
-                {DISCIPLINES.map((d) => (
+                {DISCIPLINES_AZ.map((d) => (
                   <div
                     key={d}
                     className="flex items-center justify-between gap-4 py-2"

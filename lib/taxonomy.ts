@@ -45,6 +45,16 @@ export const DISCIPLINES = [
   "Composer / Music",
 ] as const;
 
+/* DISCIPLINES above is ordered by department, the way a call sheet reads, and
+ * every filter and the AI matcher depend on nothing but membership. The crafts
+ * checklist in onboarding is a different job: 37 rows scanned by name, where
+ * department order means hunting for the one you want. That screen sorts. Do
+ * NOT re-order the source list to get this — the other surfaces read better
+ * grouped, and the signup picker is meant to grow department headings. */
+export const DISCIPLINES_AZ = [...DISCIPLINES].sort((a, b) =>
+  a.localeCompare(b, "en"),
+);
+
 export const LEVELS = [
   {
     id: "apprentice",

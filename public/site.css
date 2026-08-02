@@ -258,9 +258,36 @@ h1,h2,h3,p,figure,blockquote{margin:0}
   position:relative;overflow:hidden;min-width:0;margin:0;
 }
 .frame + .frame{border-left:var(--border) solid var(--line)}
-/* Real production stills, shown as shot: full colour, no filter, no hover
-   state, no motion. The photographs do the work on their own. */
+/* Real production stills, shown as shot: full colour, no filter. */
 .frame img{width:100%;height:100%;object-fit:cover}
+
+/* ------------------------------------------------------- filmstrip hover
+   POINTER-GUARDED. A phone gets none of this and loses nothing: the caption
+   is fully visible at rest on every device, so nothing here puts content
+   behind a hover a touch user cannot perform. Transform and opacity only. */
+@media (hover:hover) and (pointer:fine){
+  .frame img{transition:transform 1.1s var(--ease),opacity .6s var(--ease)}
+  .frame:hover img{transform:scale(1.07)}
+  /* the rest recede, so the one under the pointer is the one you read */
+  .strip:hover .frame:not(:hover) img{opacity:.5}
+
+  /* An accent rule wipes across the caption from the side the pointer actually
+     arrived from — --ox is set to 0% or 100% by site.js on pointerenter. */
+  .frame .cap::after{content:"";position:absolute;left:0;right:0;
+    top:calc(var(--border) * -1);height:var(--border);background:var(--accent);
+    transform:scaleX(0);transform-origin:var(--ox,0%) 50%;
+    transition:transform .6s var(--ease)}
+  .frame:hover .cap::after{transform:scaleX(1)}
+
+  .frame .cap{transition:transform .7s var(--ease)}
+  .frame:hover .cap{transform:translateY(-2px)}
+  .frame .cap b{transition:color .45s var(--ease)}
+  .frame:hover .cap b{color:var(--accent)}
+}
+@media (prefers-reduced-motion:reduce){
+  .frame img,.strip:hover .frame:not(:hover) img{transform:none!important;opacity:1!important}
+  .frame .cap::after{display:none}
+}
 
 .cap{
   position:absolute;left:0;right:0;bottom:0;
@@ -421,16 +448,40 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 
 /* --------------------------------------------------------------- who it's for */
 .rows{margin-top:clamp(30px,3.2vw,60px);border-top:var(--border) solid var(--line)}
-.rows li{border-bottom:var(--border) solid var(--line);
-  padding:clamp(18px,1.9vw,36px) 0;
+.rows li{border-bottom:var(--border) solid var(--line)}
+
+/* The row header is a real <button>: tab-reachable, Enter/Space for free, and
+   it carries aria-expanded for the panel underneath. */
+.rows .rowhead{
+  width:100%;padding:clamp(18px,1.9vw,36px) 0;
+  background:none;border:0;text-align:left;cursor:pointer;font:inherit;
   font-size:clamp(18px,2.2vw,38px);line-height:1.24;font-weight:600;letter-spacing:-.018em;
   display:flex;gap:clamp(14px,1.5vw,30px);align-items:baseline;color:var(--dim);
   transition:padding-left .55s var(--ease),color .45s var(--ease)}
-.rows li:hover{padding-left:clamp(10px,1.1vw,22px);color:var(--accent)}
-.rows li b{font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
+.rows .rowhead:hover,.rows .rowhead:focus-visible{padding-left:clamp(10px,1.1vw,22px);color:var(--accent)}
+.rows li.open .rowhead{color:var(--accent)}
+.rows .rowhead b{font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
   font-weight:400;letter-spacing:.2em;color:var(--dim);flex:0 0 auto;
   transition:color .45s var(--ease)}
-.rows li:hover b{color:var(--accent)}
+.rows .rowhead:hover b,.rows .rowhead:focus-visible b,.rows li.open .rowhead b{color:var(--accent)}
+.rows .rowline{flex:1 1 auto;min-width:0}
+
+/* a plus that becomes a minus — drawn, because there is no icon set here */
+.rowmark{flex:0 0 auto;position:relative;align-self:center;
+  width:clamp(15px,1.3vw,22px);height:clamp(15px,1.3vw,22px)}
+.rowmark::before,.rowmark::after{content:"";position:absolute;inset:50% 0 auto 0;
+  height:var(--border);background:currentColor;transition:transform .5s var(--ease)}
+.rowmark::after{transform:rotate(90deg)}
+.rows li.open .rowmark::after{transform:rotate(0deg)}
+
+/* 0fr -> 1fr animates a genuinely unknown height. max-height would need a
+   magic number and would ease wrong on every row that is not that tall. */
+.rowpanel{display:grid;grid-template-rows:0fr;opacity:0;
+  transition:grid-template-rows .55s var(--ease),opacity .4s var(--ease)}
+.rowpanel > div{overflow:hidden}
+.rows li.open .rowpanel{grid-template-rows:1fr;opacity:1}
+.rowpanel p{max-width:56ch;padding:0 0 clamp(20px,2.1vw,40px);
+  font-size:var(--body);line-height:1.6;font-weight:400;letter-spacing:0;color:#C9C9C3}
 /* the row list already closes with a rule, so the turn line below it should
    not draw a second one a few pixels later */
 .rows + .turn,.blk + .turn{border-top:0;margin-top:clamp(22px,2.2vw,42px);padding-top:0}
@@ -514,7 +565,8 @@ h1,h2,h3,p,figure,blockquote{margin:0}
   .cap{flex-direction:column;align-items:flex-start;gap:3px}
   .acts .btn{flex:1 1 100%}
   .head{max-width:none}
-  .rows li{flex-direction:column;gap:6px}
+  .rows .rowhead{flex-wrap:wrap;gap:6px}
+  .rows .rowline{flex:1 1 100%;order:3}
 }
 
 @media (prefers-reduced-motion:reduce){
