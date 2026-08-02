@@ -6,7 +6,8 @@ import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { newId } from "@/lib/id";
 import { isRealMediaUrl, looksVertical } from "@/lib/media";
-import { PROFILE_PROMPTS } from "@/lib/taxonomy";
+import { DISCIPLINES, LEVELS, PROFILE_PROMPTS } from "@/lib/taxonomy";
+import { geocodeCity } from "@/lib/geo";
 import { getProfileByUserId } from "./_data";
 
 /*
@@ -166,4 +167,113 @@ export async function saveRates(formData: FormData) {
     .where(eq(schema.talentProfiles.id, talentId));
 
   redirect(String(formData.get("next") ?? "/talent"));
+}
+
+/* Step 6 — basics: name, city, travel, availability, and the disciplines
+ * editor (profile-edit epic, owner's go 2026-08-02). Same skippable idiom as
+ * the other steps: only values that parse are applied, an empty field keeps
+ * what was there. Disciplines reconcile insert/update/delete against the
+ * taxonomy; an empty selection changes nothing (a profile never goes
+ * craftless from here). */
+export async function saveBasics(formData: FormData) {
+  const user = await requireUser("talent");
+  const profile = await getProfileByUserId(user.id);
+  if (!profile) redirect("/talent");
+  const talentId = profile.id;
+  const db = await getDb();
+
+  const displayName = String(formData.get("displayName") ?? "")
+    .trim()
+    .slice(0, 80);
+  const city = String(formData.get("city") ?? "").trim().slice(0, 80);
+  const willingToTravel = formData.get("willingToTravel") === "on";
+  const radiusRaw = String(formData.get("travelRadiusMiles") ?? "").trim();
+  const radiusN = Number.parseInt(radiusRaw, 10);
+  const travelRadiusMiles =
+    willingToTravel && Number.isFinite(radiusN) && radiusN > 0
+      ? Math.min(radiusN, 3000)
+      : null;
+
+  const patch: Partial<typeof schema.talentProfiles.$inferInsert> = {
+    willingToTravel,
+    travelRadiusMiles,
+  };
+  if (displayName) patch.displayName = displayName;
+  if (city && city !== profile.city) {
+    patch.city = city;
+    const geo = geocodeCity(city);
+    patch.lat = geo?.lat ?? null;
+    patch.lng = geo?.lng ?? null;
+  }
+
+  // Availability: "now" and "unavailable" always apply; "from_date" only with
+  // a parseable date (otherwise no change rather than a silent lie).
+  const avail = String(formData.get("availability") ?? "");
+  if (avail === "now" || avail === "unavailable") {
+    patch.availability = avail;
+    patch.availableFrom = null;
+  } else if (avail === "from_date") {
+    const from = new Date(String(formData.get("availableFrom") ?? ""));
+    if (!Number.isNaN(from.getTime())) {
+      patch.availability = "from_date";
+      patch.availableFrom = from;
+    }
+  }
+
+  await db
+    .update(schema.talentProfiles)
+    .set(patch)
+    .where(eq(schema.talentProfiles.id, talentId));
+
+  // Keep the account name in step with the profile name (shell greeting, CRM).
+  if (displayName) {
+    await db
+      .update(schema.users)
+      .set({ name: displayName })
+      .where(eq(schema.users.id, user.id));
+  }
+
+  // Disciplines reconciliation. Form: checkbox disc=<type> + level::<type>.
+  const LEVEL_IDS = LEVELS.map((l) => l.id) as readonly string[];
+  const chosen = new Map<string, string>();
+  for (const t of formData.getAll("disc").map(String)) {
+    if (!(DISCIPLINES as readonly string[]).includes(t)) continue;
+    const level = String(formData.get(`level::${t}`) ?? "");
+    chosen.set(t, LEVEL_IDS.includes(level) ? level : "professional");
+  }
+  if (chosen.size > 0) {
+    type DisciplineRow = typeof schema.disciplines.$inferSelect;
+    const current: DisciplineRow[] = await db
+      .select()
+      .from(schema.disciplines)
+      .where(eq(schema.disciplines.talentId, talentId));
+    const currentByType = new Map(
+      current.map((d: DisciplineRow) => [d.type, d]),
+    );
+    for (const d of current) {
+      if (!chosen.has(d.type)) {
+        await db
+          .delete(schema.disciplines)
+          .where(eq(schema.disciplines.id, d.id));
+      }
+    }
+    for (const [type, level] of chosen) {
+      const existing = currentByType.get(type);
+      if (!existing) {
+        await db.insert(schema.disciplines).values({
+          id: newId("d"),
+          talentId,
+          type,
+          level: level as (typeof LEVELS)[number]["id"],
+        });
+      } else if (existing.level !== level) {
+        await db
+          .update(schema.disciplines)
+          .set({ level: level as (typeof LEVELS)[number]["id"] })
+          .where(eq(schema.disciplines.id, existing.id));
+      }
+    }
+  }
+
+  redirect(String(formData.get("next") ?? "/talent/profile"));
 }

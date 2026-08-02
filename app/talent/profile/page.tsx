@@ -73,9 +73,10 @@ export default async function ProfilePage() {
     <div className="mx-auto w-full max-w-3xl">
       <p className="fact-secondary">talent · my profile</p>
       {/* Name — the reveal. Only appears on this page and the detail panel. */}
-      <h1 className="headline mt-4 text-4xl sm:text-5xl">
-        {profile.displayName}
-      </h1>
+      <div className="mt-4 flex items-baseline justify-between gap-6">
+        <h1 className="headline text-4xl sm:text-5xl">{profile.displayName}</h1>
+        <EditLink href="/talent/onboarding?step=6" />
+      </div>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
         This is how employers see you after the reveal. Every block edits back
         to its onboarding step. Only approved work shows here, because only
@@ -153,10 +154,7 @@ export default async function ProfilePage() {
           <div>
             <div className="flex items-baseline justify-between">
               <h2 className="fact-secondary">disciplines</h2>
-              {/* No edit affordance yet: crafts are set at signup and a real
-                  edit surface is on the roadmap. Linking /join here dead-ended
-                  on the duplicate-email check (audit 2026-08-02). */}
-              <span className="fact-secondary">set at signup</span>
+              <EditLink href="/talent/onboarding?step=6" />
             </div>
             {disciplines.length === 0 ? (
               <p className="mt-4 text-[15px] text-secondary">None listed.</p>
@@ -175,7 +173,10 @@ export default async function ProfilePage() {
           </div>
 
           <div>
-            <h2 className="fact-secondary">location &amp; availability</h2>
+            <div className="flex items-baseline justify-between">
+              <h2 className="fact-secondary">location &amp; availability</h2>
+              <EditLink href="/talent/onboarding?step=6" />
+            </div>
             <ul className="mt-4 flex flex-col gap-2">
               <li className="flex justify-between gap-4">
                 <span className="fact-secondary">city</span>

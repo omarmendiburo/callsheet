@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { PROFILE_PROMPTS } from "@/lib/taxonomy";
+import { DISCIPLINES, LEVELS, PROFILE_PROMPTS } from "@/lib/taxonomy";
 import {
   Field,
   PrimaryButton,
@@ -9,10 +9,11 @@ import {
   TextInput,
 } from "@/components/ui";
 import { MediaFrame } from "@/components/media";
-import { getMedia, getProfileByUserId } from "../_data";
+import { getDisciplines, getMedia, getProfileByUserId } from "../_data";
 import {
   addMedia,
   deleteMedia,
+  saveBasics,
   saveLinks,
   savePrompts,
   saveRates,
@@ -63,6 +64,13 @@ const STEPS = [
     title: "Rates & gear.",
     sub: "Optional, but a rate up front saves everyone a round of email. Leave anything blank you'd rather discuss.",
   },
+  {
+    n: 6,
+    key: "basics",
+    label: "you",
+    title: "Your basics.",
+    sub: "Name, city, travel, availability, and your crafts. Ranking and search read these, so keep them current.",
+  },
 ] as const;
 
 const WORK_KINDS = [
@@ -100,11 +108,13 @@ export default async function OnboardingPage({
   }
 
   const { step: stepRaw } = await searchParams;
-  const step = Math.min(Math.max(Number.parseInt(stepRaw ?? "1", 10) || 1, 1), 5);
-  const nextStepHref = step < 5 ? stepHref(step + 1) : "/talent";
+  const step = Math.min(Math.max(Number.parseInt(stepRaw ?? "1", 10) || 1, 1), STEPS.length);
+  const nextStepHref = step < STEPS.length ? stepHref(step + 1) : "/talent";
   const current = STEPS[step - 1];
 
   const media = await getMedia(profile.id);
+  const myDisciplines = step === 6 ? await getDisciplines(profile.id) : [];
+  const levelByType = new Map(myDisciplines.map((d) => [d.type, d.level]));
   const work = media.filter((m) => m.kind !== "pitch");
   const pitches = media.filter((m) => m.kind === "pitch");
   const links = profile.links ?? [];
@@ -114,7 +124,7 @@ export default async function OnboardingPage({
   return (
     <div className="mx-auto w-full max-w-2xl">
       <p className="fact-secondary">
-        talent · onboarding · step {step} of 5
+        talent · onboarding · step {step} of {STEPS.length}
       </p>
       <h1 className="headline mt-4 text-4xl sm:text-5xl">{current.title}</h1>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">{current.sub}</p>
@@ -387,8 +397,126 @@ export default async function OnboardingPage({
         </section>
       ) : null}
 
+      {/* ---------- STEP 6 — BASICS ---------- */}
+      {step === 6 ? (
+        <section className="mt-10">
+          <Rule />
+          <h2 className="fact-secondary mt-4">your basics</h2>
+          <form action={saveBasics} className="mt-6 flex flex-col gap-8">
+            <input type="hidden" name="next" value="/talent/profile" />
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <Field label="name" hint="as employers see it after the reveal">
+                <TextInput
+                  name="displayName"
+                  defaultValue={profile.displayName}
+                />
+              </Field>
+              <Field label="city">
+                <TextInput
+                  name="city"
+                  autoComplete="address-level2"
+                  defaultValue={profile.city}
+                />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <Field label="availability">
+                <select
+                  name="availability"
+                  defaultValue={profile.availability}
+                  className="fact-secondary w-full border border-rule bg-transparent px-3 py-3 focus:border-ink focus:outline-none"
+                >
+                  <option value="now">AVAILABLE NOW</option>
+                  <option value="from_date">FROM A DATE</option>
+                  <option value="unavailable">NOT AVAILABLE</option>
+                </select>
+              </Field>
+              <Field
+                label="available from"
+                hint="only read when set to from a date"
+              >
+                <TextInput
+                  name="availableFrom"
+                  type="date"
+                  defaultValue={
+                    profile.availableFrom
+                      ? profile.availableFrom.toISOString().slice(0, 10)
+                      : ""
+                  }
+                />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <label className="flex items-center gap-3 sm:pt-8">
+                <input
+                  type="checkbox"
+                  name="willingToTravel"
+                  defaultChecked={profile.willingToTravel}
+                  className="h-4 w-4 accent-ink"
+                />
+                <span className="text-[15px]">I travel for the right job.</span>
+              </label>
+              <Field label="travel radius (miles)" hint="optional">
+                <TextInput
+                  name="travelRadiusMiles"
+                  type="number"
+                  min={0}
+                  placeholder="e.g. 100"
+                  defaultValue={profile.travelRadiusMiles ?? ""}
+                />
+              </Field>
+            </div>
+
+            <fieldset>
+              <legend className="fact-secondary mb-3">
+                crafts · check what you work in, set the level that fits each
+              </legend>
+              <div className="flex flex-col divide-y divide-rule border-t border-b border-rule">
+                {DISCIPLINES.map((d) => (
+                  <div
+                    key={d}
+                    className="flex items-center justify-between gap-4 py-2"
+                  >
+                    <label className="flex min-w-0 items-center gap-3">
+                      <input
+                        type="checkbox"
+                        name="disc"
+                        value={d}
+                        defaultChecked={levelByType.has(d)}
+                        className="h-4 w-4 shrink-0 accent-ink"
+                      />
+                      <span className="fact truncate">{d}</span>
+                    </label>
+                    <select
+                      name={`level::${d}`}
+                      defaultValue={levelByType.get(d) ?? "professional"}
+                      className="fact-secondary border border-rule bg-transparent px-2 py-1.5 focus:border-ink focus:outline-none"
+                    >
+                      {LEVELS.map((l) => (
+                        <option key={l.id} value={l.id}>
+                          {l.label.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-[13px] text-secondary">
+                Unchecking everything keeps your current crafts; a profile
+                never goes craftless from here.
+              </p>
+            </fieldset>
+
+            <PrimaryButton type="submit">SAVE</PrimaryButton>
+          </form>
+        </section>
+      ) : null}
+
       {/* Step skip — real step navigation, kept. */}
-      {step < 5 ? (
+      {step < STEPS.length ? (
         <section className="mt-10">
           <Rule />
           <p className="mt-4">
