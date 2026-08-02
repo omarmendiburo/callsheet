@@ -58,23 +58,23 @@ export function ProjectCard({
 }) {
   const { project, orgName } = data;
 
-  const roles =
-    project.rolesNeeded.length > 0
-      ? project.rolesNeeded
-          .map((r) => (r.count > 1 ? `${r.discipline} ×${r.count}` : r.discipline))
-          .join(", ")
-      : "roles tbd";
-
-  const locationLine = project.remoteOk
-    ? `${project.location} · remote ok`
-    : project.location;
-
-  const rateParts: string[] = [];
-  if (project.dayRateOnset != null)
-    rateParts.push(`$${project.dayRateOnset}/day on set`);
-  if (project.hourlyPostprod != null)
-    rateParts.push(`$${project.hourlyPostprod}/hr post`);
-  const rateLine = rateParts.length > 0 ? rateParts.join(" · ") : "rate on request";
+  /* Per-role terms (rate, gear, remote live on each role now). Legacy
+   * projects without per-role data fall back to the project-level columns. */
+  const roleLine = (r: (typeof project.rolesNeeded)[number]): string => {
+    const parts: string[] = [];
+    if (r.dayRate != null) parts.push(`$${r.dayRate}/day`);
+    if (r.hourlyPost != null) parts.push(`$${r.hourlyPost}/hr post`);
+    if (parts.length === 0) {
+      if (project.dayRateOnset != null)
+        parts.push(`$${project.dayRateOnset}/day`);
+      else parts.push("rate on request");
+    }
+    const gear = r.byoGear ?? project.byoGear;
+    if (gear && gear !== "not_needed")
+      parts.push(BYO_GEAR_LABEL[gear] ?? gear);
+    if (r.remote ?? project.remoteOk) parts.push("remote ok");
+    return parts.join(" · ");
+  };
 
   return (
     <article className="border border-rule p-6">
@@ -89,16 +89,21 @@ export function ProjectCard({
       </div>
 
       <div className="mt-4 flex flex-col gap-2">
-        <Fact label="roles" value={roles} />
-        <Fact label="where" value={locationLine} />
-        <Fact label="rate" value={rateLine} />
+        {project.rolesNeeded.length > 0 ? (
+          project.rolesNeeded.map((r, i) => (
+            <Fact
+              key={i}
+              label={r.count > 1 ? `${r.discipline} ×${r.count}` : r.discipline}
+              value={roleLine(r)}
+            />
+          ))
+        ) : (
+          <Fact label="roles" value="roles tbd" />
+        )}
+        <Fact label="where" value={project.location} />
         <Fact
           label="timeline"
           value={timelineLine(project.timelineStart, project.timelineEnd)}
-        />
-        <Fact
-          label="gear"
-          value={BYO_GEAR_LABEL[project.byoGear] ?? project.byoGear}
         />
       </div>
 

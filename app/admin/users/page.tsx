@@ -60,15 +60,15 @@ export default async function AdminUsers({
 
   return (
     <AdminShell active="/admin/users">
-      <p className="fact-secondary">back office · users</p>
-      <h1 className="headline mt-3 text-4xl sm:text-5xl">Users.</h1>
+      <p className="fact-secondary">back office · accounts</p>
+      <h1 className="headline mt-3 text-4xl sm:text-5xl">Accounts.</h1>
       <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         Suspend cuts access on the user&rsquo;s very next request. Verifying an
         org marks it trusted to post. Impersonation is out of scope tonight.
       </p>
 
       <section className="mt-10">
-        <h2 className="fact-secondary">find a user</h2>
+        <h2 className="fact-secondary">find an account</h2>
         <div className="mt-4">
           <Rule />
         </div>
@@ -91,7 +91,7 @@ export default async function AdminUsers({
         </button>
       </form>
         <p className="fact-secondary mt-3">
-          {users.length} of {allUsers.length} users
+          {users.length} of {allUsers.length} accounts
           {q ? ` matching "${qRaw}"` : ""}
         </p>
 
@@ -109,7 +109,7 @@ export default async function AdminUsers({
       </section>
 
       <section className="mt-10">
-        <h2 className="fact-secondary">all users</h2>
+        <h2 className="fact-secondary">all accounts</h2>
         <div className="mt-4 overflow-x-auto border-t border-b border-rule">
           <table className="w-full min-w-[720px] border-collapse">
           <thead>
@@ -162,7 +162,7 @@ export default async function AdminUsers({
             {users.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-6 text-[14px] text-secondary">
-                  No users match that filter.
+                  No accounts match that filter.
                 </td>
               </tr>
               ) : null}

@@ -16,9 +16,9 @@ const ERRORS: Record<string, string> = {
   email: "that email address doesn't look right.",
   password: "the temp password must be at least 8 characters.",
   dupe: "an account with that email already exists.",
-  notfound: "that seat no longer exists.",
+  notfound: "that member no longer exists.",
   lastowner: "an org must keep at least one owner.",
-  self: "you can't remove your own seat.",
+  self: "you can't remove yourself.",
 };
 
 export default async function TeamPage({
@@ -40,7 +40,7 @@ export default async function TeamPage({
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <p className="fact-secondary">business · {org.name} · team</p>
+      <p className="fact-secondary">business · {org.name} · members</p>
       <p className="mt-3">
         <Link
           className="fact-secondary underline underline-offset-4"
@@ -50,17 +50,17 @@ export default async function TeamPage({
         </Link>
       </p>
 
-      <h1 className="headline mt-4 text-4xl sm:text-5xl">Team &amp; seats.</h1>
+      <h1 className="headline mt-4 text-4xl sm:text-5xl">Members.</h1>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
         {isOwner
           ? "Owners manage the roster. Managers can post projects and move applications; viewers can read."
-          : "This is your org's roster. Only an owner can change seats."}
+          : "This is your org's roster. Only an owner can change members."}
       </p>
 
       {/* One-time temp-password reveal after a successful add. */}
       {added && temp ? (
         <div className="mt-8 border border-ink p-4">
-          <p className="fact-secondary">seat added · {added}</p>
+          <p className="fact-secondary">member added · {added}</p>
           <p className="mt-3 text-[15px] leading-relaxed">
             Temporary password, shown once:
           </p>
@@ -125,7 +125,7 @@ export default async function TeamPage({
                         </button>
                       </form>
                     ) : (
-                      <span className="fact-secondary">owner (seat locked)</span>
+                      <span className="fact-secondary">owner (locked)</span>
                     )}
 
                     <form action={removeSeat}>
@@ -152,13 +152,13 @@ export default async function TeamPage({
 
       {isOwner ? (
         <section className="mt-10">
-          <p className="fact-secondary">add a seat</p>
+          <p className="fact-secondary">add a member</p>
           <div className="mt-4">
             <Rule />
           </div>
           <div className="mt-4">
             <p className="max-w-lg text-[15px] leading-relaxed">
-              Create a seat with a temporary password. You&apos;ll see the
+              Add a member with a temporary password. You&apos;ll see the
               password once, then share it privately.
             </p>
             <form action={addSeat} className="mt-8 flex flex-col gap-6">
@@ -196,7 +196,7 @@ export default async function TeamPage({
               {error ? (
                 <ErrorText>{ERRORS[error] ?? "something went wrong."}</ErrorText>
               ) : null}
-              <PrimaryButton type="submit">ADD SEAT</PrimaryButton>
+              <PrimaryButton type="submit">ADD A MEMBER</PrimaryButton>
             </form>
           </div>
         </section>

@@ -180,8 +180,21 @@ export const projects = pgTable("projects", {
   dayRateOnset: integer("day_rate_onset"),
   hourlyPostprod: integer("hourly_postprod"),
   byoGear: byoGear("byo_gear").notNull().default("not_needed"),
+  /* Per-role terms (owner's call 2026-08-01): each role carries its own
+   * rate, gear, and remote terms. Project-level rate/gear/remote columns
+   * remain as legacy fallbacks for rows created before this change. */
   rolesNeeded: jsonb("roles_needed")
-    .$type<{ discipline: string; count: number; level?: string }[]>()
+    .$type<
+      {
+        discipline: string;
+        count: number;
+        level?: string;
+        dayRate?: number;
+        hourlyPost?: number;
+        byoGear?: "not_needed" | "preferred" | "required";
+        remote?: boolean;
+      }[]
+    >()
     .notNull()
     .default([]),
   status: projectStatus("status").notNull().default("open"),

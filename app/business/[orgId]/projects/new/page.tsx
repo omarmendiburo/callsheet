@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getOrgForUser } from "../../../_data";
-import { DISCIPLINES, LEVELS, PROJECT_TYPES } from "@/lib/taxonomy";
+import { PROJECT_TYPES } from "@/lib/taxonomy";
 import {
   ErrorText,
   Field,
@@ -12,12 +12,12 @@ import {
   TextInput,
 } from "@/components/ui";
 import { createProject } from "../../../_actions";
+import { RolesEditor } from "./RolesEditor";
 
 /*
  * §5.3 project creation (manager+). getOrgForUser is the membership gate;
- * viewers are bounced to the org home. Roles-needed is a fixed set of blank
- * rows — the server keeps only the ones with a real discipline and a positive
- * count, so there is no client JS and the closed vocabulary holds.
+ * viewers are bounced to the org home. Roles are a growable per-role editor
+ * (rate, gear, remote per role); the server action re-validates every row.
  */
 
 const ERRORS: Record<string, string> = {
@@ -28,7 +28,6 @@ const ERRORS: Record<string, string> = {
   timeline: "the end date can't come before the start date.",
 };
 
-const ROLE_ROWS = [0, 1, 2, 3, 4];
 
 export default async function NewProjectPage({
   params,
@@ -106,100 +105,13 @@ export default async function NewProjectPage({
           </Field>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          <Field label="shooting location (city)">
-            <TextInput name="location" placeholder="san diego" required />
-          </Field>
-          <label className="flex items-end gap-3 pb-3">
-            <input
-              type="checkbox"
-              name="remoteOk"
-              className="h-4 w-4 accent-ink"
-            />
-            <span className="text-[15px]">Remote work is OK.</span>
-          </label>
-        </div>
-
-        <fieldset>
-          <legend className="fact-secondary mb-3">
-            roles needed · pick a craft, a count, and an optional level
-          </legend>
-          <div className="flex flex-col divide-y divide-rule border-t border-b border-rule">
-            {ROLE_ROWS.map((i) => (
-              <div
-                key={i}
-                className="grid grid-cols-1 items-center gap-3 py-3 sm:grid-cols-[2fr_1fr_1.5fr]"
-              >
-                <select
-                  name="roleDiscipline"
-                  defaultValue=""
-                  className="fact-secondary w-full border border-rule bg-transparent px-2 py-2 focus:border-ink focus:outline-none"
-                >
-                  <option value="">— DISCIPLINE —</option>
-                  {DISCIPLINES.map((d) => (
-                    <option key={d} value={d}>
-                      {d.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  name="roleCount"
-                  type="number"
-                  min={1}
-                  max={99}
-                  placeholder="count"
-                  className="w-full border border-rule bg-transparent px-2 py-2 text-[15px] placeholder:lowercase placeholder:text-secondary focus:border-ink focus:outline-none"
-                />
-                <select
-                  name="roleLevel"
-                  defaultValue=""
-                  className="fact-secondary w-full border border-rule bg-transparent px-2 py-2 focus:border-ink focus:outline-none"
-                >
-                  <option value="">ANY LEVEL</option>
-                  {LEVELS.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.label.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
-          </div>
-          <p className="mt-2 text-[13px] text-secondary">
-            Only rows with a discipline and a count of one or more are saved.
-          </p>
-        </fieldset>
-
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          <Field label="day rate on-set (usd)" hint="optional">
-            <TextInput
-              name="dayRateOnset"
-              type="number"
-              min={0}
-              placeholder="e.g. 600"
-            />
-          </Field>
-          <Field label="hourly post (usd)" hint="optional">
-            <TextInput
-              name="hourlyPostprod"
-              type="number"
-              min={0}
-              placeholder="e.g. 55"
-            />
-          </Field>
-        </div>
-
-        <Field label="bring-your-own gear">
-          <select
-            name="byoGear"
-            defaultValue="not_needed"
-            className="fact-secondary w-full border border-rule bg-transparent px-3 py-3 focus:border-ink focus:outline-none"
-          >
-            <option value="not_needed">NOT NEEDED</option>
-            <option value="preferred">PREFERRED</option>
-            <option value="required">REQUIRED</option>
-          </select>
+        <Field label="shooting location (city)">
+          <TextInput name="location" placeholder="san diego" required />
         </Field>
+
+        <RolesEditor />
+
+
 
         {error ? (
           <ErrorText>{ERRORS[error] ?? "something went wrong."}</ErrorText>

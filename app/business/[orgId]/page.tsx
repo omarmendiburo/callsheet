@@ -48,7 +48,7 @@ export default async function OrgHome({
           <dd className="fact">{org.verified ? "verified" : "unverified"}</dd>
         </div>
         <div className="flex items-baseline justify-between gap-6 py-3">
-          <dt className="fact-secondary">your seat</dt>
+          <dt className="fact-secondary">your role</dt>
           <dd className="fact">{role}</dd>
         </div>
           <div className="flex items-baseline justify-between gap-6 py-3">

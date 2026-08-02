@@ -42,7 +42,7 @@ export default async function BusinessHome() {
             Your organizations.
           </h1>
           <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
-            You hold a seat in more than one org. Pick which one to work in.
+            You're a member of more than one org. Pick which one to work in.
           </p>
           <ul className="mt-10 flex flex-col divide-y divide-rule border-t border-b border-rule">
             {orgs.map(({ org, role }: { org: Org; role: string }) => (
@@ -86,7 +86,7 @@ async function SingleOrg({ org, role }: { org: Org; role: string }) {
           <dd className="fact">{org.verified ? "verified" : "unverified"}</dd>
         </div>
         <div className="flex items-baseline justify-between gap-6 py-3">
-          <dt className="fact-secondary">your seat</dt>
+          <dt className="fact-secondary">your role</dt>
           <dd className="fact">{role}</dd>
         </div>
           <div className="flex items-baseline justify-between gap-6 py-3">

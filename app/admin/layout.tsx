@@ -17,7 +17,7 @@ export default async function AdminLayout({
       userRole="hmnty staff"
       links={[
         { href: "/admin", label: "overview", icon: "overview" },
-        { href: "/admin/users", label: "users", icon: "users" },
+        { href: "/admin/users", label: "accounts", icon: "users" },
         { href: "/admin/moderation", label: "moderation", icon: "moderation" },
         {
           href: "/admin/certification",

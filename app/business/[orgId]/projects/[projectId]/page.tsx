@@ -80,30 +80,51 @@ export default async function ProjectDetailPage({
           <Rule />
         </div>
         <dl className="mt-4 flex flex-col divide-y divide-rule border-t border-b border-rule">
-        <Fact label="location">
-          {project.location}
-          {project.remoteOk ? " · remote ok" : ""}
-        </Fact>
+        <Fact label="location">{project.location}</Fact>
         <Fact label="timeline">
           {fmtDate(project.timelineStart)} → {fmtDate(project.timelineEnd)}
         </Fact>
-        <Fact label="day rate on-set">
-          {project.dayRateOnset != null ? `$${project.dayRateOnset}` : "—"}
-        </Fact>
-        <Fact label="hourly post">
-          {project.hourlyPostprod != null ? `$${project.hourlyPostprod}` : "—"}
-        </Fact>
-        <Fact label="byo gear">{project.byoGear.replace("_", " ")}</Fact>
-        <Fact label="roles needed">
-          {(project.rolesNeeded ?? []).length > 0
-            ? (project.rolesNeeded ?? [])
-                .map(
-                  (r) =>
-                    `${r.count}× ${r.discipline}${r.level ? ` (${r.level})` : ""}`,
-                )
-                .join(" · ")
-            : "—"}
-        </Fact>
+        </dl>
+      </section>
+
+      {/* Per-role terms: each role carries its own rate, gear, and remote. */}
+      <section className="mt-10">
+        <p className="fact-secondary">the roles</p>
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <dl className="mt-4 flex flex-col divide-y divide-rule border-t border-b border-rule">
+          {(project.rolesNeeded ?? []).length > 0 ? (
+            (project.rolesNeeded ?? []).map((r, i) => {
+              const parts: string[] = [];
+              if (r.level) parts.push(r.level);
+              if (r.dayRate != null) parts.push(`$${r.dayRate}/day on set`);
+              else if (project.dayRateOnset != null)
+                parts.push(`$${project.dayRateOnset}/day on set`);
+              if (r.hourlyPost != null) parts.push(`$${r.hourlyPost}/hr post`);
+              else if (project.hourlyPostprod != null)
+                parts.push(`$${project.hourlyPostprod}/hr post`);
+              const gear = r.byoGear ?? project.byoGear;
+              parts.push(
+                gear === "not_needed"
+                  ? "gear provided"
+                  : gear === "preferred"
+                    ? "own gear preferred"
+                    : "own gear required",
+              );
+              parts.push(r.remote ?? project.remoteOk ? "remote ok" : "on set");
+              return (
+                <Fact
+                  key={i}
+                  label={r.count > 1 ? `${r.discipline} ×${r.count}` : r.discipline}
+                >
+                  {parts.join(" · ")}
+                </Fact>
+              );
+            })
+          ) : (
+            <Fact label="roles">—</Fact>
+          )}
         </dl>
       </section>
 

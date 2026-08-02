@@ -57,10 +57,16 @@ export async function rankTalentForProject(
     return [];
   }
 
+  /* Rates are per role now: the target is the highest per-role day rate,
+   * falling back to the legacy project-level column for older rows. */
+  const roleRates = ((project.rolesNeeded ?? []) as { dayRate?: number }[])
+    .map((r) => r.dayRate)
+    .filter((n): n is number => typeof n === "number" && n > 0);
   const scoreInputs = {
     neededDisciplines: facts.neededDisciplines,
     neededLevels: facts.neededLevels,
-    dayRateTarget: facts.dayRateOnset,
+    dayRateTarget:
+      roleRates.length > 0 ? Math.max(...roleRates) : facts.dayRateOnset,
     availableNowWanted: false,
   };
 

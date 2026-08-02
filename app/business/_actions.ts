@@ -71,38 +71,50 @@ export async function createProject(formData: FormData) {
     : "";
   const description = String(formData.get("description") ?? "").trim();
   const location = String(formData.get("location") ?? "").trim();
-  const remoteOk = formData.get("remoteOk") === "on";
-  const dayRateOnset = parseRate(formData, "dayRateOnset");
-  const hourlyPostprod = parseRate(formData, "hourlyPostprod");
-
-  const byoRaw = String(formData.get("byoGear") ?? "not_needed");
-  const byoGear: Byo = BYO.includes(byoRaw as Byo)
-    ? (byoRaw as Byo)
-    : "not_needed";
 
   const start = parseDate(formData, "timelineStart");
   const end = parseDate(formData, "timelineEnd");
 
-  // Roles needed: parallel discipline + count arrays. Keep only real
-  // disciplines with a positive count; drop forged / blank rows.
-  const rawDisciplines = formData.getAll("roleDiscipline").map((d) => String(d));
-  const rawCounts = formData.getAll("roleCount").map((c) => String(c));
-  const rawLevels = formData.getAll("roleLevel").map((l) => String(l));
-  const rolesNeeded: { discipline: string; count: number; level?: string }[] =
-    [];
-  for (let i = 0; i < rawDisciplines.length; i++) {
-    const discipline = rawDisciplines[i];
-    if (!(DISCIPLINES as readonly string[]).includes(discipline)) continue;
-    const count = Number.parseInt(rawCounts[i] ?? "", 10);
-    if (!Number.isFinite(count) || count < 1) continue;
-    const level = rawLevels[i] ?? "";
-    const row: { discipline: string; count: number; level?: string } = {
-      discipline,
-      count: Math.min(count, 99),
-    };
-    if (LEVEL_IDS.includes(level)) row.level = level;
-    rolesNeeded.push(row);
+  /* Per-role terms (owner's call 2026-08-01): one JSON field from the
+   * RolesEditor, re-validated row by row — forged disciplines, levels,
+   * gear values, and absurd numbers are dropped or clamped, never trusted. */
+  type RoleRow = {
+    discipline: string;
+    count: number;
+    level?: string;
+    dayRate?: number;
+    hourlyPost?: number;
+    byoGear?: Byo;
+    remote?: boolean;
+  };
+  const rolesNeeded: RoleRow[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("rolesJson") ?? "[]"));
+    if (Array.isArray(parsed)) {
+      for (const raw of parsed.slice(0, 20)) {
+        if (typeof raw !== "object" || raw === null) continue;
+        const discipline = String(raw.discipline ?? "");
+        if (!(DISCIPLINES as readonly string[]).includes(discipline)) continue;
+        const count = Number.parseInt(String(raw.count ?? ""), 10);
+        if (!Number.isFinite(count) || count < 1) continue;
+        const row: RoleRow = { discipline, count: Math.min(count, 99) };
+        const level = String(raw.level ?? "");
+        if (LEVEL_IDS.includes(level)) row.level = level;
+        const dayRate = Number.parseInt(String(raw.dayRate ?? ""), 10);
+        if (Number.isFinite(dayRate) && dayRate > 0)
+          row.dayRate = Math.min(dayRate, 100000);
+        const hourlyPost = Number.parseInt(String(raw.hourlyPost ?? ""), 10);
+        if (Number.isFinite(hourlyPost) && hourlyPost > 0)
+          row.hourlyPost = Math.min(hourlyPost, 10000);
+        if (BYO.includes(raw.byoGear as Byo)) row.byoGear = raw.byoGear as Byo;
+        if (raw.remote === true) row.remote = true;
+        rolesNeeded.push(row);
+      }
+    }
+  } catch {
+    // fall through — empty rolesNeeded fails validation below
   }
+  const remoteOk = rolesNeeded.some((r) => r.remote === true);
 
   if (!title) err("title");
   if (!type) err("type");
@@ -126,9 +138,9 @@ export async function createProject(formData: FormData) {
     lat: geo?.lat,
     lng: geo?.lng,
     remoteOk,
-    dayRateOnset,
-    hourlyPostprod,
-    byoGear,
+    dayRateOnset: null,
+    hourlyPostprod: null,
+    byoGear: "not_needed",
     rolesNeeded,
     status: "open",
   });

@@ -339,9 +339,9 @@ async function main() {
       hourlyPostprod: 55,
       byoGear: "preferred",
       rolesNeeded: [
-        { discipline: "Cinematographer / DP", count: 1 },
-        { discipline: "Editor", count: 1 },
-        { discipline: "Colorist", count: 1 },
+        { discipline: "Cinematographer / DP", count: 1, dayRate: 600, byoGear: "preferred" as const },
+        { discipline: "Editor", count: 1, dayRate: 450, hourlyPost: 55, remote: true },
+        { discipline: "Colorist", count: 1, hourlyPost: 60, remote: true },
       ],
       status: "open",
     },
@@ -359,8 +359,8 @@ async function main() {
       hourlyPostprod: 45,
       byoGear: "required",
       rolesNeeded: [
-        { discipline: "Shortform creator", count: 1 },
-        { discipline: "Photographer", count: 1 },
+        { discipline: "Shortform creator", count: 1, dayRate: 450, hourlyPost: 45, byoGear: "required" as const },
+        { discipline: "Photographer", count: 1, dayRate: 400, byoGear: "required" as const },
       ],
       status: "open",
     },

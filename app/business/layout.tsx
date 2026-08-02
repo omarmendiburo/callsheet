@@ -22,7 +22,7 @@ export default async function BusinessLayout({
   if (orgs.length === 1) {
     const orgId = orgs[0].org.id;
     links.push(
-      { href: `/business/${orgId}/team`, label: "team", icon: "team" },
+      { href: `/business/${orgId}/team`, label: "members", icon: "team" },
       {
         href: `/business/${orgId}/projects/new`,
         label: "new project",
