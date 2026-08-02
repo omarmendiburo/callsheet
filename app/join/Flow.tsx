@@ -79,11 +79,8 @@ function Question({
   error?: string | null;
 }) {
   return (
-    <div className="flex min-h-dvh w-full flex-col px-6 py-8 sm:px-12">
-      <div className="flex items-center justify-between">
-        <Link href="/" className={`${LABEL} text-secondary`}>
-          callsheet
-        </Link>
+    <div className="flex w-full flex-1 flex-col px-6 pb-8 pt-2 sm:px-12">
+      <div className="flex items-center justify-end">
         <span className={`${LABEL} text-secondary`}>
           {n} / {total}
         </span>
@@ -290,7 +287,7 @@ export default function Flow() {
 
   const shell = (node: ReactNode) => (
     <main
-      className="transition-opacity duration-150"
+      className="flex flex-1 flex-col transition-opacity duration-150"
       style={{ opacity: visible ? 1 : 0 }}
     >
       {node}
@@ -363,44 +360,47 @@ export default function Flow() {
         title="how seasoned are you?"
         sub={
           picked.length > 1
-            ? "set the level that fits each craft."
-            : "set the level that fits."
+            ? "pick the line that sounds like you, one per craft. different levels across crafts is normal."
+            : "pick the line that sounds like you. gut answer is fine."
         }
         onBack={back}
         onNext={advance}
         canAdvance={canAdvance("levels")}
       >
         <div className="flex flex-col gap-8">
-          {picked.map((d) => (
-            <div key={d}>
-              <p className={`${LABEL} mb-3`}>{d}</p>
-              <div className="flex flex-col divide-y divide-rule border-t border-b border-rule">
-                {LEVELS.map((l) => {
-                  const on = (levels[d] ?? "professional") === l.id;
-                  return (
-                    <button
-                      key={l.id}
-                      type="button"
-                      onClick={() =>
-                        setLevels((lv) => ({ ...lv, [d]: l.id }))
-                      }
-                      className="flex items-baseline justify-between gap-4 py-3 text-left transition-opacity duration-150 hover:opacity-70"
-                    >
-                      <span className="flex items-baseline gap-3">
-                        <span className={`${LABEL} w-4 text-secondary`}>
-                          {on ? "x" : ""}
-                        </span>
-                        <span className="text-[18px]">{l.label}</span>
-                      </span>
-                      <span className="max-w-xs text-[13px] leading-snug text-secondary">
-                        {l.blurb}
-                      </span>
-                    </button>
-                  );
-                })}
+          {picked.map((d) => {
+            const current = levels[d];
+            const sel = LEVELS.find((l) => l.id === current);
+            return (
+              <div key={d}>
+                <p className={`${LABEL} mb-3`}>{d}</p>
+                <div className="flex flex-wrap gap-2">
+                  {LEVELS.map((l) => {
+                    const on = current === l.id;
+                    return (
+                      <button
+                        key={l.id}
+                        type="button"
+                        onClick={() =>
+                          setLevels((lv) => ({ ...lv, [d]: l.id }))
+                        }
+                        className={`border px-3 py-2 transition-opacity duration-150 ${LABEL} ${
+                          on
+                            ? "border-ink bg-ink text-paper"
+                            : "border-rule bg-paper text-secondary hover:opacity-70"
+                        }`}
+                      >
+                        {l.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 min-h-[1.4em] text-[13px] leading-snug text-secondary">
+                  {sel ? sel.blurb : "pick the line that sounds like you."}
+                </p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Question>,
     );
@@ -573,11 +573,8 @@ export default function Flow() {
   ];
 
   return shell(
-    <div className="flex min-h-dvh w-full flex-col px-6 py-8 sm:px-12">
-      <div className="flex items-center justify-between">
-        <Link href="/" className={`${LABEL} text-secondary`}>
-          callsheet
-        </Link>
+    <div className="flex w-full flex-1 flex-col px-6 pb-8 pt-2 sm:px-12">
+      <div className="flex items-center justify-end">
         <span className={`${LABEL} text-secondary`}>
           {index + 1} / {total}
         </span>

@@ -8,6 +8,7 @@ import { newId } from "@/lib/id";
 import { geocodeCity } from "@/lib/geo";
 import { WORK_TYPES } from "@/lib/taxonomy";
 import { ErrorText, Field, PrimaryButton, TextInput } from "@/components/ui";
+import { Nav } from "@/components/nav";
 
 /*
  * §5.1 org signup. Creates, in one submission: the owner's user (role
@@ -120,11 +121,10 @@ export default async function BusinessSignupPage({
 }) {
   const { error } = await searchParams;
   return (
+    <>
+    <Nav primary={false} />
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
-      <p className="fact">
-        <Link href="/">Callsheet</Link>
-      </p>
-      <h1 className="headline mt-10 text-5xl">Bring your organization.</h1>
+      <h1 className="headline text-5xl">Bring your organization.</h1>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
         Set up the org, add your seats later, and post projects. You describe
         the work. A ranked, human-reviewed team comes back.
@@ -252,5 +252,6 @@ export default async function BusinessSignupPage({
         .
       </p>
     </main>
+    </>
   );
 }

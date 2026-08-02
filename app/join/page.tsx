@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { Nav } from "@/components/nav";
 import Flow from "./Flow";
 
 /*
- * §4.1 talent signup. A full-viewport, distraction-free conversational intake
- * (typeform-style): one question per screen. All logic and state live in the
- * client Flow; the server action in ./_actions.ts is the source of truth and
- * re-validates every field before writing the user, profile, and disciplines.
+ * §4.1 talent signup. A conversational intake (typeform-style): one question
+ * per screen under the standard site nav (owner's call 2026-08-02). All logic
+ * and state live in the client Flow; the server action in ./_actions.ts is the
+ * source of truth and re-validates every field before writing the user,
+ * profile, and disciplines.
  *
  * Logged-in users are sent home instead (audit 2026-08-02): re-running signup
  * while authenticated can only ever dead-end on the duplicate-email check.
@@ -14,5 +16,10 @@ import Flow from "./Flow";
 export default async function JoinPage() {
   const user = await getCurrentUser();
   if (user) redirect(`/${user.role}`);
-  return <Flow />;
+  return (
+    <>
+      <Nav primary={false} />
+      <Flow />
+    </>
+  );
 }

@@ -46,22 +46,22 @@ export const LEVELS = [
   {
     id: "apprentice",
     label: "Apprentice",
-    blurb: "Learning on-set; supervised. The mission's front door.",
+    blurb: "I'm learning. I want to be on sets and soak it up.",
   },
   {
     id: "emerging",
     label: "Emerging",
-    blurb: "Some paid credits; works semi-independently.",
+    blurb: "I've been paid for this a few times. Still building the reel.",
   },
   {
     id: "professional",
     label: "Professional",
-    blurb: "Reliable, independent, portfolio of work.",
+    blurb: "This is my job. Hand me the brief and I deliver.",
   },
   {
     id: "expert",
     label: "Expert",
-    blurb: "Senior / lead; can head a department.",
+    blurb: "I run the department. People learn from me.",
   },
 ] as const;
 

@@ -53,7 +53,7 @@ export async function Nav({ primary = true }: { primary?: boolean } = {}) {
         ) : (
           <>
             <Link
-              className="fact-secondary transition-opacity duration-150 hover:opacity-70"
+              className="fact-secondary whitespace-nowrap transition-opacity duration-150 hover:opacity-70"
               href="/login"
             >
               log in
@@ -61,8 +61,8 @@ export async function Nav({ primary = true }: { primary?: boolean } = {}) {
             <Link
               className={
                 primary
-                  ? "fact bg-ink px-3 py-2 text-paper transition-opacity duration-150 hover:opacity-80"
-                  : "fact border border-ink px-3 py-2 transition-opacity duration-150 hover:opacity-70"
+                  ? "fact whitespace-nowrap bg-ink px-3 py-2 text-paper transition-opacity duration-150 hover:opacity-80"
+                  : "fact whitespace-nowrap border border-ink px-3 py-2 transition-opacity duration-150 hover:opacity-70"
               }
               href="/signup"
             >
