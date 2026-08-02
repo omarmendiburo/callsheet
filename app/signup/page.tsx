@@ -20,31 +20,37 @@ export default function SignupPage() {
   return (
     <>
       <Nav />
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-14 sm:px-10">
-        <h1 className="headline text-6xl sm:text-7xl">Get on the callsheet.</h1>
-        <p className="mt-6 max-w-xl text-[17px] leading-relaxed">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-6 py-16 sm:px-10">
+        <h1 className="headline text-6xl sm:text-8xl">
+          Get on the <span className="text-accent">callsheet.</span>
+        </h1>
+        <p className="mt-6 max-w-xl text-[18px] leading-relaxed text-secondary">
           Two doors, one network. Pick yours.
         </p>
 
-        <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2">
+        <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-rule sm:mt-20 sm:grid-cols-2">
           {DOORS.map((d) => (
             <Link
               key={d.href}
               href={d.href}
-              className="group flex flex-col gap-4 border-t border-ink pt-6 transition-opacity duration-150 hover:opacity-70"
+              className="group flex min-h-[44vh] flex-col justify-between gap-8 bg-paper p-10 transition-colors duration-150 hover:bg-sunken sm:p-14"
             >
-              <span className="headline text-4xl">{d.title}</span>
-              <span className="text-[16px] leading-relaxed">{d.line}</span>
-              <span className="fact mt-2 underline underline-offset-4">
-                {d.cta}
-              </span>
+              <span className="headline text-5xl sm:text-6xl">{d.title}</span>
+              <div className="flex flex-col gap-6">
+                <span className="max-w-sm text-[17px] leading-relaxed">
+                  {d.line}
+                </span>
+                <span className="fact text-accent underline underline-offset-4">
+                  {d.cta} &rarr;
+                </span>
+              </div>
             </Link>
           ))}
         </div>
 
-        <p className="mt-14 text-[15px] text-secondary">
+        <p className="mt-12 text-[15px] text-secondary">
           Already have an account?{" "}
-          <Link className="underline underline-offset-4" href="/login">
+          <Link className="text-accent underline underline-offset-4" href="/login">
             Log in
           </Link>
           .

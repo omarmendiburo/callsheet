@@ -86,7 +86,7 @@ export function AppShell({
           compact ? "px-3 py-2" : "px-4 py-2.5"
         } ${
           active
-            ? "bg-ink text-paper"
+            ? "bg-accent text-paper"
             : "text-secondary hover:opacity-70"
         }`}
       >

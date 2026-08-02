@@ -17,6 +17,10 @@
   --color-rule: #2A2A2E;
   --color-frame: #202024;
   --color-error: #E5675A;
+  /* The brand accent (landing/deck yellow), used sparingly on dark: the
+   * active nav state and inline action links. Not on surfaces — balanced,
+   * not loud (owner's call 2026-08-02). */
+  --color-accent: #fddb32;
 
   /* Two voices only (owner's call, 2026-08-01, revised 9:06 PM): Anton for
    * statements, Helvetica-lineage sans (Inter) for everything else.
