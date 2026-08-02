@@ -613,7 +613,21 @@ export default function Flow() {
           <p className="mt-6 text-[15px] leading-relaxed text-error">{err}</p>
         ) : null}
 
-        <div className="mt-12 flex items-center gap-8">
+        <p className="mt-10 text-[13px] leading-relaxed text-secondary">
+          by joining you agree to{" "}
+          {/* new tab on purpose: this flow keeps your answers in memory */}
+          <a
+            className="text-ink underline underline-offset-4"
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            how callsheet handles your data
+          </a>
+          .
+        </p>
+
+        <div className="mt-6 flex items-center gap-8">
           <button
             type="button"
             onClick={submit}

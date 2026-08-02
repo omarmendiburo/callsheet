@@ -241,6 +241,18 @@ export default async function BusinessSignupPage({
           <ErrorText>{ERRORS[error] ?? "something went wrong."}</ErrorText>
         ) : null}
 
+        <p className="text-[13px] leading-relaxed text-secondary">
+          by creating the organization you agree to{" "}
+          <Link
+            className="text-ink underline underline-offset-4"
+            href="/privacy"
+            target="_blank"
+          >
+            how callsheet handles your data
+          </Link>
+          .
+        </p>
+
         <PrimaryButton type="submit">CREATE THE ORGANIZATION</PrimaryButton>
       </form>
 
