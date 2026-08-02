@@ -88,6 +88,7 @@ export const PROFILE_PROMPTS = [
 ] as const;
 
 export const WORK_TYPES = [
+  "Narrative",
   "Marketing",
   "Documentary",
   "Commercial",
