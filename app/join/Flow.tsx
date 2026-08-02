@@ -49,6 +49,7 @@ const ERROR_STEP: Record<string, StepId> = {
   disciplines: "disciplines",
   radius: "travel",
   dupe: "contact",
+  agree: "review",
 };
 
 const LABEL = "font-serif uppercase tracking-[0.08em] text-[12px]";
@@ -145,6 +146,7 @@ export default function Flow() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
 
   // navigation
   const [step, setStep] = useState<StepId>("name");
@@ -205,6 +207,7 @@ export default function Flow() {
       fd.append("discipline", d);
       fd.set(`level_${d}`, levels[d] ?? "professional");
     }
+    fd.set("agree", agreed ? "on" : "");
     fd.set("travel", travel === "yes" ? "yes" : "no");
     if (travel === "yes" && radius.trim()) {
       fd.set("travelRadiusMiles", radius.trim());
@@ -613,34 +616,42 @@ export default function Flow() {
           <p className="mt-6 text-[15px] leading-relaxed text-error">{err}</p>
         ) : null}
 
-        <p className="mt-10 text-[13px] leading-relaxed text-secondary">
-          by joining you agree to the{" "}
-          {/* new tabs on purpose: this flow keeps your answers in memory */}
-          <a
-            className="text-ink underline underline-offset-4"
-            href="/terms"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            terms of use
-          </a>{" "}
-          and{" "}
-          <a
-            className="text-ink underline underline-offset-4"
-            href="/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            how callsheet handles your data
-          </a>
-          .
-        </p>
+        <label className="mt-10 flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 h-4 w-4 accent-ink"
+          />
+          <span className="text-[13px] leading-relaxed text-secondary">
+            I read and agree to the{" "}
+            {/* new tabs on purpose: this flow keeps your answers in memory */}
+            <a
+              className="text-ink underline underline-offset-4"
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              terms of use
+            </a>{" "}
+            and{" "}
+            <a
+              className="text-ink underline underline-offset-4"
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              how callsheet handles your data
+            </a>
+            .
+          </span>
+        </label>
 
         <div className="mt-6 flex items-center gap-8">
           <button
             type="button"
             onClick={submit}
-            disabled={pending}
+            disabled={pending || !agreed}
             className="bg-ink px-8 py-4 text-paper transition-opacity duration-150 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <span className={LABEL}>

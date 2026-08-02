@@ -50,6 +50,7 @@ export async function signup(
   const phone = String(formData.get("phone") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
+  if (formData.get("agree") !== "on") return { code: "agree" };
   if (!orgName || !name || !email || !password) return { code: "missing" };
   if (!/^\d{9}$/.test(ein)) return { code: "ein" };
   if (workTypes.length === 0) return { code: "worktypes" };

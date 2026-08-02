@@ -16,4 +16,5 @@ export const ERROR_MESSAGES: Record<string, string> = {
   disciplines: "pick at least one craft and a level for it.",
   radius: "travel radius has to be a positive number of miles.",
   dupe: "an account with that email already exists. try logging in.",
+  agree: "please confirm you read the terms and the data notice.",
 };

@@ -59,6 +59,7 @@ export async function join(
 
   const fail = (code: string): JoinState => ({ code });
 
+  if (formData.get("agree") !== "on") return fail("agree");
   if (!name || !email || !password) return fail("missing");
   if (password.length < 8) return fail("password");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("email");

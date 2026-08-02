@@ -25,6 +25,7 @@ const ERRORS: Record<string, string> = {
   email: "that email address doesn't look right.",
   website: "the website must start with http:// or https://.",
   dupe: "an account with that email already exists.",
+  agree: "please confirm you read the terms and the data notice.",
 };
 
 export function SignupForm() {
@@ -149,25 +150,33 @@ export function SignupForm() {
         <ErrorText>{ERRORS[state.code] ?? "something went wrong."}</ErrorText>
       ) : null}
 
-      <p className="text-[13px] leading-relaxed text-secondary">
-        by creating the organization you agree to the{" "}
-        <Link
-          className="text-ink underline underline-offset-4"
-          href="/terms"
-          target="_blank"
-        >
-          terms of use
-        </Link>{" "}
-        and{" "}
-        <Link
-          className="text-ink underline underline-offset-4"
-          href="/privacy"
-          target="_blank"
-        >
-          how callsheet handles your data
-        </Link>
-        .
-      </p>
+      <label className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          name="agree"
+          required
+          className="mt-0.5 h-4 w-4 accent-ink"
+        />
+        <span className="text-[13px] leading-relaxed text-secondary">
+          I read and agree to the{" "}
+          <Link
+            className="text-ink underline underline-offset-4"
+            href="/terms"
+            target="_blank"
+          >
+            terms of use
+          </Link>{" "}
+          and{" "}
+          <Link
+            className="text-ink underline underline-offset-4"
+            href="/privacy"
+            target="_blank"
+          >
+            how callsheet handles your data
+          </Link>
+          .
+        </span>
+      </label>
 
       <PrimaryButton type="submit" disabled={pending}>
         {pending ? "CREATING..." : "CREATE THE ORGANIZATION"}
