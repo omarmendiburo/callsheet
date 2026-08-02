@@ -1,19 +1,22 @@
 @import "tailwindcss";
 
 /*
- * Callsheet design tokens — DESIGN.md is law.
- * Black on white. Greys recede. No accent colour, ever.
- * 0px radius everywhere. No shadows, no gradients, no icons.
- * Motion is opacity only, 150ms.
+ * Callsheet design tokens.
+ * DARK THEME (owner's call, 2026-08-02): the product runs on a black page.
+ * The tokens stay semantic — `ink` is the foreground (now soft white), `paper`
+ * is the background (now near-black), so every `bg-ink`/`text-paper`/`border-rule`
+ * usage flips consistently with zero component changes. Greys still recede; no
+ * accent colour, ever; 0px radius; no shadows/gradients/icons; opacity-only
+ * motion. (The landing and deck carry their own dark styles already.)
  */
 @theme inline {
-  --color-ink: #000000;
-  --color-secondary: #6b6b6b;
-  --color-paper: #ffffff;
-  --color-sunken: #f4f4f2;
-  --color-rule: #e4e4e2;
-  --color-frame: #0a0a0a;
-  --color-error: #b23b2e;
+  --color-ink: #F4F4F3;
+  --color-secondary: #9A9A9E;
+  --color-paper: #0B0B0C;
+  --color-sunken: #17171A;
+  --color-rule: #2A2A2E;
+  --color-frame: #202024;
+  --color-error: #E5675A;
 
   /* Two voices only (owner's call, 2026-08-01, revised 9:06 PM): Anton for
    * statements, Helvetica-lineage sans (Inter) for everything else.
