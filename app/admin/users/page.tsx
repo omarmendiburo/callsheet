@@ -125,7 +125,14 @@ export default async function AdminUsers({
           <tbody>
             {users.map((u) => (
               <tr key={u.id} className="border-b border-rule align-top">
-                <td className="py-3 pr-4 text-[14px]">{u.name}</td>
+                <td className="py-3 pr-4 text-[14px]">
+                  <a
+                    className="underline underline-offset-4 transition-opacity duration-150 hover:opacity-70"
+                    href={`/admin/users/${u.id}`}
+                  >
+                    {u.name}
+                  </a>
+                </td>
                 <td className="py-3 pr-4 text-[13px] break-all">
                   {u.email}
                 </td>
@@ -136,6 +143,12 @@ export default async function AdminUsers({
                 </td>
                 <td className="py-3">
                   <div className="flex items-center gap-4">
+                    <a
+                      className="fact underline underline-offset-4 transition-opacity duration-150 hover:opacity-70"
+                      href={`/admin/users/${u.id}`}
+                    >
+                      profile
+                    </a>
                     <form
                       action={u.suspended ? unsuspendUser : suspendUser}
                     >

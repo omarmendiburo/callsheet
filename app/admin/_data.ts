@@ -108,6 +108,16 @@ export async function listUsers(): Promise<User[]> {
   return db.select().from(schema.users).orderBy(desc(schema.users.createdAt));
 }
 
+export async function getUserById(id: string): Promise<User | null> {
+  const db = await getDb();
+  const rows = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, id))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
 export async function listOrgs(): Promise<Org[]> {
   const db = await getDb();
   return db.select().from(schema.orgs).orderBy(desc(schema.orgs.createdAt));
