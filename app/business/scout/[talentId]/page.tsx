@@ -252,7 +252,7 @@ export default async function RevealPage({
             {track ? (
               <p className="mt-3 text-[15px] leading-relaxed">
                 <span className="fact border border-ink px-2 py-1.5">
-                  tracking · {track.status}
+                  saved{track.status !== "watching" ? ` · ${track.status}` : ""}
                 </span>
                 <Link
                   className="fact-secondary ml-4 underline underline-offset-4"
@@ -269,15 +269,15 @@ export default async function RevealPage({
                   type="submit"
                   className="fact underline underline-offset-4"
                 >
-                  track this creative
+                  save this creative
                 </button>
                 <span className="fact-secondary ml-3">
-                  adds them to your scouting list in the crm
+                  adds them to your saved list in the crm
                 </span>
               </form>
             ) : (
               <p className="fact-secondary mt-3">
-                not tracked yet. a manager on your team can start tracking.
+                not saved yet. a manager on your team can save creatives.
               </p>
             )}
           </section>

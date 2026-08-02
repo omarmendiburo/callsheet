@@ -58,7 +58,7 @@ const FORWARD: Record<string, { target: PipelineStatus; label: string } | null> 
 
 /* Scouting bands, in tracker order. */
 const TRACK_BANDS: { status: TrackStatus; label: string }[] = [
-  { status: "watching", label: "watching" },
+  { status: "watching", label: "saved" },
   { status: "contacted", label: "contacted" },
   { status: "invited", label: "invited" },
 ];
@@ -178,7 +178,7 @@ export default async function CrmPage({
       <h1 className="headline mt-4 text-4xl sm:text-5xl">The pipeline.</h1>
       <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         Two lists, one desk. Scouting is the pool you are building: creatives
-        you tracked from the wall, moved from watching to contacted to invited.
+        you saved from the wall, moved from saved to contacted to invited.
         Inbound is every application to your projects, applied to booked. Names
         live here; the wall stays name-blind.
       </p>
@@ -191,7 +191,7 @@ export default async function CrmPage({
         </div>
         {tracks.length === 0 ? (
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-secondary">
-            Nobody tracked yet. Open the{" "}
+            Nobody saved yet. Open the{" "}
             <Link
               className="text-ink underline underline-offset-4"
               href={withOrg("/business/scout", orgParam)}
@@ -205,7 +205,7 @@ export default async function CrmPage({
             >
               reels view
             </Link>{" "}
-            and track the creatives you want to keep eyes on.
+            and save the creatives you want to come back to.
           </p>
         ) : (
           <div className="mt-6 flex flex-col gap-10">
@@ -583,7 +583,7 @@ function TrackItem({
               type="submit"
               className="fact-secondary underline underline-offset-4"
             >
-              stop tracking
+              unsave
             </button>
           </form>
         ) : null}

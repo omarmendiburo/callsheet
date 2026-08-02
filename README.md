@@ -8,7 +8,8 @@ doors, one law: the work is the resume.
   with quiet recommendations, screen-tests feed.
 - **Business** — orgs with seats and roles: post projects with per-role
   terms, scout a name-blind wall (gallery / reels / CRM trio), AI-suggested
-  order and plain-English recruiter search, scouting tracker, application
+  order and plain-English recruiter search, saved-talent list (one-tap save
+  from the wall, reels, or reveal), application
   pipeline. Names appear ONLY on the reveal and in the CRM.
 - **Admin** — HMNTY staff: accounts (suspend, verify orgs, reset links),
   media moderation (nothing goes public unapproved), certification, metrics,

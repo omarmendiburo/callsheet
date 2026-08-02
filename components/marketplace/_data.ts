@@ -246,8 +246,29 @@ export async function getOrgShortlistForTalent(
   return rows[0] ?? null;
 }
 
+/* Every creative this org has saved, as a talentId -> status map. Drives the
+ * one-tap save state on the wall grid without a per-card query. Org-scoped. */
+export async function getOrgTrackedMap(
+  orgId: string,
+): Promise<Map<string, string>> {
+  const db = await getDb();
+  const rows = await db
+    .select({
+      talentId: schema.talentTracks.talentId,
+      status: schema.talentTracks.status,
+    })
+    .from(schema.talentTracks)
+    .where(eq(schema.talentTracks.orgId, orgId));
+  return new Map(
+    rows.map((r: { talentId: string; status: string }) => [
+      r.talentId,
+      r.status,
+    ]),
+  );
+}
+
 /* The org's scouting-tracker row for one creative, if any — drives the
- * track/tracked state on the reveal and reels surfaces. Org-scoped read. */
+ * save/saved state on the reveal and reels surfaces. Org-scoped read. */
 export async function getOrgTrackForTalent(
   orgId: string,
   talentId: string,

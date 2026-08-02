@@ -8,6 +8,7 @@ import { WorkCard } from "@/components/marketplace/WorkCard";
 import {
   getBrowsePool,
   getOpenProjectsForOrg,
+  getOrgTrackedMap,
   type BrowseCreative,
 } from "@/components/marketplace/_data";
 import {
@@ -17,6 +18,7 @@ import {
   RATE_OPTIONS,
 } from "@/components/marketplace/filters";
 import { ChipLink } from "@/components/marketplace/FilterRow";
+import { trackTalent } from "./_actions";
 import { resolveScoutOrg } from "./_org";
 import { rankTalentForProject } from "@/lib/ai/match";
 import { recruiterSearch } from "@/lib/ai/recruiter";
@@ -73,10 +75,15 @@ export default async function ScoutPage({
   }
 
   const org = resolution.org;
+  // Viewers browse; managers save/shortlist (actions re-check server-side).
+  const canManage = resolution.orgs.some(
+    (o) => o.org.id === org.id && (o.role === "owner" || o.role === "manager"),
+  );
 
-  const [pool, projects] = await Promise.all([
+  const [pool, projects, trackedMap] = await Promise.all([
     getBrowsePool(),
     getOpenProjectsForOrg(org.id),
+    getOrgTrackedMap(org.id),
   ]);
 
   const fDiscipline = one(params, "discipline");
@@ -376,6 +383,45 @@ export default async function ScoutPage({
                     <span className="fact">[{note.score}]</span>{" "}
                     {note.rationale}
                   </p>
+                ) : null}
+                {/* One-tap save, the feed idiom: save from the wall without
+                    opening the reveal. Name-blind — the action reveals
+                    nothing. Managers only; the action re-checks rank. */}
+                {canManage ? (
+                  trackedMap.has(c.talentId) ? (
+                    <p className="fact-secondary mt-1.5">
+                      saved
+                      {trackedMap.get(c.talentId) !== "watching"
+                        ? ` · ${trackedMap.get(c.talentId)}`
+                        : ""}{" "}
+                      ·{" "}
+                      <Link
+                        className="underline underline-offset-4"
+                        href={
+                          orgParam
+                            ? `/business/crm?org=${org.id}`
+                            : "/business/crm"
+                        }
+                      >
+                        view in crm
+                      </Link>
+                    </p>
+                  ) : (
+                    <form action={trackTalent} className="mt-1.5">
+                      <input
+                        type="hidden"
+                        name="talentId"
+                        value={c.talentId}
+                      />
+                      <input type="hidden" name="orgId" value={org.id} />
+                      <button
+                        type="submit"
+                        className="fact-secondary underline underline-offset-4"
+                      >
+                        save
+                      </button>
+                    </form>
+                  )
                 ) : null}
               </div>
             );
