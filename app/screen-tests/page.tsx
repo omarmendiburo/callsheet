@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Nav } from "@/components/nav";
 import { getCurrentUser } from "@/lib/auth";
 import { DISCIPLINES } from "@/lib/taxonomy";
@@ -17,10 +18,10 @@ import { one } from "@/components/marketplace/filters";
  * single scrollable column. Under each: disciplines + city in mono. NO names
  * anywhere — this is a browsing surface, and the wall never reveals identity.
  *
- * Card links are role-aware (audit 2026-08-02): the reveal behind them is a
- * business surface, so business viewers and logged-out visitors get the link
- * (logged-out click-through lands on login — correct); a TALENT viewer gets
- * a plain card instead of a silent bounce to the marketing homepage.
+ * Talent never sees this page (owner's ruling 2026-08-02: creatives do not
+ * browse each other's pitches) — logged-in talent redirects to /talent. The
+ * reveal behind each card is a business surface; logged-out click-through
+ * lands on login, which is correct.
  *
  * Filter chips: discipline, city. Cities are derived from the live pool.
  */
@@ -39,8 +40,10 @@ export default async function ScreenTestsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
+  // Owner's ruling 2026-08-02: talent does not browse other talents' pitches.
+  // Logged-in creatives go home; the feed stays public for everyone else.
   const viewer = await getCurrentUser();
-  const talentViewer = viewer?.role === "talent";
+  if (viewer?.role === "talent") redirect("/talent");
 
   // Pitch media only. getBrowsePool returns approved media exclusively, so a
   // pending pitch (e.g. the seed's t11) can never appear here.
@@ -67,9 +70,8 @@ export default async function ScreenTestsPage({
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-8">
       <h1 className="headline mt-6 text-6xl">Screen tests.</h1>
       <p className="mt-4 text-[15px] leading-relaxed">
-        {talentViewer
-          ? "Ten seconds each. No names, no schools, just the pitch. This is the company you keep; business accounts see who made each one."
-          : "Ten seconds each. No names, no schools, just the pitch. Tap one to see who made it."}
+        Ten seconds each. No names, no schools, just the pitch. Tap one to see
+        who made it.
       </p>
 
       <div className="mt-8">
@@ -137,11 +139,7 @@ export default async function ScreenTestsPage({
                 </div>
               </>
             );
-            // The reveal is a business surface; a talent viewer gets the
-            // card without the link instead of a dead-end redirect.
-            return talentViewer ? (
-              <div key={c.talentId}>{body}</div>
-            ) : (
+            return (
               <Link
                 key={c.talentId}
                 href={`/business/scout/${c.talentId}`}
