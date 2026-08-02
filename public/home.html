@@ -99,6 +99,10 @@
   --body:     clamp(15px, 1.12vw, 19px);
   --small:    clamp(12px, .86vw, 15px);
   --mono:     clamp(10px, .74vw, 13px);
+  /* The eyebrow above every headline is its own step, deliberately larger than
+     the call-sheet mono used inside tables and rows. It has to survive as a
+     label at a glance on a phone; --mono only has to be legible up close. */
+  --eyebrow:  clamp(12px, 1.02vw, 18px);
 
   --strip-h:  clamp(160px, 21vw, 380px);
   --border:   max(1px, .12vw);
@@ -106,6 +110,11 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
+/* The UA rule for [hidden] is display:none at ZERO specificity, so any class
+   that sets display — .btn is inline-flex — silently un-hides the element. That
+   is why the logged-out nav was still painting MY CALLSHEET off the right edge
+   on a phone. Keep this above every component rule. */
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0;background:var(--bg);color:var(--ink);
@@ -131,9 +140,13 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 /* the utility face: call sheets are typed forms, so labels are monospaced */
 .label{
   font-family:"Space Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);
+  font-size:var(--eyebrow);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
 }
 .label b{color:var(--accent);font-weight:400}
+/* An eyebrow used mid-section, above a sub-block rather than above the H2. It
+   supplies its own top space and absorbs the block's, so the two do not stack. */
+.section .label.mid{margin-top:clamp(30px,3.2vw,60px);margin-bottom:clamp(12px,1.2vw,20px)}
+.label.mid + .chips,.label.mid + .offers,.label.mid + .sheet{margin-top:0}
 
 /* ------------------------------------------------------------------ chrome */
 .masthead{display:flex;align-items:center;gap:clamp(9px,.9vw,16px);
@@ -143,11 +156,16 @@ h1,h2,h3,p,figure,blockquote{margin:0}
   font-size:clamp(19px,1.83vw,32px);line-height:1;letter-spacing:.012em;
   padding-top:.06em}
 .nav{margin-left:auto;display:flex;align-items:center;gap:clamp(14px,2.1vw,38px)}
-.nav a{font-size:var(--nav);font-weight:500;letter-spacing:.14em;white-space:nowrap;position:relative}
+/* 44px minimum on every nav link, at every width — tablets in the 720–1024 band
+   show these links AND have a touch pointer. The box is grown, not the type. */
+.nav a{font-size:var(--nav);font-weight:500;letter-spacing:.14em;white-space:nowrap;position:relative;
+  display:inline-flex;align-items:center;min-height:44px}
 .nav a.link{color:var(--dim);transition:color .4s var(--ease)}
 .nav a.link:hover,.nav a.link:focus-visible{color:var(--ink)}
+/* the rule hangs off the TEXT, not the padded box, so the extra height stays
+   invisible — same trick as .tcta */
 .nav a.link::after{
-  content:"";position:absolute;left:0;right:0;bottom:-7px;height:1px;background:var(--accent);
+  content:"";position:absolute;left:0;right:0;bottom:calc(50% - 1.1em);height:1px;background:var(--accent);
   transform:scaleX(0);transform-origin:0 50%;transition:transform .5s var(--ease);
 }
 .nav a.link:hover::after,.nav a.link:focus-visible::after{transform:scaleX(1)}
@@ -222,6 +240,8 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 .assure span{color:var(--accent)}
 
 /* ------------------------------------------------- the filmstrip: signature */
+.stripbar{padding:0 var(--pad) clamp(10px,1vw,18px)}
+.stripbar .label{display:block}
 .strip{
   margin:0 var(--pad);
   border:var(--border) solid var(--line);
@@ -283,7 +303,11 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 .partners .label{display:block;padding:0 var(--pad);margin-bottom:clamp(24px,2.4vw,44px);
   color:#6A6A62}
 .partners .label b{color:#0B0B0C}
+/* The rail is deliberately narrower than the page. Fewer marks on screen at
+   once, each one bigger — a partner row reads as a claim, and a claim you
+   cannot see is not one. The mask still eats the edges, so it never looks cut. */
 .mq{position:relative;display:flex;overflow:hidden;
+  width:min(100%,980px);margin:0 auto;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
   mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
   /* the track is taller than the tallest mark so nothing clips at the top */
@@ -293,15 +317,15 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 .mq:hover .mq-track,.mq:focus-within .mq-track{animation-play-state:paused}
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-.lg{flex:0 0 auto;padding:0 clamp(24px,3vw,64px);display:flex;align-items:center;
-  justify-content:center;height:clamp(39px,4.03vw,65px);
+.lg{flex:0 0 auto;padding:0 clamp(18px,2.2vw,44px);display:flex;align-items:center;
+  justify-content:center;height:clamp(54px,5.7vw,94px);
   opacity:1;transition:opacity .45s var(--ease)}
 .mq:hover .lg{opacity:.4}
 .mq .lg:hover{opacity:1}
 .lg svg{height:calc(100% * var(--k,1));width:auto;max-width:none;flex:0 0 auto}
 /* MOFT publishes no public vector mark, so it is set as type at the same
    optical weight as the drawn logos rather than pulled in as a bitmap */
-.lg.type{font-weight:800;font-size:clamp(19px,1.95vw,32px);letter-spacing:-.02em;
+.lg.type{font-weight:800;font-size:clamp(26px,2.75vw,46px);letter-spacing:-.02em;
   line-height:1;color:#0B0B0C}
 
 /* ------------------------------------------------------- what you get: 3 up */
@@ -312,7 +336,10 @@ h1,h2,h3,p,figure,blockquote{margin:0}
   display:flex;flex-direction:column;gap:clamp(12px,1.1vw,20px);
   transition:background .5s var(--ease)}
 .offer:hover{background:#131315}
-.offer h3{font-size:var(--h3);line-height:1.16;font-weight:700;letter-spacing:-.02em}
+/* These three headlines ARE the offer, so they carry the accent — same rule as
+   the rotator: the accent marks the promise, never the furniture. */
+.offer h3{font-size:var(--h3);line-height:1.16;font-weight:700;letter-spacing:-.02em;
+  color:var(--accent)}
 .offer p{font-size:var(--body);line-height:1.55;color:#C9C9C3}
 .offer .tcta{margin-top:auto;align-self:flex-start}
 
@@ -354,7 +381,30 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 .rows li:hover b{color:var(--accent)}
 /* the row list already closes with a rule, so the turn line below it should
    not draw a second one a few pixels later */
-.rows + .turn{border-top:0;margin-top:clamp(22px,2.2vw,42px);padding-top:0}
+.rows + .turn,.blk + .turn{border-top:0;margin-top:clamp(22px,2.2vw,42px);padding-top:0}
+
+/* ------------------------------------------- what makes us different */
+.blk{margin-top:clamp(44px,5vw,96px)}
+.subhead{margin-top:clamp(14px,1.4vw,26px);
+  font-family:Anton,"Anton fallback",Impact,"Arial Narrow",sans-serif;font-weight:400;
+  font-size:clamp(24px,3.3vw,56px);line-height:1;letter-spacing:.006em;
+  text-transform:uppercase;max-width:20ch}
+
+/* Same hairline-grid construction as .offers: the gap IS the rule, so no cell
+   ever needs its own border. One column on a phone, by default. */
+.diffs{display:grid;gap:var(--border);margin-top:clamp(26px,2.8vw,52px);
+  background:var(--line);border:var(--border) solid var(--line)}
+@media (min-width:640px){.diffs{grid-template-columns:repeat(2,1fr)}
+  /* the closed loop is the one nobody else can copy — give it the full width */
+  .diffs li:last-child{grid-column:1/-1}}
+.diff{background:var(--bg);padding:clamp(20px,2vw,40px);
+  display:flex;flex-direction:column;gap:clamp(7px,.7vw,13px);
+  transition:background .5s var(--ease)}
+.diff:hover{background:#131315}
+.diff b{font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
+  font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.diff h4{margin:0;font-size:var(--h3);line-height:1.16;font-weight:700;letter-spacing:-.02em}
+.diff p{font-size:var(--body);line-height:1.55;color:#C9C9C3}
 
 /* ------------------------------------------------------------- closing CTA */
 .close{background:var(--paper);color:#0B0B0C;padding:clamp(56px,7vw,140px) var(--pad)}
@@ -373,6 +423,8 @@ h1,h2,h3,p,figure,blockquote{margin:0}
   display:flex;flex-wrap:wrap;align-items:center;gap:16px}
 .foot .mark{width:clamp(26px,2.4vw,40px)}
 .foot p{margin-left:auto;text-align:right;font-size:var(--small);color:var(--dim)}
+/* terms + data notice are 15px tall as inline text; grow the hit box to 44 */
+.foot a{display:inline-flex;align-items:center;min-height:44px}
 
 /* ------------------------------------------------------------ motion layer */
 .split .w{display:inline-block;overflow:hidden;vertical-align:top;
@@ -469,6 +521,10 @@ h1,h2,h3,p,figure,blockquote{margin:0}
     <p class="assure rise"><span>●</span> Free to join · No reel required · No film school required</p>
   </div>
 
+  <div class="stripbar">
+    <span class="label">Recent frames &nbsp;·&nbsp; <b>San Diego</b></span>
+  </div>
+
   <div class="strip">
     <figure class="frame" style="--f:418">
       <img src="images/panel-1.jpg" alt="A photographer shooting a seated subject on a studio cyclorama while two crew members watch.">
@@ -498,6 +554,8 @@ h1,h2,h3,p,figure,blockquote{margin:0}
     private channels, and if you're not already standing inside one of them, you simply never hear
     that the work existed.</p>
 
+  <span class="label mid">The nine channels &nbsp;·&nbsp; <b>none of them public</b></span>
+
   <ul class="chips reveal-group">
     <li class="reveal">personal networks</li><li class="reveal">referrals</li><li class="reveal">Facebook groups</li>
     <li class="reveal">Instagram</li><li class="reveal">LinkedIn</li><li class="reveal">emails</li>
@@ -514,6 +572,8 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 <section class="section">
   <span class="label">02 &nbsp;/&nbsp; What you get</span>
   <h2 class="h2 split head">Built for your first credit, not your fifth</h2>
+
+  <span class="label mid">Three things you get &nbsp;·&nbsp; <b>free</b></span>
 
   <div class="offers">
     <article class="offer">
@@ -1553,6 +1613,8 @@ h1,h2,h3,p,figure,blockquote{margin:0}
     elementary schools. Bilingual Spanish. Budget $8k, need it in 6 weeks.”
     <cite>What the employer typed</cite></blockquote>
 
+  <span class="label mid">The call sheet it builds back &nbsp;·&nbsp; <b>7 paid roles</b></span>
+
   <table class="sheet">
     <caption class="sr">Roles generated from the brief, with days of work and whether the role requires being on set.</caption>
     <thead><tr><th>Role</th><th>Days</th><th class="where">Where</th></tr></thead>
@@ -1586,6 +1648,52 @@ h1,h2,h3,p,figure,blockquote{margin:0}
     <li class="reveal"><b>04</b>You're working two jobs, and neither of them is this one.</li>
     <li class="reveal"><b>05</b>You left the industry because it never paid enough to stay.</li>
   </ul>
+
+  <div class="blk">
+    <span class="label mid">Why here &nbsp;·&nbsp; <b>and not a job board</b></span>
+    <h3 class="subhead split rise">What differentiates us from other platforms</h3>
+
+    <ul class="diffs rise">
+      <li class="diff">
+        <b>01 &nbsp;/&nbsp; Security</b>
+        <h4>Your details are not the product</h4>
+        <p>Employers are verified before they can see anyone. Your rate, your contact
+          details and your unreleased work stay yours until you say yes to a specific
+          job — we don't sell a list of you to anybody.</p>
+      </li>
+      <li class="diff">
+        <b>02 &nbsp;/&nbsp; Communication</b>
+        <h4>One thread per job, not five apps</h4>
+        <p>Every message about a role lives on the job it belongs to. No chasing a DM,
+          an email and a group chat to find out whether the shoot is still happening —
+          and a real person answers when it stalls.</p>
+      </li>
+      <li class="diff">
+        <b>03 &nbsp;/&nbsp; Personalised</b>
+        <h4>It reads your whole run, not your last title</h4>
+        <p>Callsheet takes in everything you've done in this industry — paid credits,
+          class projects, the wedding you cut for a cousin, the skills nobody put on a
+          résumé — and shows employers the shape of it. The match sharpens every time
+          you add to it.</p>
+      </li>
+      <li class="diff">
+        <b>04 &nbsp;/&nbsp; Tracking</b>
+        <h4>You can see where every application stands</h4>
+        <p>Sent, opened, shortlisted, booked, passed — each one carries a status you can
+          check, with the date it changed. You are never left refreshing an inbox
+          wondering whether anyone read it.</p>
+      </li>
+      <li class="diff">
+        <b>05 &nbsp;/&nbsp; Closed loop</b>
+        <h4>You're not applying to the platform. You're inside the studio.</h4>
+        <p>Every other platform hands you a listing and wishes you luck. Callsheet is
+          built by a working film studio, and joining it puts you inside the business
+          itself — the productions we make, the crews we staff and the employers we
+          bring on are all on the same sheet. The work doesn't get posted somewhere
+          else first.</p>
+      </li>
+    </ul>
+  </div>
 
   <div class="turn">
     <p class="rise">Every one of those is a person who <em>got the call.</em></p>
@@ -1728,14 +1836,14 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 </script>
 <script>
 /* Auth-aware nav for the static landing: logged-in visitors get one
-   MY CALLSHEET button to their own portal. Fails open to the default
-   logged-out nav on any error. */
+   MY CALLSHEET button. Owner's call — it points at /login for everyone rather
+   than deep-linking to /talent|/business|/admin, so there is a single door into
+   the product. Do NOT reintroduce the per-role href rewrite; the destination
+   lives in the markup on purpose. Fails open to the logged-out nav on error. */
 fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(me){
   if(me && me.role){
     document.querySelectorAll('[data-auth="out"]').forEach(function(el){el.hidden=true});
-    var inBtn=document.querySelector('[data-auth="in"]');
-    inBtn.href='/'+me.role;
-    inBtn.hidden=false;
+    document.querySelector('[data-auth="in"]').hidden=false;
   }
 }).catch(function(){});
 </script>
