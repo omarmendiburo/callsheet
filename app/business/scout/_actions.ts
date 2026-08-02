@@ -6,6 +6,7 @@ import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { requireOrgRole } from "@/lib/tenancy";
 import { newId } from "@/lib/id";
+import { notifyTalentInvited } from "@/lib/notify";
 
 /*
  * Shortlist a creative for one of the org's open projects (spec §5.4). This
@@ -246,7 +247,7 @@ export async function inviteTrackedToProject(formData: FormData) {
   if (!track) return;
 
   const projRows = await db
-    .select({ id: schema.projects.id })
+    .select({ id: schema.projects.id, title: schema.projects.title })
     .from(schema.projects)
     .where(
       and(
@@ -288,6 +289,8 @@ export async function inviteTrackedToProject(formData: FormData) {
     .update(schema.talentTracks)
     .set({ status: "invited" })
     .where(eq(schema.talentTracks.id, trackId));
+
+  await notifyTalentInvited(track.talentId, projRows[0].title);
 
   revalidateTrackSurfaces(track.talentId);
 }

@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { newId } from "@/lib/id";
+import { notifyOrgVerified, notifyTalentMediaApproved } from "@/lib/notify";
 
 /*
  * All admin mutations (spec §6). Defense in depth: every action re-checks
@@ -62,7 +63,7 @@ async function setVerified(formData: FormData, verified: boolean) {
 
   const db = await getDb();
   const rows = await db
-    .select({ id: schema.orgs.id })
+    .select({ id: schema.orgs.id, name: schema.orgs.name, verified: schema.orgs.verified })
     .from(schema.orgs)
     .where(eq(schema.orgs.id, orgId))
     .limit(1);
@@ -72,6 +73,10 @@ async function setVerified(formData: FormData, verified: boolean) {
     .update(schema.orgs)
     .set({ verified })
     .where(eq(schema.orgs.id, orgId));
+
+  if (verified && !rows[0].verified) {
+    await notifyOrgVerified(orgId, rows[0].name);
+  }
 
   revalidatePath("/admin/users");
   revalidatePath("/admin");
@@ -98,7 +103,12 @@ async function setMediaStatus(
 
   const db = await getDb();
   const rows = await db
-    .select({ id: schema.media.id })
+    .select({
+      id: schema.media.id,
+      talentId: schema.media.talentId,
+      title: schema.media.title,
+      status: schema.media.status,
+    })
     .from(schema.media)
     .where(eq(schema.media.id, mediaId))
     .limit(1);
@@ -108,6 +118,10 @@ async function setMediaStatus(
     .update(schema.media)
     .set({ status: next })
     .where(eq(schema.media.id, mediaId));
+
+  if (next === "approved" && rows[0].status !== "approved") {
+    await notifyTalentMediaApproved(rows[0].talentId, rows[0].title);
+  }
 
   revalidatePath("/admin/moderation");
   revalidatePath("/admin");

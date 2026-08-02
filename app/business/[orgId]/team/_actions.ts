@@ -7,6 +7,7 @@ import { getDb, schema } from "@/lib/db";
 import { requireUser, hashPassword } from "@/lib/auth";
 import { requireOrgRole } from "@/lib/tenancy";
 import { newId } from "@/lib/id";
+import { notifySeatCredentials } from "@/lib/notify";
 
 /*
  * §5.2 seats & roles. Every action re-derives the caller from the session and
@@ -85,6 +86,18 @@ export async function addSeat(formData: FormData) {
     orgId,
     role,
   });
+
+  const orgRows = await db
+    .select({ name: schema.orgs.name })
+    .from(schema.orgs)
+    .where(eq(schema.orgs.id, orgId))
+    .limit(1);
+  await notifySeatCredentials(
+    email,
+    name.split(" ")[0] || name,
+    orgRows[0]?.name ?? "your organization",
+    tempPassword,
+  );
 
   revalidatePath(`/business/${orgId}/team`);
   // Surface the temp password once, in the success state, so the owner can

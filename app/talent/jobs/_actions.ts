@@ -6,6 +6,7 @@ import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { newId } from "@/lib/id";
 import { getProfileByUserId } from "@/app/talent/_data";
+import { notifyOrgNewApplication } from "@/lib/notify";
 
 /*
  * Apply to a project (spec §4.3). The talent is re-derived from the session —
@@ -31,7 +32,11 @@ export async function applyToProject(formData: FormData) {
 
   // Only ever apply to an OPEN project that exists.
   const projRows = await db
-    .select({ id: schema.projects.id })
+    .select({
+      id: schema.projects.id,
+      title: schema.projects.title,
+      orgId: schema.projects.orgId,
+    })
     .from(schema.projects)
     .where(
       and(
@@ -65,6 +70,8 @@ export async function applyToProject(formData: FormData) {
     status: "applied",
     note: note || null,
   });
+
+  await notifyOrgNewApplication(projRows[0].orgId, projRows[0].title);
 
   revalidatePath("/talent/jobs");
 }

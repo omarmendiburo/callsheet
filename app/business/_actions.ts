@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { requireOrgRole } from "@/lib/tenancy";
+import { notifyTalentApplicationStatus } from "@/lib/notify";
 import { newId } from "@/lib/id";
 import { geocodeCity } from "@/lib/geo";
 import { DISCIPLINES, LEVELS, PROJECT_TYPES } from "@/lib/taxonomy";
@@ -172,7 +173,7 @@ export async function transitionApplication(formData: FormData) {
   // The project must belong to THIS org — the orgId filter blocks moving an
   // application on a project the caller has no authority over.
   const projRows = await db
-    .select({ id: schema.projects.id })
+    .select({ id: schema.projects.id, title: schema.projects.title })
     .from(schema.projects)
     .where(
       and(eq(schema.projects.id, projectId), eq(schema.projects.orgId, orgId)),
@@ -205,6 +206,14 @@ export async function transitionApplication(formData: FormData) {
     .update(schema.applications)
     .set({ status: target, updatedAt: new Date() })
     .where(eq(schema.applications.id, applicationId));
+
+  if (
+    target === "shortlisted" ||
+    target === "booked" ||
+    target === "declined"
+  ) {
+    await notifyTalentApplicationStatus(app.talentId, projRows[0].title, target);
+  }
 
   revalidatePath(`/business/${orgId}/projects/${projectId}`);
   back();

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { createPasswordResetToken } from "@/lib/auth";
+import { sendEmail } from "@/lib/email";
 import { Nav } from "@/components/nav";
 import { Field, PrimaryButton, TextInput } from "@/components/ui";
 
@@ -30,28 +31,13 @@ async function requestReset(formData: FormData) {
       const h = await headers();
       const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host") ?? "localhost:3000"}`;
       const link = `${origin}/reset?token=${createPasswordResetToken(user)}`;
-      const key = process.env.RESEND_API_KEY;
-      if (key) {
-        try {
-          const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${key}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              from: "Callsheet <onboarding@resend.dev>",
-              to: [user.email],
-              subject: "Reset your Callsheet password",
-              text: `Someone asked to reset the password for this account. If that was you, use this link within 30 minutes:\n\n${link}\n\nIf it was not you, ignore this email. Nothing changes until the link is used.`,
-            }),
-          });
-          if (!res.ok) console.error(`[reset] delivery failed ${res.status}`);
-        } catch {
-          console.error("[reset] delivery failed");
-        }
-      } else {
-        console.log(`[reset] email not configured; link for ${user.email}: ${link}`);
+      const delivered = await sendEmail(
+        user.email,
+        "Reset your Callsheet password",
+        `Someone asked to reset the password for this account. If that was you, use this link within 30 minutes:\n\n${link}\n\nIf it was not you, ignore this email. Nothing changes until the link is used.`,
+      );
+      if (!delivered) {
+        console.log(`[reset] not delivered; link for ${user.email}: ${link}`);
       }
     }
   }

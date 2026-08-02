@@ -7,6 +7,7 @@ import { createSession, hashPassword } from "@/lib/auth";
 import { newId } from "@/lib/id";
 import { geocodeCity } from "@/lib/geo";
 import { WORK_TYPES } from "@/lib/taxonomy";
+import { notifyAdminsNewOrg, notifyBusinessWelcome } from "@/lib/notify";
 
 /*
  * §5.1 org signup. Creates, in one submission: the owner's user (role
@@ -103,6 +104,9 @@ export async function signup(
     orgId,
     role: "owner",
   });
+
+  await notifyBusinessWelcome(email, name.split(" ")[0] || name, orgName);
+  await notifyAdminsNewOrg(orgName);
 
   await createSession(userId);
   redirect("/business");
