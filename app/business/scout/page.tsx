@@ -129,6 +129,9 @@ export default async function ScoutPage({
   const q = one(params, "q")?.trim() ?? "";
   const rankActive = one(params, "rank") === "1" && Boolean(selectedProject);
 
+  // LAW GUARD: Match objects carry displayName for the reveal context. This
+  // page is a name-blind browsing surface — render note.score/note.rationale
+  // ONLY; note.displayName must never reach this page's JSX.
   let aiNotes: Map<string, Match> | null = null;
   let aiHeading: string | null = null;
   let aiEngine: string | null = null;
