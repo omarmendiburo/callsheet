@@ -125,7 +125,7 @@ export default async function TeamPage({
                         </button>
                       </form>
                     ) : (
-                      <span className="fact-secondary">owner — seat locked</span>
+                      <span className="fact-secondary">owner (seat locked)</span>
                     )}
 
                     <form action={removeSeat}>

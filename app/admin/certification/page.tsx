@@ -25,7 +25,7 @@ export default async function AdminCertification() {
         granted it.
       </p>
       <p className="fact-secondary mt-3">
-        criteria owed from HMNTY — placeholder process
+        criteria owed from HMNTY. placeholder process
       </p>
       <p className="fact-secondary mt-3">
         {certified} of {talent.length} certified

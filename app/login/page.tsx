@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { createSession, verifyPassword } from "@/lib/auth";
+import { Nav } from "@/components/nav";
 import { ErrorText, Field, PrimaryButton, TextInput } from "@/components/ui";
 
 async function login(formData: FormData) {
@@ -34,11 +35,10 @@ export default async function LoginPage({
 }) {
   const { error } = await searchParams;
   return (
-    <main className="mx-auto w-full max-w-md flex-1 px-6 py-16">
-      <p className="fact">
-        <Link href="/">Callsheet</Link>
-      </p>
-      <h1 className="headline mt-10 text-5xl">Log in.</h1>
+    <>
+      <Nav />
+      <main className="mx-auto w-full max-w-md flex-1 px-6 py-10">
+        <h1 className="headline mt-6 text-5xl">Log in.</h1>
       <form action={login} className="mt-10 flex flex-col gap-6">
         <Field label="email">
           <TextInput
@@ -78,6 +78,7 @@ export default async function LoginPage({
         </Link>
         .
       </p>
-    </main>
+      </main>
+    </>
   );
 }

@@ -93,7 +93,7 @@ export default async function JobsPage({
       <h1 className="headline mt-10 text-6xl">Open work.</h1>
       <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         Every open project on the network, newest first. Filter by craft,
-        distance from your city, rate, and type. One tap to apply — a person
+        distance from your city, rate, and type. One tap to apply. A person
         reads every application.
       </p>
 

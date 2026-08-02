@@ -28,7 +28,7 @@ function MetricRow({
           {note}
         </div>
       </div>
-      <div className="font-mono text-3xl leading-none tabular-nums shrink-0">
+      <div className="font-serif text-3xl leading-none tabular-nums shrink-0">
         {value}
       </div>
     </div>
@@ -63,7 +63,7 @@ export default async function AdminMetrics() {
           <MetricRow
             value={usd(m.estimatedWagesBooked)}
             label="estimated wages booked"
-            note="estimate — sum of dayRateOnset across booked applications; one on-set day assumed per booking, post-production hourly excluded"
+            note="estimate: sum of dayRateOnset across booked applications; one on-set day assumed per booking, post-production hourly excluded"
           />
           <MetricRow
             value={m.firstTimePlacements}

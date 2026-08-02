@@ -15,9 +15,11 @@
   --color-frame: #0a0a0a;
   --color-error: #b23b2e;
 
+  /* Two voices only (owner's call, 2026-08-01): Anton for statements,
+   * Lora serif for everything else. Monospace is retired. */
   --font-display: var(--font-anton);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains);
+  --font-sans: var(--font-lora);
+  --font-serif: var(--font-lora);
 
   --radius-none: 0px;
   --radius-sm: 0px;
@@ -57,18 +59,18 @@ body {
   text-transform: uppercase;
 }
 
-/* Metadata voice: every fact is monospace, uppercase, tracked. */
+/* Metadata voice: facts are serif caps now — tracked, quiet, editorial. */
 .fact {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .fact-secondary {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-secondary);
 }

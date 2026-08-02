@@ -215,7 +215,7 @@ export default async function OnboardingPage({
               className="fact underline underline-offset-4"
               href={nextStepHref}
             >
-              done adding work — continue
+              done adding work, continue
             </Link>
           </p>
         </section>
@@ -355,7 +355,7 @@ export default async function OnboardingPage({
       </div>
       <div className="mt-6 flex items-baseline justify-between">
         <Link className="fact-secondary underline underline-offset-4" href="/talent">
-          save for later — back to dashboard
+          save for later, back to dashboard
         </Link>
         {step < 5 ? (
           <Link

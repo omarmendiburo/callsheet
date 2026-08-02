@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Nav } from "@/components/nav";
 import { DISCIPLINES } from "@/lib/taxonomy";
 import { Rule, WorkFrame } from "@/components/ui";
 import { FilterRow } from "@/components/marketplace/FilterRow";
@@ -56,17 +57,10 @@ export default async function ScreenTestsPage({
   const anyFilter = Boolean(fDiscipline || fCity);
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
-      <header className="flex items-baseline justify-between">
-        <p className="fact">
-          <Link href="/">Callsheet</Link>
-        </p>
-        <Link className="fact-secondary" href="/login">
-          log in
-        </Link>
-      </header>
-
-      <h1 className="headline mt-10 text-6xl">Screen tests.</h1>
+    <>
+      <Nav />
+      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-8">
+      <h1 className="headline mt-6 text-6xl">Screen tests.</h1>
       <p className="mt-4 text-[15px] leading-relaxed">
         Ten seconds each. No names, no schools, just the pitch. Tap one to see
         who made it.
@@ -144,6 +138,7 @@ export default async function ScreenTestsPage({
           })}
         </div>
       )}
-    </main>
+      </main>
+    </>
   );
 }

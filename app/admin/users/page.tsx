@@ -89,7 +89,7 @@ export default async function AdminUsers({
             {users.map((u) => (
               <tr key={u.id} className="border-b border-rule align-top">
                 <td className="py-3 pr-4 text-[14px]">{u.name}</td>
-                <td className="py-3 pr-4 font-mono text-[13px] break-all">
+                <td className="py-3 pr-4 font-serif text-[13px] break-all">
                   {u.email}
                 </td>
                 <td className="fact py-3 pr-4">{u.role}</td>

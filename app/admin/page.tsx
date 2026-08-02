@@ -25,7 +25,7 @@ function Stat({
 }) {
   const body = (
     <div className="border border-rule p-5">
-      <div className="font-mono text-4xl leading-none tracking-tight tabular-nums">
+      <div className="font-serif text-4xl leading-none tracking-tight tabular-nums">
         {value}
       </div>
       <div className="fact-secondary mt-3">{label}</div>
@@ -78,7 +78,7 @@ export default async function AdminOverview() {
         <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
           {APP_STATUSES.map((s) => (
             <li key={s} className="border border-rule p-4">
-              <div className="font-mono text-2xl leading-none tabular-nums">
+              <div className="font-serif text-2xl leading-none tabular-nums">
                 {o.applicationsByStatus[s] ?? 0}
               </div>
               <div className="fact-secondary mt-2">{s}</div>
@@ -93,7 +93,7 @@ export default async function AdminOverview() {
 
       <section className="mt-8">
         <h2 className="fact-secondary">estimated wages booked</h2>
-        <div className="mt-3 font-mono text-4xl leading-none tabular-nums">
+        <div className="mt-3 font-serif text-4xl leading-none tabular-nums">
           {usd(o.estimatedWagesBooked)}
         </div>
         <p className="mt-3 max-w-xl text-[13px] leading-relaxed text-secondary">
