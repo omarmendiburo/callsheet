@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/auth";
+import { Rule } from "@/components/ui";
 import { AdminShell } from "../_shell";
 import { listTalentForCert } from "../_data";
 import { grantCertification, revokeCertification } from "../_actions";
@@ -19,20 +20,22 @@ export default async function AdminCertification() {
 
   return (
     <AdminShell active="/admin/certification">
-      <h1 className="headline mt-10 text-4xl">Certification.</h1>
-      <p className="mt-5 max-w-xl text-[15px] leading-relaxed">
+      <p className="fact-secondary">back office · certification</p>
+      <h1 className="headline mt-3 text-4xl sm:text-5xl">Certification.</h1>
+      <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         Certifying a creative flips their status to certified and records who
-        granted it.
-      </p>
-      <p className="fact-secondary mt-3">
-        criteria owed from HMNTY. placeholder process
-      </p>
-      <p className="fact-secondary mt-3">
-        {certified} of {talent.length} certified
+        granted it. Criteria owed from HMNTY. Placeholder process.
       </p>
 
-      <div className="mt-6 overflow-x-auto border-t border-b border-rule">
-        <table className="w-full min-w-[640px] border-collapse">
+      <section className="mt-10">
+        <h2 className="fact-secondary">
+          talent · {certified} of {talent.length} certified
+        </h2>
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <div className="mt-4 overflow-x-auto border-t border-b border-rule">
+          <table className="w-full min-w-[640px] border-collapse">
           <thead>
             <tr className="border-b border-rule text-left">
               <th className="fact-secondary py-3 pr-4 font-normal">talent</th>
@@ -80,7 +83,8 @@ export default async function AdminCertification() {
             ) : null}
           </tbody>
         </table>
-      </div>
+        </div>
+      </section>
     </AdminShell>
   );
 }

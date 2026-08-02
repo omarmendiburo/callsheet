@@ -80,8 +80,9 @@ export default async function AdminModeration() {
 
   return (
     <AdminShell active="/admin/moderation">
-      <h1 className="headline mt-10 text-4xl">Moderation.</h1>
-      <p className="mt-5 max-w-xl text-[15px] leading-relaxed">
+      <p className="fact-secondary">back office · moderation</p>
+      <h1 className="headline mt-3 text-4xl sm:text-5xl">Moderation.</h1>
+      <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         Nothing goes public before approval. Uploads sit here as pending until
         an admin approves them; approve publishes, flag holds for review, remove
         takes it down.
@@ -89,6 +90,9 @@ export default async function AdminModeration() {
 
       <section className="mt-10">
         <h2 className="fact-secondary">pending review · {pending.length}</h2>
+        <div className="mt-4">
+          <Rule />
+        </div>
         {pending.length === 0 ? (
           <p className="mt-4 text-[15px] text-secondary">
             Nothing pending. The queue is clear.
@@ -102,12 +106,11 @@ export default async function AdminModeration() {
         )}
       </section>
 
-      <div className="mt-12">
-        <Rule />
-      </div>
-
-      <section className="mt-8">
+      <section className="mt-10">
         <h2 className="fact-secondary">flagged · {flagged.length}</h2>
+        <div className="mt-4">
+          <Rule />
+        </div>
         {flagged.length === 0 ? (
           <p className="mt-4 text-[15px] text-secondary">Nothing flagged.</p>
         ) : (

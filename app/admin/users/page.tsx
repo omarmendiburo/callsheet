@@ -60,13 +60,19 @@ export default async function AdminUsers({
 
   return (
     <AdminShell active="/admin/users">
-      <h1 className="headline mt-10 text-4xl">Users.</h1>
-      <p className="mt-5 max-w-xl text-[15px] leading-relaxed">
+      <p className="fact-secondary">back office · users</p>
+      <h1 className="headline mt-3 text-4xl sm:text-5xl">Users.</h1>
+      <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         Suspend cuts access on the user&rsquo;s very next request. Verifying an
         org marks it trusted to post. Impersonation is out of scope tonight.
       </p>
 
-      <form method="get" className="mt-8 flex items-end gap-3">
+      <section className="mt-10">
+        <h2 className="fact-secondary">find a user</h2>
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <form method="get" className="mt-4 flex items-end gap-3">
         <label className="block flex-1">
           <span className="fact-secondary mb-2 block">filter by name or email</span>
           <input
@@ -84,25 +90,28 @@ export default async function AdminUsers({
           filter
         </button>
       </form>
-      <p className="fact-secondary mt-3">
-        {users.length} of {allUsers.length} users
-        {q ? ` matching "${qRaw}"` : ""}
-      </p>
+        <p className="fact-secondary mt-3">
+          {users.length} of {allUsers.length} users
+          {q ? ` matching "${qRaw}"` : ""}
+        </p>
 
-      {resetLink ? (
-        <div className="mt-4 border border-ink p-4">
-          <p className="fact">reset link for {resetLink.email}</p>
-          <p className="mt-2 text-[13px] break-all select-all">
-            {resetLink.url}
-          </p>
-          <p className="fact-secondary mt-2">
-            hand it to them privately. works once, expires in 30 minutes.
-          </p>
-        </div>
-      ) : null}
+        {resetLink ? (
+          <div className="mt-4 border border-ink p-4">
+            <p className="fact">reset link for {resetLink.email}</p>
+            <p className="mt-2 text-[13px] break-all select-all">
+              {resetLink.url}
+            </p>
+            <p className="fact-secondary mt-2">
+              hand it to them privately. works once, expires in 30 minutes.
+            </p>
+          </div>
+        ) : null}
+      </section>
 
-      <div className="mt-4 overflow-x-auto border-t border-b border-rule">
-        <table className="w-full min-w-[720px] border-collapse">
+      <section className="mt-10">
+        <h2 className="fact-secondary">all users</h2>
+        <div className="mt-4 overflow-x-auto border-t border-b border-rule">
+          <table className="w-full min-w-[720px] border-collapse">
           <thead>
             <tr className="border-b border-rule text-left">
               <th className="fact-secondary py-3 pr-4 font-normal">name</th>
@@ -117,7 +126,7 @@ export default async function AdminUsers({
             {users.map((u) => (
               <tr key={u.id} className="border-b border-rule align-top">
                 <td className="py-3 pr-4 text-[14px]">{u.name}</td>
-                <td className="py-3 pr-4 font-serif text-[13px] break-all">
+                <td className="py-3 pr-4 text-[13px] break-all">
                   {u.email}
                 </td>
                 <td className="fact py-3 pr-4">{u.role}</td>
@@ -156,17 +165,17 @@ export default async function AdminUsers({
                   No users match that filter.
                 </td>
               </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </div>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <div className="mt-12">
-        <Rule />
-      </div>
-
-      <section className="mt-8">
+      <section className="mt-10">
         <h2 className="fact-secondary">organizations · verify to trust for posting</h2>
+        <div className="mt-4">
+          <Rule />
+        </div>
         <div className="mt-4 overflow-x-auto border-t border-b border-rule">
           <table className="w-full min-w-[640px] border-collapse">
             <thead>

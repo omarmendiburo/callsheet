@@ -4,9 +4,9 @@ import { AdminShell } from "../_shell";
 import { getMetrics, usd } from "../_data";
 
 /*
- * Impact scoreboard (spec §11), computed honestly from the DB. No charts — mono
- * numbers and rules only. Every figure carries a one-line definition of exactly
- * what it counts and, where it is an estimate, that it is one.
+ * Impact scoreboard (spec §11), computed honestly from the DB. No charts — plain
+ * tabular sans numbers and rules only. Every figure carries a one-line definition
+ * of exactly what it counts and, where it is an estimate, that it is one.
  */
 
 export const dynamic = "force-dynamic";
@@ -28,7 +28,7 @@ function MetricRow({
           {note}
         </div>
       </div>
-      <div className="font-serif text-3xl leading-none tabular-nums shrink-0">
+      <div className="text-3xl leading-none tabular-nums shrink-0">
         {value}
       </div>
     </div>
@@ -46,15 +46,19 @@ export default async function AdminMetrics() {
 
   return (
     <AdminShell active="/admin/metrics">
-      <h1 className="headline mt-10 text-4xl">Impact.</h1>
-      <p className="mt-5 max-w-xl text-[15px] leading-relaxed">
+      <p className="fact-secondary">back office · metrics</p>
+      <h1 className="headline mt-3 text-4xl sm:text-5xl">Impact.</h1>
+      <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
         The scoreboard, computed live from the database. Every number is labeled
         with exactly what it counts. Nothing here is projected or padded.
       </p>
 
       <section className="mt-10">
         <h2 className="fact-secondary">workforce</h2>
-        <div className="mt-2 border-t border-rule">
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <div className="mt-4 border-t border-rule">
           <MetricRow
             value={m.bookedPlacements}
             label="booked placements"
@@ -73,13 +77,12 @@ export default async function AdminMetrics() {
         </div>
       </section>
 
-      <div className="mt-10">
-        <Rule />
-      </div>
-
-      <section className="mt-8">
+      <section className="mt-10">
         <h2 className="fact-secondary">employer</h2>
-        <div className="mt-2 border-t border-rule">
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <div className="mt-4 border-t border-rule">
           <MetricRow
             value={`${m.projectsWithBooking} / ${m.totalProjects}`}
             label="projects with at least one booking"
@@ -93,13 +96,12 @@ export default async function AdminMetrics() {
         </div>
       </section>
 
-      <div className="mt-10">
-        <Rule />
-      </div>
-
-      <section className="mt-8">
+      <section className="mt-10">
         <h2 className="fact-secondary">platform</h2>
-        <div className="mt-2 border-t border-rule">
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <div className="mt-4 border-t border-rule">
           <MetricRow
             value={`${m.activeTalent} / ${m.totalTalent}`}
             label="active talent"
