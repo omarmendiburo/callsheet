@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { DISCIPLINES_AZ, LEVELS, PROFILE_PROMPTS } from "@/lib/taxonomy";
+import {
+  DISCIPLINE_DEPARTMENTS,
+  LEVELS,
+  PROFILE_PROMPTS,
+} from "@/lib/taxonomy";
 import {
   Field,
   PrimaryButton,
@@ -456,33 +460,40 @@ export default async function OnboardingPage({
               <legend className="fact-secondary mb-3">
                 crafts · check what you work in, set the level that fits each
               </legend>
-              <div className="flex flex-col divide-y divide-rule border-t border-b border-rule">
-                {DISCIPLINES_AZ.map((d) => (
-                  <div
-                    key={d}
-                    className="flex items-center justify-between gap-4 py-2"
-                  >
-                    <label className="flex min-w-0 items-center gap-3">
-                      <input
-                        type="checkbox"
-                        name="disc"
-                        value={d}
-                        defaultChecked={levelByType.has(d)}
-                        className="h-4 w-4 shrink-0 accent-ink"
-                      />
-                      <span className="fact truncate">{d}</span>
-                    </label>
-                    <select
-                      name={`level::${d}`}
-                      defaultValue={levelByType.get(d) ?? "professional"}
-                      className="fact-secondary border border-rule bg-transparent px-2 py-1.5 focus:border-ink focus:outline-none"
-                    >
-                      {LEVELS.map((l) => (
-                        <option key={l.id} value={l.id}>
-                          {l.label.toUpperCase()}
-                        </option>
+              <div className="flex flex-col gap-6">
+                {DISCIPLINE_DEPARTMENTS.map((dept) => (
+                  <div key={dept.name}>
+                    <p className="fact-secondary mb-1">{dept.name}</p>
+                    <div className="flex flex-col divide-y divide-rule border-t border-b border-rule">
+                      {dept.members.map((d) => (
+                        <div
+                          key={d}
+                          className="flex items-center justify-between gap-4 py-2"
+                        >
+                          <label className="flex min-w-0 items-center gap-3">
+                            <input
+                              type="checkbox"
+                              name="disc"
+                              value={d}
+                              defaultChecked={levelByType.has(d)}
+                              className="h-4 w-4 shrink-0 accent-ink"
+                            />
+                            <span className="fact truncate">{d}</span>
+                          </label>
+                          <select
+                            name={`level::${d}`}
+                            defaultValue={levelByType.get(d) ?? "professional"}
+                            className="fact-secondary border border-rule bg-transparent px-2 py-1.5 focus:border-ink focus:outline-none"
+                          >
+                            {LEVELS.map((l) => (
+                              <option key={l.id} value={l.id}>
+                                {l.label.toUpperCase()}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       ))}
-                    </select>
+                    </div>
                   </div>
                 ))}
               </div>

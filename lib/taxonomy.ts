@@ -5,52 +5,84 @@
  * else in the codebase hardcodes these lists.
  */
 
-export const DISCIPLINES = [
-  "Director",
-  "Producer",
-  "Assistant Director",
-  "Cinematographer / DP",
-  "Camera Op",
-  "Videographer",
-  "Drone Op",
-  "Gaffer / Lighting",
-  "Grip",
-  "Sound",
-  "Sound Design / Mix",
-  "Editor",
-  "Colorist",
-  "Motion / Animation",
-  "3D Artist",
-  "VFX",
-  "Photographer",
-  "BTS Photographer",
-  "Retoucher",
-  "Writer",
-  "Storyboard Artist",
-  "Designer",
-  "Art Director",
-  "Illustrator",
-  "Fine Artist / Muralist",
-  "UGC Creator",
-  "Shortform creator",
-  "Voice / VO Artist",
-  "Actor",
-  "Model",
-  "Host / Presenter",
-  "Production Designer",
-  "Production coordinator",
-  "PA",
-  "Hair / Makeup",
-  "Wardrobe / Stylist",
-  "Composer / Music",
+/* Departments are the source of truth (judge feedback 2026-08-02: group crafts
+ * by department, and add the granular set-floor roles). A call sheet reads by
+ * department, so the signup picker and the crafts editor render these headings.
+ * DISCIPLINES (flat) derives from this — every filter and the AI matcher depend
+ * on nothing but membership, so order here is the only order that matters. */
+export const DISCIPLINE_DEPARTMENTS = [
+  {
+    name: "Direction & Production",
+    members: [
+      "Director",
+      "Assistant Director",
+      "2nd AD",
+      "Producer",
+      "Production coordinator",
+      "PA",
+      "Key PA",
+    ],
+  },
+  {
+    name: "Camera",
+    members: [
+      "Cinematographer / DP",
+      "Camera Op",
+      "1st AC",
+      "2nd AC",
+      "Videographer",
+      "Drone Op",
+      "BTS Photographer",
+    ],
+  },
+  {
+    name: "Lighting & Grip",
+    members: ["Gaffer / Lighting", "Grip"],
+  },
+  {
+    name: "Sound & Music",
+    members: ["Sound", "Sound Design / Mix", "Composer / Music"],
+  },
+  {
+    name: "Art & Design",
+    members: [
+      "Production Designer",
+      "Art Director",
+      "Designer",
+      "Illustrator",
+      "Storyboard Artist",
+      "Fine Artist / Muralist",
+      "3D Artist",
+    ],
+  },
+  {
+    name: "Hair, Makeup & Wardrobe",
+    members: ["Hair / Makeup", "Wardrobe / Stylist"],
+  },
+  {
+    name: "Post-Production",
+    members: ["Editor", "Colorist", "Motion / Animation", "VFX", "Retoucher"],
+  },
+  {
+    name: "Photography",
+    members: ["Photographer"],
+  },
+  {
+    name: "Talent & Voice",
+    members: ["Actor", "Model", "Host / Presenter", "Voice / VO Artist"],
+  },
+  {
+    name: "Writing & Content",
+    members: ["Writer", "UGC Creator", "Shortform creator"],
+  },
 ] as const;
 
-/* DISCIPLINES above is ordered by department, the way a call sheet reads, and
- * every filter and the AI matcher depend on nothing but membership. The crafts
- * checklist in onboarding is a different job: 37 rows scanned by name, where
- * department order means hunting for the one you want. That screen sorts. Do
- * NOT re-order the source list to get this — the other surfaces read better
- * grouped, and the signup picker is meant to grow department headings. */
+export const DISCIPLINES = DISCIPLINE_DEPARTMENTS.flatMap(
+  (d) => d.members,
+) as readonly string[];
+
+/* The onboarding crafts editor sorts by name for scanning; grouped surfaces use
+ * DISCIPLINE_DEPARTMENTS directly. */
 export const DISCIPLINES_AZ = [...DISCIPLINES].sort((a, b) =>
   a.localeCompare(b, "en"),
 );

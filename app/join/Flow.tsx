@@ -11,7 +11,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { DISCIPLINES, LEVELS } from "@/lib/taxonomy";
+import { DISCIPLINE_DEPARTMENTS, DISCIPLINES, LEVELS } from "@/lib/taxonomy";
 import { join } from "./_actions";
 import { ERROR_MESSAGES, type JoinState } from "./messages";
 
@@ -397,24 +397,31 @@ export default function Flow() {
         canAdvance={canAdvance("disciplines")}
         error={errFor("disciplines")}
       >
-        <div className="flex flex-wrap gap-2">
-          {DISCIPLINES.map((d) => {
-            const on = picked.includes(d);
-            return (
-              <button
-                key={d}
-                type="button"
-                onClick={() => toggleDiscipline(d)}
-                className={`border px-3 py-2 transition-opacity duration-150 ${LABEL} ${
-                  on
-                    ? "border-ink bg-ink text-paper"
-                    : "border-rule bg-paper text-secondary hover:opacity-70"
-                }`}
-              >
-                {d}
-              </button>
-            );
-          })}
+        <div className="flex flex-col gap-6">
+          {DISCIPLINE_DEPARTMENTS.map((dept) => (
+            <div key={dept.name}>
+              <p className={`${LABEL} mb-2 text-secondary`}>{dept.name}</p>
+              <div className="flex flex-wrap gap-2">
+                {dept.members.map((d) => {
+                  const on = picked.includes(d);
+                  return (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => toggleDiscipline(d)}
+                      className={`border px-3 py-2 transition-opacity duration-150 ${LABEL} ${
+                        on
+                          ? "border-ink bg-ink text-paper"
+                          : "border-rule bg-paper text-secondary hover:opacity-70"
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </Question>,
     );
