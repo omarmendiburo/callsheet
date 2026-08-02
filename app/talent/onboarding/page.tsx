@@ -146,6 +146,10 @@ export default async function OnboardingPage({
             </Link>
           ))}
         </nav>
+        <p className="mt-3 text-[13px] leading-relaxed text-secondary">
+          Nothing here is one-shot. Skip what you want and come back to any
+          step later; your profile page links straight back here.
+        </p>
       </section>
 
       {/* ---------- STEP 1 — LINKS ---------- */}

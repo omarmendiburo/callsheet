@@ -4,7 +4,7 @@ import { Nav } from "@/components/nav";
 const DOORS = [
   {
     href: "/join",
-    title: "I make things.",
+    title: "Create.",
     line: "Build one profile that carries your reel, your rates, and your availability. Matched work finds you.",
     cta: "JOIN AS A CREATIVE",
   },

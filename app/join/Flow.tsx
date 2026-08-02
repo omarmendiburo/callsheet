@@ -119,9 +119,6 @@ function Question({
               back
             </button>
           ) : null}
-          <span className={`${LABEL} hidden text-secondary sm:inline`}>
-            press enter
-          </span>
         </div>
       </div>
     </div>
@@ -151,6 +148,74 @@ export default function Flow() {
   // navigation
   const [step, setStep] = useState<StepId>("name");
   const [visible, setVisible] = useState(true); // opacity gate for 150ms fades
+
+  // ---- draft persistence (audit H-6, owner's bug report 2026-08-02) ----
+  // Answers survive the back button, a tab reload, or wandering off to read
+  // the terms. Session-scoped (dies with the tab); the password is never
+  // stored, so a resumed draft re-enters at the password step at the latest.
+  const DRAFT_KEY = "callsheet-join-draft";
+  const hydrated = useRef(false);
+  const wroteOnce = useRef(false);
+
+  useEffect(() => {
+    if (hydrated.current) return;
+    hydrated.current = true;
+    try {
+      const raw = window.sessionStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw) as Record<string, unknown>;
+      if (typeof d.name === "string") setName(d.name);
+      if (Array.isArray(d.picked))
+        setPicked(d.picked.filter((x): x is string => typeof x === "string"));
+      if (d.levels && typeof d.levels === "object")
+        setLevels(d.levels as Record<string, string>);
+      if (typeof d.city === "string") setCity(d.city);
+      if (d.travel === "yes" || d.travel === "no") setTravel(d.travel);
+      if (typeof d.radius === "string") setRadius(d.radius);
+      if (typeof d.email === "string") setEmail(d.email);
+      if (typeof d.phone === "string") setPhone(d.phone);
+      const resumable: StepId[] = [
+        "name",
+        "disciplines",
+        "levels",
+        "city",
+        "travel",
+        "contact",
+        "password",
+      ];
+      const target = d.step === "review" ? "password" : d.step;
+      if (resumable.includes(target as StepId)) setStep(target as StepId);
+    } catch {
+      // A corrupt draft is just ignored.
+    }
+  }, []);
+
+  useEffect(() => {
+    // Skip the very first commit so an empty initial render never clobbers
+    // an existing draft before the restore above has applied.
+    if (!wroteOnce.current) {
+      wroteOnce.current = true;
+      return;
+    }
+    try {
+      window.sessionStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({
+          name,
+          picked,
+          levels,
+          city,
+          travel,
+          radius,
+          email,
+          phone,
+          step,
+        }),
+      );
+    } catch {
+      // Storage full or blocked: the flow still works, just without drafts.
+    }
+  }, [name, picked, levels, city, travel, radius, email, phone, step]);
 
   // The live path. "levels" only exists once a craft is picked.
   const order: StepId[] = [
@@ -325,8 +390,8 @@ export default function Flow() {
       <Question
         n={index + 1}
         total={total}
-        title="what do you make?"
-        sub="pick every craft you work in. you can choose more than one."
+        title="pick your crafts."
+        sub="everything you work in. you can choose more than one."
         onBack={back}
         onNext={advance}
         canAdvance={canAdvance("disciplines")}
@@ -360,7 +425,7 @@ export default function Flow() {
       <Question
         n={index + 1}
         total={total}
-        title="how seasoned are you?"
+        title="how experienced are you?"
         sub={
           picked.length > 1
             ? "pick the line that sounds like you, one per craft. different levels across crafts is normal."
