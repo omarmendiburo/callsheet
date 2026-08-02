@@ -365,5 +365,13 @@ fetch('/api/me',{credentials:'same-origin'}).then(function(r){return r.json()}).
         el.setAttribute('href', el.getAttribute('data-talent-href'));
       });
     }
+    /* data-portal: send ANY signed-in role to its own dashboard, whichever it
+       is. The markup href stays /login, which is where a signed-out visitor
+       should land. Same per-element opt-in as data-talent-href above, and the
+       nav button is deliberately NOT one of these: it keeps the single /login
+       door the owner asked for. */
+    document.querySelectorAll('[data-portal]').forEach(function(el){
+      el.setAttribute('href', '/' + me.role);
+    });
   }
 }).catch(function(){});
