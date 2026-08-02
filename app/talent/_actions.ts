@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
-import { requireUser } from "@/lib/auth";
+import { destroySession, requireUser } from "@/lib/auth";
 import { newId } from "@/lib/id";
 import { isRealMediaUrl, looksVertical } from "@/lib/media";
 import { DISCIPLINES, LEVELS, PROFILE_PROMPTS } from "@/lib/taxonomy";
@@ -333,4 +333,67 @@ export async function registerUploadedMedia(
     status: "pending",
   });
   redirect(String(formData.get("next") ?? "/talent/onboarding?step=3"));
+}
+
+/* Withdraw an application (audit M-2, owner's ask 2026-08-02: creatives take
+ * back applications when they are no longer available). Only your own row,
+ * and only from a non-terminal state — a booked or declined application is
+ * already resolved and stays as the record. */
+export async function withdrawApplication(formData: FormData) {
+  const talentId = await currentTalentId();
+  const applicationId = String(formData.get("applicationId") ?? "");
+  if (applicationId) {
+    const db = await getDb();
+    const rows = await db
+      .select({
+        talentId: schema.applications.talentId,
+        status: schema.applications.status,
+      })
+      .from(schema.applications)
+      .where(eq(schema.applications.id, applicationId))
+      .limit(1);
+    const app = rows[0];
+    if (
+      app &&
+      app.talentId === talentId &&
+      app.status !== "booked" &&
+      app.status !== "declined"
+    ) {
+      await db
+        .delete(schema.applications)
+        .where(eq(schema.applications.id, applicationId));
+    }
+  }
+  redirect("/talent");
+}
+
+/* Permanently delete the signed-in creative's own account and everything
+ * hanging off it (owner's ask 2026-08-02). Irreversible; gated behind a typed
+ * confirmation in the UI. Order respects FKs: child rows first, profile, then
+ * the user, then the session dies. */
+export async function deleteOwnAccount(formData: FormData) {
+  const user = await requireUser("talent");
+  if (String(formData.get("confirm") ?? "").trim().toUpperCase() !== "DELETE") {
+    redirect("/talent/settings?error=confirm");
+  }
+  const db = await getDb();
+  const profile = await getProfileByUserId(user.id);
+
+  if (profile) {
+    const pid = profile.id;
+    await db.delete(schema.profileViews).where(eq(schema.profileViews.talentId, pid));
+    await db.delete(schema.matches).where(eq(schema.matches.talentId, pid));
+    await db.delete(schema.applications).where(eq(schema.applications.talentId, pid));
+    await db.delete(schema.talentTracks).where(eq(schema.talentTracks.talentId, pid));
+    await db.delete(schema.certifications).where(eq(schema.certifications.talentId, pid));
+    await db.delete(schema.media).where(eq(schema.media.talentId, pid));
+    await db.delete(schema.disciplines).where(eq(schema.disciplines.talentId, pid));
+    await db.delete(schema.talentProfiles).where(eq(schema.talentProfiles.id, pid));
+  }
+  await db.delete(schema.acceptances).where(eq(schema.acceptances.userId, user.id));
+  await db.delete(schema.memberships).where(eq(schema.memberships.userId, user.id));
+  await db.delete(schema.users).where(eq(schema.users.id, user.id));
+
+  await destroySession();
+  redirect("/?deleted=1");
 }

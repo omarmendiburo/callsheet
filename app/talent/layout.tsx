@@ -21,6 +21,7 @@ export default async function TalentLayout({
         { href: "/talent/jobs", label: "open work", icon: "work" },
         { href: "/talent/profile", label: "my profile", icon: "profile" },
         { href: "/talent/onboarding", label: "onboarding", icon: "onboarding" },
+        { href: "/talent/settings", label: "settings", icon: "profile" },
       ]}
     >
       {children}

@@ -7,6 +7,7 @@ import {
   getMedia,
   getProfileByUserId,
 } from "./_data";
+import { withdrawApplication } from "./_actions";
 import { getProfileOpenStats } from "@/lib/views";
 
 /*
@@ -145,7 +146,21 @@ export default async function TalentHome() {
                     Not a fit for this one. New work posts on the jobs wall all
                     the time.
                   </p>
-                ) : null}
+                ) : (
+                  <form action={withdrawApplication}>
+                    <input
+                      type="hidden"
+                      name="applicationId"
+                      value={application.id}
+                    />
+                    <button
+                      type="submit"
+                      className="fact-secondary underline underline-offset-4 transition-opacity duration-150 hover:opacity-70"
+                    >
+                      withdraw application
+                    </button>
+                  </form>
+                )}
               </li>
             ))}
           </ul>
