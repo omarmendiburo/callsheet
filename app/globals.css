@@ -46,6 +46,34 @@ body {
   color: var(--color-paper);
 }
 
+/* Motion law (DESIGN.md): opacity, 150ms, nothing else.
+ * Every interactive element responds to hover — one global fallback so no
+ * text action anywhere sits dead. Per-element hover:opacity-* utilities
+ * (cards 90, buttons 80) win over this by specificity, so existing tuned
+ * values keep their exact dim. */
+a,
+button {
+  transition: opacity 150ms ease;
+}
+a:hover,
+button:hover:not(:disabled) {
+  opacity: 0.7;
+}
+
+/* Page entrance: a single opacity fade on navigation. Still the motion law
+ * (opacity, 150ms) — chrome never slides, scales, or lifts. */
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+main {
+  animation: page-fade 150ms ease-out;
+}
+
 /* No default blue focus rings — 1px black outline instead. */
 :focus-visible {
   outline: 1px solid var(--color-ink);
