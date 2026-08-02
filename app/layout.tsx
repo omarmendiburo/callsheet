@@ -19,7 +19,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Callsheet — the creative workforce OS",
+  title: "Callsheet · the creative workforce OS",
   description:
     "Creatives find and land paid work. Businesses build project teams. AI matches people to opportunity instead of making them search.",
 };

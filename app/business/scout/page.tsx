@@ -176,7 +176,7 @@ export default async function ScoutPage({
 
       <h1 className="headline mt-10 text-6xl">Scout the wall.</h1>
       <p className="mt-4 max-w-xl text-[15px] leading-relaxed">
-        The work is the résumé. React to the reel first — names, cities, and
+        The work is the résumé. React to the reel first. Names, cities, and
         rates are here, but no headshots and no schools. Open a card to see who
         made it.
       </p>
@@ -340,8 +340,9 @@ export default async function ScoutPage({
               <div key={c.talentId} className="break-inside-avoid">
                 <WorkCard creative={c} media={cardMedia(c)} />
                 {note ? (
-                  <p className="fact-secondary mt-1 normal-case tracking-normal">
-                    [{note.score}] {note.rationale}
+                  <p className="mt-1 text-[13px] leading-snug text-secondary">
+                    <span className="fact">[{note.score}]</span>{" "}
+                    {note.rationale}
                   </p>
                 ) : null}
               </div>

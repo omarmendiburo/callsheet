@@ -59,7 +59,7 @@ export default async function Home() {
             key={d.href}
             href={d.href}
             className={`group flex flex-col gap-4 py-10 transition-opacity duration-150 hover:opacity-80 sm:px-8 ${
-              i > 0 ? "border-t border-rule sm:border-t-0 sm:border-l" : ""
+              i > 0 ? "border-t border-rule sm:border-t-0" : ""
             }`}
           >
             <span className="fact-secondary">{`0${i + 1}`}</span>

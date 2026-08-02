@@ -68,7 +68,7 @@ export default async function ScreenTestsPage({
 
       <h1 className="headline mt-10 text-6xl">Screen tests.</h1>
       <p className="mt-4 text-[15px] leading-relaxed">
-        Ten seconds each. No names, no schools — just the pitch. Tap one to see
+        Ten seconds each. No names, no schools, just the pitch. Tap one to see
         who made it.
       </p>
 
