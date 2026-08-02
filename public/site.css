@@ -434,6 +434,7 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 .q figcaption{margin-top:clamp(16px,1.7vw,30px);text-align:right;
   font-size:var(--h3);line-height:1.35;color:var(--ink)}
 .q figcaption b{font-weight:700}
+.q figcaption .qcity{display:inline-block;margin-top:3px;font-weight:400;font-size:.9em;color:var(--dim)}
 .q figcaption .dash{margin-right:.7em;color:var(--dim);font-weight:400}
 
 /* arrows live on the screen edges, flanking the deck */
