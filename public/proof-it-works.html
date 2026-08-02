@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proof it works — Callsheet | HMNTY Studios</title>
+<meta name="description" content="One documentary brief becomes seven paid positions. Four of them go to someone who never sets foot on the set.">
+<meta name="theme-color" content="#0B0B0C">
+
+<!--
+  ===========================================================================
+  CALLSHEET — HMNTY Studios
+  ===========================================================================
+
+  FOR THE DEVELOPER
+
+  · Four static pages share /site.css and /site.js: this one, /who-its-for,
+    /how-it-works and /proof-it-works. next.config.ts rewrites the clean paths
+    onto the .html files. Edit the shared chrome ONCE in site.css — the nav and
+    footer markup is duplicated per page on purpose (no build step), so if you
+    change a nav item, change it in all four.
+
+  · THE ROTATOR IS THE PRIMARY CTA (homepage only). "LET'S GET YOU ___" cycles
+    six phrases on a masked slide. All six words sit in the same CSS grid cell,
+    so the block is sized by the longest phrase ("BEHIND THE CAMERA") and never
+    reflows mid-cycle. If you add a longer phrase, re-check --display at 1440
+    and 390.
+
+  · The rotator is aria-hidden and paired with a visually-hidden full sentence.
+    An aria-live region that re-announces every 3 seconds is hostile to screen
+    reader users — do not "fix" it by adding one back.
+
+  · THE FILMSTRIP IS THE SECOND SIGNATURE. Panels are deliberately UNEQUAL
+    (418/306/438/468) and each photo is cropped to its own panel. Changing a
+    ratio without re-cropping that photo will distort it.
+
+  · The nav bar is sticky. body uses overflow-x:clip, not hidden — hidden makes
+    body a scroll container and silently kills position:sticky.
+
+  · The mobile menu is CSS-gated: .burger is display:none above 720px, so the
+    menu JS cannot fire on desktop.
+
+  · No custom cursor anywhere. The OS cursor stays native.
+
+  · The partner row is labelled "IN PARTNERSHIP WITH" at the client's
+    direction. If that relationship changes, change the label — the logos are
+    real marks and the caption is the claim.
+
+  · Everything is torn down in destroy() on pagehide. Call
+    window.callsheet.destroy() if you port this into a SPA.
+
+  · prefers-reduced-motion stops the rotator on its first phrase, freezes the
+    marquee, and reveals all content at rest. Test it; it is a supported path.
+  ===========================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+</head>
+
+<body>
+<div class="grain" aria-hidden="true"></div>
+  <div class="bar">
+    <div class="masthead">
+      <a class="lockup" href="/" aria-label="Callsheet home"><svg class="mark" viewBox="0 0 76 66" role="img" aria-label="Callsheet"><title>Callsheet</title><path d="M16 25 L75 25 L75 56 L25 56 L16 64 Z" fill="none" stroke="#FFFFFF" stroke-width="2.6"/><path d="M15 14 L75 0 L75 10 L15 24 Z" fill="#FFFFFF"/><path d="M22.80,12.18 L28.80,10.78 L23.80,20.78 L17.80,22.18 Z" fill="#0B0B0C"/><path d="M37.80,8.68 L43.80,7.28 L38.80,17.28 L32.80,18.68 Z" fill="#0B0B0C"/><path d="M53.40,5.04 L59.40,3.64 L54.40,13.64 L48.40,15.04 Z" fill="#0B0B0C"/><path d="M68.40,1.54 L74.40,0.14 L69.40,10.14 L63.40,11.54 Z" fill="#0B0B0C"/><circle cx="19.5" cy="18.5" r="2.3" fill="#0B0B0C"/></svg><span class="brand">CALLSHEET</span></a>
+      <nav class="nav" aria-label="Main">
+        <a class="link" href="/who-its-for">WHO IT'S FOR</a>
+        <a class="link" href="/how-it-works">HOW IT WORKS</a>
+        <a class="link" href="/proof-it-works">PROOF IT WORKS</a>
+        <a class="link login" href="/login" data-auth="out">LOG IN</a>
+        <a class="btn" href="/signup" data-auth="out">JOIN FREE</a>
+        <a class="btn" href="/login" data-auth="in" hidden>MY CALLSHEET →</a>
+        <button class="burger" type="button" aria-expanded="false" aria-controls="menu">
+          <span class="sr">Menu</span><i aria-hidden="true"></i>
+        </button>
+      </nav>
+    </div>
+
+    <div class="rule" role="presentation"><i></i></div>
+
+    <div class="menu" id="menu">
+      <ul>
+        <li><a href="/who-its-for">WHO IT'S FOR</a></li>
+        <li><a href="/how-it-works">HOW IT WORKS</a></li>
+        <li><a href="/proof-it-works">PROOF IT WORKS</a></li>
+        <li><a href="/login" data-auth="out">LOG IN</a></li>
+        <li><a class="cta" href="/signup" data-auth="out">JOIN FREE</a></li>
+        <li><a class="cta" href="/login" data-auth="in" hidden>MY CALLSHEET →</a></li>
+      </ul>
+    </div>
+  </div>
+
+<main>
+
+<section class="section" id="hire">
+  <span class="label">03 &nbsp;/&nbsp; Proof the jobs are real</span>
+  <h2 class="h2 split head">One documentary. Seven people paid.</h2>
+  <p class="sub rise">An employer describes the project in plain words. Callsheet turns it into a
+    crew, a schedule, and seven paid positions — then finds the people.</p>
+
+  <blockquote class="brief rise">“A 5-minute documentary about our art programme in San Diego
+    elementary schools. Bilingual Spanish. Budget $8k, need it in 6 weeks.”
+    <cite>What the employer typed</cite></blockquote>
+
+  <span class="label mid">The call sheet it builds back &nbsp;·&nbsp; <b>7 paid roles</b></span>
+
+  <table class="sheet">
+    <caption class="sr">Roles generated from the brief, with days of work and whether the role requires being on set.</caption>
+    <thead><tr><th>Role</th><th>Days</th><th class="where">Where</th></tr></thead>
+    <tbody>
+      <tr><td class="role">Film Director</td><td>3</td><td class="where">On set</td></tr>
+      <tr><td class="role">Producer</td><td>5</td><td class="where">On set</td></tr>
+      <tr><td class="role">Director of Photography</td><td>3</td><td class="where">On set</td></tr>
+      <tr><td class="role">Lead Editor</td><td>8</td><td class="where async">From anywhere</td></tr>
+      <tr><td class="role">Sound Designer</td><td>3</td><td class="where async">From anywhere</td></tr>
+      <tr><td class="role">Music &amp; Score Composer</td><td>4</td><td class="where async">From anywhere</td></tr>
+      <tr><td class="role">Captioning &amp; Transcription</td><td>2</td><td class="where async">From anywhere</td></tr>
+    </tbody>
+  </table>
+
+  <p class="punch rise">Four of those seven go to someone who <em>never sets foot on the set.</em></p>
+
+  <div class="turn stack">
+    <p class="rise">Hiring for something? Describe it the same way and we'll build the crew.</p>
+    <a class="tcta rise" href="/business/signup">Post a project <span class="arw" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+</main>
+
+<section class="close" id="join">
+  <span class="label">Your call time &nbsp;/&nbsp; <b>now</b></span>
+  <h2 class="h2 split head">Your first credit starts with one profile</h2>
+  <p class="rise">It takes about ten minutes and costs nothing. You'll be visible to every employer
+    on Callsheet the moment you finish — including the ones who never post publicly.</p>
+  <div class="acts rise">
+    <a class="btn" href="/join">CREATE MY PROFILE <span class="arw" aria-hidden="true">→</span></a>
+    <a class="btn ghost" href="/business/signup">I'M HIRING INSTEAD</a>
+  </div>
+</section>
+
+<footer class="foot">
+  <svg class="mark" viewBox="0 0 76 66" role="img" aria-label="Callsheet"><title>Callsheet</title><path d="M16 25 L75 25 L75 56 L25 56 L16 64 Z" fill="none" stroke="#FFFFFF" stroke-width="2.6"/><path d="M15 14 L75 0 L75 10 L15 24 Z" fill="#FFFFFF"/><path d="M22.80,12.18 L28.80,10.78 L23.80,20.78 L17.80,22.18 Z" fill="#0B0B0C"/><path d="M37.80,8.68 L43.80,7.28 L38.80,17.28 L32.80,18.68 Z" fill="#0B0B0C"/><path d="M53.40,5.04 L59.40,3.64 L54.40,13.64 L48.40,15.04 Z" fill="#0B0B0C"/><path d="M68.40,1.54 L74.40,0.14 L69.40,10.14 L63.40,11.54 Z" fill="#0B0B0C"/><circle cx="19.5" cy="18.5" r="2.3" fill="#0B0B0C"/></svg>
+  <span class="brand">CALLSHEET</span>
+  <p>HMNTY Studios · Creating dignified jobs in the creative economy<br>
+     Future of Work Social Impact Hackathon · San Diego</p>
+  <p><a href="/terms" style="color:inherit">Terms of use</a> · <a href="/privacy" style="color:inherit">Data notice</a></p>
+</footer>
+
+<script src="/site.js"></script>
+</body>
+</html>

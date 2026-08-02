@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who it's for — Callsheet | HMNTY Studios</title>
+<meta name="description" content="No paid credit yet, first in your family to try this, or working two jobs that are not this one. Callsheet is built for exactly that, and here is what makes it different.">
+<meta name="theme-color" content="#0B0B0C">
+
+<!--
+  ===========================================================================
+  CALLSHEET — HMNTY Studios
+  ===========================================================================
+
+  FOR THE DEVELOPER
+
+  · Four static pages share /site.css and /site.js: this one, /who-its-for,
+    /how-it-works and /proof-it-works. next.config.ts rewrites the clean paths
+    onto the .html files. Edit the shared chrome ONCE in site.css — the nav and
+    footer markup is duplicated per page on purpose (no build step), so if you
+    change a nav item, change it in all four.
+
+  · THE ROTATOR IS THE PRIMARY CTA (homepage only). "LET'S GET YOU ___" cycles
+    six phrases on a masked slide. All six words sit in the same CSS grid cell,
+    so the block is sized by the longest phrase ("BEHIND THE CAMERA") and never
+    reflows mid-cycle. If you add a longer phrase, re-check --display at 1440
+    and 390.
+
+  · The rotator is aria-hidden and paired with a visually-hidden full sentence.
+    An aria-live region that re-announces every 3 seconds is hostile to screen
+    reader users — do not "fix" it by adding one back.
+
+  · THE FILMSTRIP IS THE SECOND SIGNATURE. Panels are deliberately UNEQUAL
+    (418/306/438/468) and each photo is cropped to its own panel. Changing a
+    ratio without re-cropping that photo will distort it.
+
+  · The nav bar is sticky. body uses overflow-x:clip, not hidden — hidden makes
+    body a scroll container and silently kills position:sticky.
+
+  · The mobile menu is CSS-gated: .burger is display:none above 720px, so the
+    menu JS cannot fire on desktop.
+
+  · No custom cursor anywhere. The OS cursor stays native.
+
+  · The partner row is labelled "IN PARTNERSHIP WITH" at the client's
+    direction. If that relationship changes, change the label — the logos are
+    real marks and the caption is the claim.
+
+  · Everything is torn down in destroy() on pagehide. Call
+    window.callsheet.destroy() if you port this into a SPA.
+
+  · prefers-reduced-motion stops the rotator on its first phrase, freezes the
+    marquee, and reveals all content at rest. Test it; it is a supported path.
+  ===========================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+</head>
+
+<body>
+<div class="grain" aria-hidden="true"></div>
+  <div class="bar">
+    <div class="masthead">
+      <a class="lockup" href="/" aria-label="Callsheet home"><svg class="mark" viewBox="0 0 76 66" role="img" aria-label="Callsheet"><title>Callsheet</title><path d="M16 25 L75 25 L75 56 L25 56 L16 64 Z" fill="none" stroke="#FFFFFF" stroke-width="2.6"/><path d="M15 14 L75 0 L75 10 L15 24 Z" fill="#FFFFFF"/><path d="M22.80,12.18 L28.80,10.78 L23.80,20.78 L17.80,22.18 Z" fill="#0B0B0C"/><path d="M37.80,8.68 L43.80,7.28 L38.80,17.28 L32.80,18.68 Z" fill="#0B0B0C"/><path d="M53.40,5.04 L59.40,3.64 L54.40,13.64 L48.40,15.04 Z" fill="#0B0B0C"/><path d="M68.40,1.54 L74.40,0.14 L69.40,10.14 L63.40,11.54 Z" fill="#0B0B0C"/><circle cx="19.5" cy="18.5" r="2.3" fill="#0B0B0C"/></svg><span class="brand">CALLSHEET</span></a>
+      <nav class="nav" aria-label="Main">
+        <a class="link" href="/who-its-for">WHO IT'S FOR</a>
+        <a class="link" href="/how-it-works">HOW IT WORKS</a>
+        <a class="link" href="/proof-it-works">PROOF IT WORKS</a>
+        <a class="link login" href="/login" data-auth="out">LOG IN</a>
+        <a class="btn" href="/signup" data-auth="out">JOIN FREE</a>
+        <a class="btn" href="/login" data-auth="in" hidden>MY CALLSHEET →</a>
+        <button class="burger" type="button" aria-expanded="false" aria-controls="menu">
+          <span class="sr">Menu</span><i aria-hidden="true"></i>
+        </button>
+      </nav>
+    </div>
+
+    <div class="rule" role="presentation"><i></i></div>
+
+    <div class="menu" id="menu">
+      <ul>
+        <li><a href="/who-its-for">WHO IT'S FOR</a></li>
+        <li><a href="/how-it-works">HOW IT WORKS</a></li>
+        <li><a href="/proof-it-works">PROOF IT WORKS</a></li>
+        <li><a href="/login" data-auth="out">LOG IN</a></li>
+        <li><a class="cta" href="/signup" data-auth="out">JOIN FREE</a></li>
+        <li><a class="cta" href="/login" data-auth="in" hidden>MY CALLSHEET →</a></li>
+      </ul>
+    </div>
+  </div>
+
+<main>
+
+<section class="section" id="who">
+  <span class="label">01 &nbsp;/&nbsp; Who this is for</span>
+  <h2 class="h2 split head">If one of these is you, <span class="hi">you're already one of us</span></h2>
+
+  <ul class="rows reveal-group">
+    <li class="reveal"><b>01</b>You've never had a paid credit, and everyone wants one first.</li>
+    <li class="reveal"><b>02</b>You're the first in your family to try a career in this.</li>
+    <li class="reveal"><b>03</b>You have the skill and no idea who to send it to.</li>
+    <li class="reveal"><b>04</b>You're working two jobs, and neither of them is this one.</li>
+    <li class="reveal"><b>05</b>You left the industry because it never paid enough to stay.</li>
+  </ul>
+
+  <div class="blk">
+    <span class="label mid">Why here &nbsp;·&nbsp; <b>and not a job board</b></span>
+    <h3 class="subhead split rise">What differentiates us from other platforms</h3>
+
+    <ul class="diffs rise">
+      <li class="diff">
+        <b>01 &nbsp;/&nbsp; Security</b>
+        <h4>Your details are not the product</h4>
+        <p>Employers are verified before they can see anyone. Your rate, your contact
+          details and your unreleased work stay yours until you say yes to a specific
+          job — we don't sell a list of you to anybody.</p>
+      </li>
+      <li class="diff">
+        <b>02 &nbsp;/&nbsp; Communication</b>
+        <h4>One thread per job, not five apps</h4>
+        <p>Every message about a role lives on the job it belongs to. No chasing a DM,
+          an email and a group chat to find out whether the shoot is still happening —
+          and a real person answers when it stalls.</p>
+      </li>
+      <li class="diff">
+        <b>03 &nbsp;/&nbsp; Personalised</b>
+        <h4>It reads your whole run, not your last title</h4>
+        <p>Callsheet takes in everything you've done in this industry — paid credits,
+          class projects, the wedding you cut for a cousin, the skills nobody put on a
+          résumé — and shows employers the shape of it. The match sharpens every time
+          you add to it.</p>
+      </li>
+      <li class="diff">
+        <b>04 &nbsp;/&nbsp; Tracking</b>
+        <h4>You can see where every application stands</h4>
+        <p>Sent, opened, shortlisted, booked, passed — each one carries a status you can
+          check, with the date it changed. You are never left refreshing an inbox
+          wondering whether anyone read it.</p>
+      </li>
+      <li class="diff">
+        <b>05 &nbsp;/&nbsp; Closed loop</b>
+        <h4>You're not applying to the platform. You're inside the studio.</h4>
+        <p>Every other platform hands you a listing and wishes you luck. Callsheet is
+          built by a working film studio, and joining it puts you inside the business
+          itself — the productions we make, the crews we staff and the employers we
+          bring on are all on the same sheet. The work doesn't get posted somewhere
+          else first.</p>
+      </li>
+    </ul>
+  </div>
+
+  <div class="turn">
+    <p class="rise">Every one of those is a person who <em>got the call.</em></p>
+    <a class="tcta rise" href="/join">I want the next one <span class="arw" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+</main>
+
+<section class="close" id="join">
+  <span class="label">Your call time &nbsp;/&nbsp; <b>now</b></span>
+  <h2 class="h2 split head">Your first credit starts with one profile</h2>
+  <p class="rise">It takes about ten minutes and costs nothing. You'll be visible to every employer
+    on Callsheet the moment you finish — including the ones who never post publicly.</p>
+  <div class="acts rise">
+    <a class="btn" href="/join">CREATE MY PROFILE <span class="arw" aria-hidden="true">→</span></a>
+    <a class="btn ghost" href="/business/signup">I'M HIRING INSTEAD</a>
+  </div>
+</section>
+
+<footer class="foot">
+  <svg class="mark" viewBox="0 0 76 66" role="img" aria-label="Callsheet"><title>Callsheet</title><path d="M16 25 L75 25 L75 56 L25 56 L16 64 Z" fill="none" stroke="#FFFFFF" stroke-width="2.6"/><path d="M15 14 L75 0 L75 10 L15 24 Z" fill="#FFFFFF"/><path d="M22.80,12.18 L28.80,10.78 L23.80,20.78 L17.80,22.18 Z" fill="#0B0B0C"/><path d="M37.80,8.68 L43.80,7.28 L38.80,17.28 L32.80,18.68 Z" fill="#0B0B0C"/><path d="M53.40,5.04 L59.40,3.64 L54.40,13.64 L48.40,15.04 Z" fill="#0B0B0C"/><path d="M68.40,1.54 L74.40,0.14 L69.40,10.14 L63.40,11.54 Z" fill="#0B0B0C"/><circle cx="19.5" cy="18.5" r="2.3" fill="#0B0B0C"/></svg>
+  <span class="brand">CALLSHEET</span>
+  <p>HMNTY Studios · Creating dignified jobs in the creative economy<br>
+     Future of Work Social Impact Hackathon · San Diego</p>
+  <p><a href="/terms" style="color:inherit">Terms of use</a> · <a href="/privacy" style="color:inherit">Data notice</a></p>
+</footer>
+
+<script src="/site.js"></script>
+</body>
+</html>
