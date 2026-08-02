@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PasswordInput } from "@/components/password-input";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
@@ -227,9 +228,8 @@ export default async function BusinessSignupPage({
           </div>
 
           <Field label="password" hint="8 characters or more">
-            <TextInput
+            <PasswordInput
               name="password"
-              type="password"
               autoComplete="new-password"
               placeholder="set a password"
               required

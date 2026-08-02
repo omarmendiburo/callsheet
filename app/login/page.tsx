@@ -5,6 +5,7 @@ import { getDb, schema } from "@/lib/db";
 import { createSession, verifyPassword } from "@/lib/auth";
 import { Nav } from "@/components/nav";
 import { ErrorText, Field, PrimaryButton, TextInput } from "@/components/ui";
+import { PasswordInput } from "@/components/password-input";
 
 async function login(formData: FormData) {
   "use server";
@@ -31,14 +32,19 @@ async function login(formData: FormData) {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; reset?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, reset } = await searchParams;
   return (
     <>
       <Nav />
       <main className="mx-auto w-full max-w-md flex-1 px-6 py-10">
         <h1 className="headline mt-6 text-5xl">Log in.</h1>
+        {reset ? (
+          <p className="mt-4 border-l border-ink pl-4 text-[15px]">
+            Password updated. Log in with the new one.
+          </p>
+        ) : null}
       <form action={login} className="mt-10 flex flex-col gap-6">
         <Field label="email">
           <TextInput
@@ -50,9 +56,8 @@ export default async function LoginPage({
           />
         </Field>
         <Field label="password">
-          <TextInput
+          <PasswordInput
             name="password"
-            type="password"
             autoComplete="current-password"
             placeholder="your password"
             required
@@ -66,6 +71,14 @@ export default async function LoginPage({
           </ErrorText>
         ) : null}
         <PrimaryButton type="submit">LOG IN</PrimaryButton>
+        <p>
+          <Link
+            className="fact-secondary underline underline-offset-4"
+            href="/forgot"
+          >
+            forgot password?
+          </Link>
+        </p>
       </form>
       <p className="mt-8 text-[13px] text-secondary">
         No account yet? Join as a{" "}

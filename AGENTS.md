@@ -14,11 +14,12 @@ holds; ask via NEEDS_CONTEXT if a requirement is ambiguous.
 ## Law
 
 - **DESIGN.md rules everything visible** (summary: black #000 on white #FFF, grey #6B6B6B recedes;
-  Anton = statements ≥32px via `.headline`; Inter = sentences; JetBrains Mono = every fact via
-  `.fact` / `.fact-secondary`; 0px radius; no shadows/gradients/icons/emoji/accent colours; motion
-  = opacity 150ms only; one black primary button per screen; secondary actions are mono text
-  links). `pnpm check:design` must pass — it is a build gate. Admin surfaces: same tokens, plain
-  and fast, polish not required.
+  Anton = statements ≥32px via `.headline`; Inter (Helvetica-lineage sans) = everything else;
+  facts via `.fact` / `.fact-secondary` (sans caps, tracked). **NO monospace, NO serif** (owner's
+  calls 2026-08-01). Icons: **lucide-react ONLY**, used sparingly where a word won't do; no other
+  icon set may be imported. 0px radius; no shadows/gradients/emoji/accent colours; motion =
+  opacity 150ms only; one black primary button per screen. `pnpm check:design` must pass — it is
+  a build gate. Admin surfaces: same tokens, plain and fast, polish not required.
 - **Gates before any commit:** `pnpm build` && `pnpm check:design` both green, changed path
   exercised (curl or dev-server walk), diff reviewed for unrelated changes.
 - **No new dependencies.** NEEDS_CONTEXT to the orchestrator if you believe one is required.

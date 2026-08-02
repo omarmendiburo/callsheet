@@ -85,6 +85,64 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   return user;
 }
 
+/*
+ * Password reset: a stateless HMAC token bound to the CURRENT password hash
+ * fragment, so a successful reset invalidates every outstanding token for
+ * that user (single-use without a table). 30-minute expiry.
+ */
+const RESET_MINUTES = 30;
+
+export function createPasswordResetToken(user: {
+  id: string;
+  passwordHash: string;
+}): string {
+  const exp = Date.now() + RESET_MINUTES * 60 * 1000;
+  const payload = Buffer.from(
+    JSON.stringify({
+      uid: user.id,
+      exp,
+      pv: user.passwordHash.slice(0, 16),
+      t: "reset",
+    }),
+  ).toString("base64url");
+  return `${payload}.${sign(payload)}`;
+}
+
+export async function verifyPasswordResetToken(
+  token: string,
+): Promise<SessionUser | null> {
+  const [payload, sig] = token.split(".");
+  if (!payload || !sig) return null;
+  const expected = sign(payload);
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString());
+    const { uid, exp, pv, t } = parsed;
+    if (
+      t !== "reset" ||
+      typeof uid !== "string" ||
+      typeof exp !== "number" ||
+      typeof pv !== "string"
+    )
+      return null;
+    if (Date.now() > exp) return null;
+    const db = await getDb();
+    const rows = await db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.id, uid))
+      .limit(1);
+    const user = rows[0];
+    if (!user || user.suspended) return null;
+    if (user.passwordHash.slice(0, 16) !== pv) return null;
+    return user;
+  } catch {
+    return null;
+  }
+}
+
 /* Redirects to /login when unauthenticated; to home when the role is wrong. */
 export async function requireUser(
   role?: "talent" | "business" | "admin",

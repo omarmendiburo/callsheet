@@ -27,7 +27,8 @@ check() {
 check "corner radius (0px everywhere)" 'rounded-(sm|md|lg|xl|2xl|3xl|full)|border-radius:\s*[1-9]'
 check "shadows" 'shadow-(sm|md|lg|xl|2xl)|box-shadow:\s*[^n]'
 check "gradients" 'bg-gradient|linear-gradient|radial-gradient|conic-gradient|from-\w+-[0-9]{3}|via-\w+-[0-9]{3}'
-check "icon libraries" "from ['\"](lucide-react|react-icons|@heroicons|@radix-ui/react-icons|@tabler/icons)"
+# Owner's call 2026-08-01: icons allowed, lucide-react ONLY — one cohesive set.
+check "icon libraries other than lucide" "from ['\"](react-icons|@heroicons|@radix-ui/react-icons|@tabler/icons|@phosphor-icons|react-feather)"
 check "accent colours" '(text|bg|border|ring|fill|stroke)-(indigo|violet|purple|blue|teal|pink|rose|amber|emerald|cyan|fuchsia|sky|lime|orange|yellow|green|red)-[0-9]'
 check "transform motion" 'hover:(scale|translate|rotate)|animate-(bounce|spin|pulse|ping)|transition-transform'
 check "monospace (retired 2026-08-01 — serif or Anton only)" 'JetBrains|font-mono|font-jetbrains'

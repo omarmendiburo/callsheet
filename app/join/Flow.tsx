@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import {
   startTransition,
   useActionState,
@@ -664,20 +665,42 @@ function AutoInput({
   focus?: boolean;
 }) {
   const ref = useRef<HTMLInputElement>(null);
+  const [show, setShow] = useState(false);
   useEffect(() => {
     if (focus) ref.current?.focus();
   }, [focus]);
+  const isPassword = type === "password";
   return (
-    <input
-      ref={ref}
-      type={type}
-      autoComplete={autoComplete}
-      value={value}
-      onChange={(e: FormEvent<HTMLInputElement>) =>
-        onChange(e.currentTarget.value)
-      }
-      placeholder={placeholder}
-      className="w-full border-0 border-b border-rule bg-transparent pb-3 text-[24px] leading-tight placeholder:text-secondary focus:border-ink focus:outline-none"
-    />
+    <span className="relative block">
+      <input
+        ref={ref}
+        type={isPassword && show ? "text" : type}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={(e: FormEvent<HTMLInputElement>) =>
+          onChange(e.currentTarget.value)
+        }
+        placeholder={placeholder}
+        className={`w-full border-0 border-b border-rule bg-transparent pb-3 text-[24px] leading-tight placeholder:text-secondary focus:border-ink focus:outline-none ${isPassword ? "pr-10" : ""}`}
+      />
+      {isPassword ? (
+        <button
+          type="button"
+          aria-label={show ? "hide password" : "show password"}
+          aria-pressed={show}
+          onClick={() => {
+            setShow((s) => !s);
+            ref.current?.focus();
+          }}
+          className="absolute top-1 right-0 text-secondary transition-opacity duration-150 hover:opacity-70"
+        >
+          {show ? (
+            <EyeOff size={20} strokeWidth={1.5} />
+          ) : (
+            <Eye size={20} strokeWidth={1.5} />
+          )}
+        </button>
+      ) : null}
+    </span>
   );
 }

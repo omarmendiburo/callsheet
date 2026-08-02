@@ -1,4 +1,5 @@
-import { requireUser } from "@/lib/auth";
+import { createPasswordResetToken, requireUser } from "@/lib/auth";
+import { headers } from "next/headers";
 import { Rule } from "@/components/ui";
 import { AdminShell } from "../_shell";
 import { listOrgs, listUsers } from "../_data";
@@ -27,13 +28,28 @@ function fmtDate(d: Date | string): string {
 export default async function AdminUsers({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; resetFor?: string }>;
 }) {
   await requireUser("admin");
-  const { q: qRaw } = await searchParams;
+  const { q: qRaw, resetFor } = await searchParams;
   const q = (qRaw ?? "").trim().toLowerCase();
 
   const [allUsers, orgs] = await Promise.all([listUsers(), listOrgs()]);
+
+  /* Staff-assisted reset: generate a 30-minute link the admin hands to the
+   * person privately. Stateless token; nothing is stored or sent. */
+  let resetLink: { email: string; url: string } | null = null;
+  if (resetFor) {
+    const target = allUsers.find((u) => u.id === resetFor);
+    if (target && !target.suspended) {
+      const h = await headers();
+      const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host") ?? "localhost:3000"}`;
+      resetLink = {
+        email: target.email,
+        url: `${origin}/reset?token=${createPasswordResetToken(target)}`,
+      };
+    }
+  }
   const users = q
     ? allUsers.filter(
         (u) =>
@@ -73,6 +89,18 @@ export default async function AdminUsers({
         {q ? ` matching "${qRaw}"` : ""}
       </p>
 
+      {resetLink ? (
+        <div className="mt-4 border border-ink p-4">
+          <p className="fact">reset link for {resetLink.email}</p>
+          <p className="mt-2 text-[13px] break-all select-all">
+            {resetLink.url}
+          </p>
+          <p className="fact-secondary mt-2">
+            hand it to them privately. works once, expires in 30 minutes.
+          </p>
+        </div>
+      ) : null}
+
       <div className="mt-4 overflow-x-auto border-t border-b border-rule">
         <table className="w-full min-w-[720px] border-collapse">
           <thead>
@@ -98,17 +126,27 @@ export default async function AdminUsers({
                   {u.suspended ? "suspended" : "active"}
                 </td>
                 <td className="py-3">
-                  <form
-                    action={u.suspended ? unsuspendUser : suspendUser}
-                  >
-                    <input type="hidden" name="userId" value={u.id} />
-                    <button
-                      type="submit"
-                      className="fact underline underline-offset-4 transition-opacity duration-150 hover:opacity-70"
+                  <div className="flex items-center gap-4">
+                    <form
+                      action={u.suspended ? unsuspendUser : suspendUser}
                     >
-                      {u.suspended ? "unsuspend" : "suspend"}
-                    </button>
-                  </form>
+                      <input type="hidden" name="userId" value={u.id} />
+                      <button
+                        type="submit"
+                        className="fact underline underline-offset-4 transition-opacity duration-150 hover:opacity-70"
+                      >
+                        {u.suspended ? "unsuspend" : "suspend"}
+                      </button>
+                    </form>
+                    {!u.suspended ? (
+                      <a
+                        className="fact underline underline-offset-4 transition-opacity duration-150 hover:opacity-70"
+                        href={`/admin/users?resetFor=${u.id}${qRaw ? `&q=${encodeURIComponent(qRaw)}` : ""}`}
+                      >
+                        reset link
+                      </a>
+                    ) : null}
+                  </div>
                 </td>
               </tr>
             ))}
