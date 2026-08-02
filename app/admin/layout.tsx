@@ -25,6 +25,8 @@ export default async function AdminLayout({
           icon: "certification",
         },
         { href: "/admin/metrics", label: "metrics", icon: "metrics" },
+        { href: "/admin/preview/board", label: "board preview", icon: "work" },
+        { href: "/admin/preview/wall", label: "wall preview", icon: "scout" },
       ]}
     >
       {children}
