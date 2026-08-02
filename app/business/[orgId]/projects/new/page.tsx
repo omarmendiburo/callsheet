@@ -48,20 +48,18 @@ export default async function NewProjectPage({
   if (role === "viewer") redirect(`/business/${org.id}`);
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
-      <header className="flex items-baseline justify-between">
-        <p className="fact">
-          <Link href={`/business/${org.id}`}>{org.name}</Link>
-        </p>
+    <div className="mx-auto w-full max-w-2xl">
+      <p className="fact-secondary">business · {org.name} · new project</p>
+      <p className="mt-3">
         <Link
           className="fact-secondary underline underline-offset-4"
           href={`/business/${org.id}`}
         >
-          back to org
+          all projects
         </Link>
-      </header>
+      </p>
 
-      <h1 className="headline mt-12 text-5xl">Post a project.</h1>
+      <h1 className="headline mt-4 text-4xl sm:text-5xl">Post a project.</h1>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
         Describe the work and the roles you need. It opens for applications the
         moment you post it.
@@ -213,6 +211,6 @@ export default async function NewProjectPage({
 
         <PrimaryButton type="submit">POST THE PROJECT</PrimaryButton>
       </form>
-    </main>
+    </div>
   );
 }

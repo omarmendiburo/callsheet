@@ -48,11 +48,17 @@ export default async function RevealPage({
   // A multi-org user landing here without ?org is sent to pick one.
   if (resolution.kind === "choose") {
     return (
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16 sm:px-10">
-        <p className="fact">
-          <Link href="/business/scout">Callsheet</Link>
+      <div className="mx-auto w-full max-w-3xl">
+        <p className="fact-secondary">scout · pick an org</p>
+        <p className="mt-3">
+          <Link
+            className="fact-secondary underline underline-offset-4"
+            href="/business/scout"
+          >
+            back to scout
+          </Link>
         </p>
-        <h1 className="headline mt-10 text-5xl">Which org?</h1>
+        <h1 className="headline mt-4 text-4xl sm:text-5xl">Which org?</h1>
         <ul className="mt-8 flex flex-col divide-y divide-rule border-t border-b border-rule">
           {resolution.orgs.map(({ org }) => (
             <li key={org.id} className="flex items-center justify-between py-4">
@@ -66,7 +72,7 @@ export default async function RevealPage({
             </li>
           ))}
         </ul>
-      </main>
+      </div>
     );
   }
 
@@ -88,17 +94,18 @@ export default async function RevealPage({
     : "/business/scout";
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-10 sm:px-10">
-      <header className="flex items-baseline justify-between">
-        <p className="fact">
-          <Link href="/business">Callsheet</Link>
-        </p>
-        <Link className="fact-secondary" href={backHref}>
-          back to the wall
+    <div className="mx-auto w-full max-w-[1440px]">
+      <p className="fact-secondary">scout · {org.name} · reveal</p>
+      <p className="mt-3">
+        <Link
+          className="fact-secondary underline underline-offset-4"
+          href={backHref}
+        >
+          back to scout
         </Link>
-      </header>
+      </p>
 
-      <div className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_1fr]">
         {/* Left: the work, stacked large in native aspect ratios. */}
         <div>
           <div className="columns-1 gap-4 sm:columns-2 [&>*]:mb-4">
@@ -118,7 +125,9 @@ export default async function RevealPage({
         {/* Right: the reveal — name, facts, prompts, shortlist. */}
         <div>
           {/* The name. This is the only surface it appears on. */}
-          <h1 className="headline text-5xl">{profile.displayName}</h1>
+          <h1 className="headline text-4xl sm:text-5xl">
+            {profile.displayName}
+          </h1>
           {profile.isPlaceholder ? (
             <p className="fact-secondary mt-3">placeholder profile · demo data</p>
           ) : null}
@@ -241,6 +250,6 @@ export default async function RevealPage({
           </section>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -39,17 +39,18 @@ export default async function TeamPage({
   const seats = await getOrgSeats(org.id);
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
-      <header className="flex items-baseline justify-between">
-        <p className="fact">
-          <Link href={`/business/${org.id}`}>{org.name}</Link>
-        </p>
-        <Link className="fact-secondary underline underline-offset-4" href={`/business/${org.id}`}>
-          back to org
+    <div className="mx-auto w-full max-w-3xl">
+      <p className="fact-secondary">business · {org.name} · team</p>
+      <p className="mt-3">
+        <Link
+          className="fact-secondary underline underline-offset-4"
+          href={`/business/${org.id}`}
+        >
+          back to overview
         </Link>
-      </header>
+      </p>
 
-      <h1 className="headline mt-12 text-5xl">Team &amp; seats.</h1>
+      <h1 className="headline mt-4 text-4xl sm:text-5xl">Team &amp; seats.</h1>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
         {isOwner
           ? "Owners manage the roster. Managers can post projects and move applications; viewers can read."
@@ -71,12 +72,11 @@ export default async function TeamPage({
         </div>
       ) : null}
 
-      <div className="mt-10">
-        <Rule />
-      </div>
-
       <section className="mt-10">
-        <h2 className="fact-secondary">members · {seats.length}</h2>
+        <p className="fact-secondary">roster · {seats.length}</p>
+        <div className="mt-4">
+          <Rule />
+        </div>
         <ul className="mt-4 flex flex-col divide-y divide-rule border-t border-b border-rule">
           {seats.map((s) => {
             const isSelf = s.userId === user.id;
@@ -151,13 +151,13 @@ export default async function TeamPage({
       </section>
 
       {isOwner ? (
-        <>
-          <div className="mt-10">
+        <section className="mt-10">
+          <p className="fact-secondary">add a seat</p>
+          <div className="mt-4">
             <Rule />
           </div>
-          <section className="mt-10">
-            <h2 className="fact-secondary">add a seat</h2>
-            <p className="mt-3 max-w-lg text-[15px] leading-relaxed">
+          <div className="mt-4">
+            <p className="max-w-lg text-[15px] leading-relaxed">
               Create a seat with a temporary password. You&apos;ll see the
               password once, then share it privately.
             </p>
@@ -198,13 +198,13 @@ export default async function TeamPage({
               ) : null}
               <PrimaryButton type="submit">ADD SEAT</PrimaryButton>
             </form>
-          </section>
-        </>
+          </div>
+        </section>
       ) : error ? (
         <div className="mt-8">
           <ErrorText>{ERRORS[error] ?? "something went wrong."}</ErrorText>
         </div>
       ) : null}
-    </main>
+    </div>
   );
 }
