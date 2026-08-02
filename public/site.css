@@ -43,7 +43,7 @@
      label at a glance on a phone; --mono only has to be legible up close.
      Doubled at the owner's call 2026-08-02. Tracking drops to .12em at this
      size — .22em on a 24px mono label runs a long eyebrow off a phone. */
-  --eyebrow:  clamp(24px, 2.04vw, 36px);
+  --eyebrow:  clamp(17px, 1.43vw, 25px);
 
   --strip-h:  clamp(160px, 21vw, 380px);
   --border:   max(1px, .12vw);
@@ -56,7 +56,14 @@
    is why the logged-out nav was still painting MY CALLSHEET off the right edge
    on a phone. Keep this above every component rule. */
 [hidden]{display:none!important}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+/* Anchors used to land UNDER the sticky bar — 86px of the target was covered on
+   a phone. Every jump target clears the bar by its own height. */
+[id]{scroll-margin-top:clamp(104px,8.6vw,134px)}
+/* iOS paints a grey box over any tapped link. Killing it only works if the tap
+   still gives feedback, so :active supplies it. */
+a,button{-webkit-tap-highlight-color:transparent}
+a:active,button:active{opacity:.65}
 body{
   margin:0;background:var(--bg);color:var(--ink);
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
@@ -78,7 +85,7 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 
 /* film grain — on black this reads as emulsion, not as a filter */
 .grain{
-  position:fixed;inset:-120%;z-index:60;pointer-events:none;opacity:.05;
+  position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.05;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -223,6 +230,11 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 .lede b{color:var(--ink);font-weight:600}
 
 .acts{display:flex;flex-wrap:wrap;gap:clamp(10px,1vw,16px);margin-top:clamp(24px,2.6vw,46px)}
+/* The two hero CTAs run 1.4x the standard button — box and label together, so
+   the proportions hold. Only the hero: the closing block's buttons stay
+   standard or nothing on the page reads as bigger than anything else. */
+.hero .acts .btn{height:clamp(62px,4.34vw,76px);padding:0 clamp(22px,2.38vw,42px);
+  font-size:clamp(14px,1.09vw,18px)}
 /* The three objections this product exists to answer. It was set at --small,
    which buried it directly under the primary CTA where it does the most work. */
 .assure{margin-top:clamp(16px,1.7vw,30px);font-size:clamp(16px,1.45vw,24px);
@@ -307,14 +319,14 @@ h1,h2,h3,p,figure,blockquote{margin:0}
    in tracked monospace reads as a headline competing with the section above */
 .partners .label{display:block;padding:0 var(--pad);margin-bottom:clamp(7px,.75vw,13px);
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-  font-size:clamp(26px,2.9vw,46px);font-weight:700;letter-spacing:-.015em;line-height:1.1;
+  font-size:clamp(18px,2.03vw,32px);font-weight:700;letter-spacing:-.015em;line-height:1.1;
   color:#6A6A62}
 .partners .label b{color:#0B0B0C;font-weight:700}
 /* The rail is deliberately narrower than the page. Fewer marks on screen at
    once, each one bigger — a partner row reads as a claim, and a claim you
    cannot see is not one. The mask still eats the edges, so it never looks cut. */
 .mq{position:relative;display:flex;overflow:hidden;
-  width:min(100%,980px);margin:0 auto;
+  width:100%;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
   mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
   /* the track is taller than the tallest mark so nothing clips at the top */
@@ -334,6 +346,39 @@ h1,h2,h3,p,figure,blockquote{margin:0}
    optical weight as the drawn logos rather than pulled in as a bitmap */
 .lg.type{font-weight:800;font-size:clamp(39px,4.13vw,69px);letter-spacing:-.02em;
   line-height:1;color:#0B0B0C}
+
+/* ------------------------------------------------------------ testimonials */
+/* Sits directly under the partner band, so it goes back to the page black —
+   the white band ends the moment the logos do. */
+.quotes{background:var(--bg);padding:clamp(48px,6vw,110px) 0}
+.quotes .label,.quotes .h2{padding:0 var(--pad)}
+.quotes .label{display:block;margin-bottom:clamp(12px,1.3vw,24px)}
+
+/* The list scrolls inside its own box because there are more testimonials than
+   a section should ever be tall. Scroll chaining is left ON — the page keeps
+   moving once the list bottoms out, which is what stops a thumb getting stuck
+   in it. Do not add overscroll-behavior:contain here. */
+.qscroll{
+  margin-top:clamp(26px,2.8vw,52px);
+  max-height:clamp(400px,56vh,640px);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  border-top:var(--border) solid var(--line);
+  border-bottom:var(--border) solid var(--line);
+  scrollbar-width:thin;scrollbar-color:var(--line) transparent;
+}
+.qscroll::-webkit-scrollbar{width:6px}
+.qscroll::-webkit-scrollbar-track{background:transparent}
+.qscroll::-webkit-scrollbar-thumb{background:var(--line)}
+.qscroll:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+.q{padding:clamp(22px,2.4vw,44px) var(--pad);margin:0}
+.q + .q{border-top:var(--border) solid var(--line-soft)}
+.q blockquote{font-size:clamp(17px,1.6vw,27px);line-height:1.4;font-weight:600;
+  letter-spacing:-.012em;color:#E4E4DE;max-width:44ch}
+.q figcaption{margin-top:clamp(10px,1vw,18px);
+  font-family:"Space Mono",ui-monospace,monospace;font-size:var(--mono);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.q figcaption b{color:var(--accent);font-weight:400}
 
 /* ------------------------------------------------------- what you get: 3 up */
 .offers{display:grid;gap:var(--border);margin-top:clamp(34px,3.6vw,68px);
@@ -414,22 +459,23 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 .diff p{font-size:var(--body);line-height:1.55;color:#C9C9C3}
 
 /* ------------------------------------------------------------- closing CTA */
-.close{background:var(--paper);color:#0B0B0C;padding:clamp(56px,7vw,140px) var(--pad)}
-.close .label{color:#6A6A62}
-.close .label b{color:#8A6708;font-weight:700}
+/* Owner's call 2026-08-02: the closing block is black like the rest of the page.
+   The partner band is now the only inverted surface on the site, which is the
+   point — one white band, and it is the one carrying somebody else's logos. */
+.close{background:var(--bg);color:var(--ink);padding:clamp(56px,7vw,140px) var(--pad)}
 .close .h2{max-width:16ch}
 .close p{margin-top:clamp(18px,1.8vw,34px);max-width:42ch;font-size:var(--body);
-  line-height:1.55;color:#3A3A34}
-.close .btn{border-color:#0B0B0C;background:#0B0B0C;color:var(--paper)}
-.close .btn:hover,.close .btn:focus-visible{background:var(--paper);color:#0B0B0C}
-.close .btn.ghost{background:none;color:#0B0B0C;border-color:rgba(0,0,0,.3)}
-.close .btn.ghost:hover,.close .btn.ghost:focus-visible{background:#0B0B0C;color:var(--paper);border-color:#0B0B0C}
-.close :focus-visible{outline-color:#0B0B0C}
+  line-height:1.55;color:#C9C9C3}
 
-.foot{padding:clamp(34px,3.4vw,64px) var(--pad);
+.foot{border-top:var(--border) solid var(--line);
+  padding:clamp(34px,3.4vw,64px) var(--pad);
   display:flex;flex-wrap:wrap;align-items:center;gap:16px}
 .foot .mark{width:clamp(26px,2.4vw,40px)}
-.foot p{margin-left:auto;text-align:right;font-size:var(--small);color:var(--dim)}
+.foot p{font-size:var(--small);color:var(--dim)}
+/* The studio line takes the middle and centres in it. It used to be pushed
+   right with margin-left:auto and ragged-right, which read as slanted. */
+.foot .who{flex:1 1 auto;text-align:center;margin:0}
+.foot .legal{margin-left:auto;text-align:right}
 /* terms + data notice are 15px tall as inline text; grow the hit box to 44 */
 .foot a{display:inline-flex;align-items:center;min-height:44px}
 
@@ -472,6 +518,7 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 }
 
 @media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
   *{transition:none!important;animation:none!important}
   .split .w > i,.rise{transform:none!important;opacity:1!important}
   .strip,.reveal{clip-path:none!important}

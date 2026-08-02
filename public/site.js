@@ -128,6 +128,26 @@
     });
   })();
 
+  /* ------------------------------------------------------- marquee throttle
+     The partner row animates a transform forever. Off-screen that is a pure
+     tax — it keeps a phone's compositor awake for a band nobody is looking at.
+     Run it only while it is actually in view. */
+  (function(){
+    var track = document.querySelector(".mq-track");
+    if (!track || reduced) return;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        track.style.animationPlayState = e.isIntersecting ? "running" : "paused";
+      });
+    }, { rootMargin: "120px 0px" });
+    io.observe(track.parentNode);
+    observers.push(io);
+    // a backgrounded tab should not animate either
+    on(document, "visibilitychange", function(){
+      if (document.hidden) track.style.animationPlayState = "paused";
+    });
+  })();
+
   /* --------------------------------------------------- you-are-here marking */
   (function(){
     var here = location.pathname.replace(/\.html$/, "").replace(/\/$/, "") || "/";

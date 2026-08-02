@@ -8,8 +8,10 @@
 export const DISCIPLINES = [
   "Director",
   "Producer",
+  "Assistant Director",
   "Cinematographer / DP",
   "Camera Op",
+  "Videographer",
   "Drone Op",
   "Gaffer / Lighting",
   "Grip",
@@ -21,6 +23,7 @@ export const DISCIPLINES = [
   "3D Artist",
   "VFX",
   "Photographer",
+  "BTS Photographer",
   "Retoucher",
   "Writer",
   "Storyboard Artist",
