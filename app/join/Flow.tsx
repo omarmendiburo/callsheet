@@ -22,7 +22,7 @@ import { ERROR_MESSAGES, type JoinState } from "./messages";
  * Typography note (owner override, this product): monospace is retired here.
  * Sentences use the default body font (a serif, wired globally). Small labels
  * and facts are serif uppercase 12px with 0.08em tracking via inline classes —
- * no .fact / font-mono.
+ * monospace-free by design.
  */
 
 // ---- steps ---------------------------------------------------------------
