@@ -103,14 +103,25 @@ export default async function TalentHome() {
         ) : (
           <ul className="mt-4 flex flex-col divide-y divide-rule border-t border-b border-rule">
             {applications.map(({ application, projectTitle }) => (
-              <li
-                key={application.id}
-                className="flex items-center justify-between gap-4 py-4"
-              >
-                <span className="text-[15px]">{projectTitle}</span>
-                <span className="fact border border-rule px-2 py-1.5">
-                  {application.status}
-                </span>
+              <li key={application.id} className="flex flex-col gap-2 py-4">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-[15px]">{projectTitle}</span>
+                  <span className="fact border border-rule px-2 py-1.5">
+                    {application.status}
+                  </span>
+                </div>
+                {/* Terminal states get one honest closing line each. */}
+                {application.status === "booked" ? (
+                  <p className="text-[13px] leading-relaxed text-secondary">
+                    You are on the callsheet. HMNTY reaches out to make the
+                    introduction.
+                  </p>
+                ) : application.status === "declined" ? (
+                  <p className="text-[13px] leading-relaxed text-secondary">
+                    Not a fit for this one. New work posts on the jobs wall all
+                    the time.
+                  </p>
+                ) : null}
               </li>
             ))}
           </ul>

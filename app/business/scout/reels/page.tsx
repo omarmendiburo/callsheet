@@ -48,6 +48,10 @@ export default async function ReelsPage({
   const resolution = await resolveScoutOrg(user.id, orgParam);
   if (resolution.kind === "choose") redirect("/business/scout");
   const org = resolution.org;
+  // Viewers browse; managers act (server actions re-check the same rank).
+  const canManage = resolution.orgs.some(
+    (o) => o.org.id === org.id && (o.role === "owner" || o.role === "manager"),
+  );
 
   const fDiscipline = one(params, "discipline");
   const pool = (await getBrowsePool()).filter(
@@ -192,7 +196,7 @@ export default async function ReelsPage({
                   manage in crm
                 </Link>
               </p>
-            ) : (
+            ) : canManage ? (
               <form action={trackTalent}>
                 <input
                   type="hidden"
@@ -210,7 +214,7 @@ export default async function ReelsPage({
                   adds them to your scouting list
                 </span>
               </form>
-            )}
+            ) : null}
           </div>
         </section>
       )}

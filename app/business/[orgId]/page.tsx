@@ -47,6 +47,15 @@ export default async function OrgHome({
           <dt className="fact-secondary">verification</dt>
           <dd className="fact">{org.verified ? "verified" : "unverified"}</dd>
         </div>
+        {!org.verified ? (
+          <div className="py-3">
+            <p className="text-[13px] leading-relaxed text-secondary">
+              Your projects go live to creatives once HMNTY verifies your
+              organization. You can post now; the board picks them up at
+              verification.
+            </p>
+          </div>
+        ) : null}
         <div className="flex items-baseline justify-between gap-6 py-3">
           <dt className="fact-secondary">your role</dt>
           <dd className="fact">{role}</dd>

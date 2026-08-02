@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Nav } from "@/components/nav";
+import { getCurrentUser } from "@/lib/auth";
 import { DISCIPLINES } from "@/lib/taxonomy";
 import { Rule } from "@/components/ui";
 import { MediaFrame } from "@/components/media";
@@ -16,9 +17,10 @@ import { one } from "@/components/marketplace/filters";
  * single scrollable column. Under each: disciplines + city in mono. NO names
  * anywhere — this is a browsing surface, and the wall never reveals identity.
  *
- * Each frame links to /business/scout/[talentId]; that page's own auth gates
- * businesses in. A logged-out visitor clicking through lands on login — the
- * correct behaviour, not a bug.
+ * Card links are role-aware (audit 2026-08-02): the reveal behind them is a
+ * business surface, so business viewers and logged-out visitors get the link
+ * (logged-out click-through lands on login — correct); a TALENT viewer gets
+ * a plain card instead of a silent bounce to the marketing homepage.
  *
  * Filter chips: discipline, city. Cities are derived from the live pool.
  */
@@ -37,6 +39,8 @@ export default async function ScreenTestsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
+  const viewer = await getCurrentUser();
+  const talentViewer = viewer?.role === "talent";
 
   // Pitch media only. getBrowsePool returns approved media exclusively, so a
   // pending pitch (e.g. the seed's t11) can never appear here.
@@ -63,8 +67,9 @@ export default async function ScreenTestsPage({
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-8">
       <h1 className="headline mt-6 text-6xl">Screen tests.</h1>
       <p className="mt-4 text-[15px] leading-relaxed">
-        Ten seconds each. No names, no schools, just the pitch. Tap one to see
-        who made it.
+        {talentViewer
+          ? "Ten seconds each. No names, no schools, just the pitch. This is the company you keep; business accounts see who made each one."
+          : "Ten seconds each. No names, no schools, just the pitch. Tap one to see who made it."}
       </p>
 
       <div className="mt-8">
@@ -122,18 +127,27 @@ export default async function ScreenTestsPage({
         <div className="mt-6 flex flex-col gap-10">
           {filtered.map((c) => {
             const pitch = c.media[0];
-            return (
-              <Link
-                key={c.talentId}
-                href={`/business/scout/${c.talentId}`}
-                className="block transition-opacity duration-150 hover:opacity-90"
-              >
+            const body = (
+              <>
                 {/* Full-width 9:16 pitch frame — always vertical. */}
                 <MediaFrame url={pitch?.url} vertical label="pitch" />
                 <div className="mt-3 flex items-start justify-between gap-3">
                   <span className="fact">{disciplineLine(c)}</span>
                   <span className="fact-secondary">{c.city}</span>
                 </div>
+              </>
+            );
+            // The reveal is a business surface; a talent viewer gets the
+            // card without the link instead of a dead-end redirect.
+            return talentViewer ? (
+              <div key={c.talentId}>{body}</div>
+            ) : (
+              <Link
+                key={c.talentId}
+                href={`/business/scout/${c.talentId}`}
+                className="block transition-opacity duration-150 hover:opacity-90"
+              >
+                {body}
               </Link>
             );
           })}

@@ -289,6 +289,9 @@ async function main() {
       lat: geo?.lat,
       lng: geo?.lng,
       workTypes: o.workTypes,
+      // Seed orgs come pre-verified: the job board only publishes projects
+      // from verified orgs, and the demo board must not be empty.
+      verified: true,
       isPlaceholder: true,
     });
     await db.insert(schema.users).values({

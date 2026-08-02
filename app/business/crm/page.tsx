@@ -244,7 +244,8 @@ export default async function CrmPage({
       {/* Booked is the celebration state — plain, per DESIGN voice. */}
       {booked.length > 0 ? (
         <p className="fact mt-6 border border-ink px-3 py-3">
-          booked. the callsheet has a name on it.
+          booked. the callsheet has a name on it. HMNTY reaches out to
+          coordinate the introduction.
         </p>
       ) : null}
 

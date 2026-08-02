@@ -28,14 +28,23 @@ export type ProjectWithOrg = {
   orgName: string;
 };
 
-/* All open projects, newest first, with the posting org's name. */
+/* All open projects from VERIFIED orgs, newest first, with the posting org's
+ * name. The verified filter is the moderation gate for business-submitted
+ * text (audit 2026-08-02): project titles/descriptions reach every talent
+ * user, so an org HMNTY has not verified does not publish to the board. The
+ * org still sees its own projects via the org-scoped readers. */
 export async function getOpenProjects(): Promise<ProjectWithOrg[]> {
   const db = await getDb();
   const rows = await db
     .select({ project: schema.projects, orgName: schema.orgs.name })
     .from(schema.projects)
     .innerJoin(schema.orgs, eq(schema.projects.orgId, schema.orgs.id))
-    .where(eq(schema.projects.status, "open"))
+    .where(
+      and(
+        eq(schema.projects.status, "open"),
+        eq(schema.orgs.verified, true),
+      ),
+    )
     .orderBy(desc(schema.projects.createdAt));
   return rows;
 }

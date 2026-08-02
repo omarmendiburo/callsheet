@@ -108,9 +108,20 @@ export function ProjectCard({
       </div>
 
       {application ? (
-        <p className="fact mt-5 border border-ink px-3 py-2 text-center">
-          applied · {application.status}
-        </p>
+        <>
+          <p className="fact mt-5 border border-ink px-3 py-2 text-center">
+            applied · {application.status}
+          </p>
+          {application.status === "booked" ? (
+            <p className="mt-2 text-center text-[13px] leading-relaxed text-secondary">
+              you are on the callsheet. HMNTY makes the introduction.
+            </p>
+          ) : application.status === "declined" ? (
+            <p className="mt-2 text-center text-[13px] leading-relaxed text-secondary">
+              not a fit for this one. new work posts all the time.
+            </p>
+          ) : null}
+        </>
       ) : (
         <ApplyForm projectId={project.id} />
       )}

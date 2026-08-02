@@ -6,8 +6,12 @@ import { getCurrentUser } from "@/lib/auth";
  * Front-of-house nav. Logo is the home button; sign up is the one
  * emphasized action. Auth-aware: logged-in users get their dashboard
  * link instead of log in / sign up.
+ *
+ * `primary` (default true) controls whether sign-up renders filled. Pages
+ * that carry their own PrimaryButton (login, forgot, reset) pass false so
+ * only one black primary exists per screen (DESIGN law; audit 2026-08-02).
  */
-export async function Nav() {
+export async function Nav({ primary = true }: { primary?: boolean } = {}) {
   const user = await getCurrentUser();
   return (
     <nav className="mx-auto flex w-full max-w-350 items-center justify-between gap-6 px-6 py-5 sm:px-10">
@@ -55,7 +59,11 @@ export async function Nav() {
               log in
             </Link>
             <Link
-              className="fact bg-ink px-3 py-2 text-paper transition-opacity duration-150 hover:opacity-80"
+              className={
+                primary
+                  ? "fact bg-ink px-3 py-2 text-paper transition-opacity duration-150 hover:opacity-80"
+                  : "fact border border-ink px-3 py-2 transition-opacity duration-150 hover:opacity-70"
+              }
               href="/signup"
             >
               sign up

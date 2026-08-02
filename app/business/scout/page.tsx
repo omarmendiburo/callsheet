@@ -142,7 +142,16 @@ export default async function ScoutPage({
     const ranked = await rankTalentForProject(selectedProject.id);
     aiNotes = new Map(ranked.map((m) => [m.talentId, m]));
     aiHeading = `Suggested order for "${selectedProject.title}". You decide.`;
-    aiEngine = ranked[0]?.engine ?? "heuristic";
+    // Honest batch label: Claude can rank most rows and heuristically
+    // backfill the ones its response omitted, so the label reflects the
+    // whole batch, not whichever row happened to sort first.
+    const claudeRows = ranked.filter((m) => m.engine === "claude").length;
+    aiEngine =
+      claudeRows === 0
+        ? "heuristic"
+        : claudeRows === ranked.length
+          ? "claude"
+          : `claude · ${claudeRows} of ${ranked.length} rows (heuristic backfill for the rest)`;
   }
 
   const ordered = aiNotes
@@ -354,7 +363,11 @@ export default async function ScoutPage({
             const note = aiNotes?.get(c.talentId);
             return (
               <div key={c.talentId} className="break-inside-avoid">
-                <WorkCard creative={c} media={cardMedia(c)} />
+                <WorkCard
+                  creative={c}
+                  media={cardMedia(c)}
+                  orgId={orgParam ? org.id : undefined}
+                />
                 {note ? (
                   <p className="mt-1 text-[13px] leading-snug text-secondary">
                     <span className="fact">[{note.score}]</span>{" "}

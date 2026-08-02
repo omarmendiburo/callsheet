@@ -248,6 +248,9 @@ export const talentTracks = pgTable(
   (t) => [uniqueIndex("talent_tracks_org_talent_idx").on(t.orgId, t.talentId)],
 );
 
+/* AI ranking snapshots. WRITE-ONLY as of 2026-08-02: persisted by
+ * lib/ai/match.ts as an audit trail; no read path exists yet (a future
+ * admin "last ranking" surface is the intended consumer). */
 export const matches = pgTable("matches", {
   id: text("id").primaryKey(),
   projectId: text("project_id")

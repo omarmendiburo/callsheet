@@ -123,6 +123,10 @@ export async function rankTalentForProject(
  * Replace the matches for a project. Deletes stale rows first, then inserts
  * the fresh ranking. Writes ONLY to the matches table — never to any
  * people-owned row.
+ *
+ * WRITE-ONLY today (audit 2026-08-02): nothing reads matches back yet; the
+ * scout page uses the in-memory return value. The table is the audit trail
+ * for a future admin "last ranking" surface — do not assume it caches.
  */
 async function persistMatches(
   projectId: string,

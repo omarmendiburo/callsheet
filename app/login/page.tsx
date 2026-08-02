@@ -37,7 +37,7 @@ export default async function LoginPage({
   const { error, reset } = await searchParams;
   return (
     <>
-      <Nav />
+      <Nav primary={false} />
       <main className="mx-auto w-full max-w-md flex-1 px-6 py-10">
         <h1 className="headline mt-6 text-5xl">Log in.</h1>
         {reset ? (

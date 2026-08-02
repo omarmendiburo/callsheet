@@ -35,13 +35,21 @@ function factLine(c: BrowseCreative): string {
 export function WorkCard({
   creative,
   media,
+  orgId,
 }: {
   creative: BrowseCreative;
   media: BrowseCreative["media"][number];
+  /* Threads ?org= into the reveal link so multi-org users keep their org
+   * context on the wall's main click path (audit 2026-08-02). */
+  orgId?: string;
 }) {
   return (
     <Link
-      href={`/business/scout/${creative.talentId}`}
+      href={
+        orgId
+          ? `/business/scout/${creative.talentId}?org=${encodeURIComponent(orgId)}`
+          : `/business/scout/${creative.talentId}`
+      }
       className="block break-inside-avoid transition-opacity duration-150 hover:opacity-90"
     >
       {/* Non-interactive on the wall: the whole card is the click, and it

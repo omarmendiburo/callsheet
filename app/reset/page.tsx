@@ -39,7 +39,7 @@ export default async function ResetPage({
 
   return (
     <>
-      <Nav />
+      <Nav primary={false} />
       <main className="mx-auto w-full max-w-md flex-1 px-6 py-10">
         <h1 className="headline mt-6 text-5xl">New password.</h1>
         {!user ? (

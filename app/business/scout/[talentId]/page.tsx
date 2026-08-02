@@ -80,6 +80,11 @@ export default async function RevealPage({
   }
 
   const org = resolution.org;
+  // Viewers browse; managers act. Mutation forms only render at manager+
+  // (the actions re-check the same rank server-side — defense in depth).
+  const canManage = resolution.orgs.some(
+    (o) => o.org.id === org.id && (o.role === "owner" || o.role === "manager"),
+  );
 
   const [reveal, projects, shortlist, track] = await Promise.all([
     getRevealCreative(talentId),
@@ -256,7 +261,7 @@ export default async function RevealPage({
                   manage in crm
                 </Link>
               </p>
-            ) : (
+            ) : canManage ? (
               <form action={trackTalent} className="mt-3">
                 <input type="hidden" name="talentId" value={talentId} />
                 <input type="hidden" name="orgId" value={org.id} />
@@ -270,6 +275,10 @@ export default async function RevealPage({
                   adds them to your scouting list in the crm
                 </span>
               </form>
+            ) : (
+              <p className="fact-secondary mt-3">
+                not tracked yet. a manager on your team can start tracking.
+              </p>
             )}
           </section>
 
@@ -280,14 +289,22 @@ export default async function RevealPage({
           {/* Shortlist — the one primary action on this screen. */}
           <section className="mt-6">
             <h2 className="fact-secondary">shortlist</h2>
-            <ShortlistForm
-              talentId={talentId}
-              orgId={org.id}
-              projects={projects.map((p) => ({ id: p.id, title: p.title }))}
-              alreadyShortlisted={
-                shortlist ? { projectTitle: shortlist.projectTitle } : null
-              }
-            />
+            {canManage ? (
+              <ShortlistForm
+                talentId={talentId}
+                orgId={org.id}
+                projects={projects.map((p) => ({ id: p.id, title: p.title }))}
+                alreadyShortlisted={
+                  shortlist ? { projectTitle: shortlist.projectTitle } : null
+                }
+              />
+            ) : (
+              <p className="mt-3 text-[15px] leading-relaxed text-secondary">
+                {shortlist
+                  ? `Shortlisted for ${shortlist.projectTitle}.`
+                  : "Your seat is view-only. A manager or owner shortlists creatives for projects."}
+              </p>
+            )}
             {/* The honest line: no contact details, intros happen off platform. */}
             <p className="mt-5 max-w-md text-[13px] leading-relaxed text-secondary">
               We do not show email or phone here. Shortlist a creative and

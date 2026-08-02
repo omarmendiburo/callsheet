@@ -155,7 +155,9 @@ export default async function JobsPage({
           />
           {radiusMi != null && !talentGeo ? (
             <p className="fact-secondary">
-              add a city to your profile to filter by distance
+              {profile?.city
+                ? `we cannot place "${profile.city}" on the map yet, so distance filters are off for now`
+                : "add a city to your profile to filter by distance"}
             </p>
           ) : null}
           {anyFilter ? (

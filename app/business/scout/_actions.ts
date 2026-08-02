@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb, schema } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { getMembership } from "@/lib/tenancy";
+import { requireOrgRole } from "@/lib/tenancy";
 import { newId } from "@/lib/id";
 
 /*
@@ -12,10 +12,11 @@ import { newId } from "@/lib/id";
  * creates or updates an application row to status "shortlisted" — the same
  * application entity the talent sees, now reflecting business interest.
  *
- * Org isolation is enforced here: the project must belong to an org the caller
- * is a member of (via lib/tenancy.getMembership). The talent pool is
- * platform-wide, but the project the shortlist attaches to is org-owned, so
- * the write is org-scoped. Fails closed on any ownership mismatch.
+ * Org isolation is enforced here: the project must belong to an org the
+ * caller holds MANAGER rank in (audit 2026-08-02: all five scout mutations
+ * write org state — shortlist/invite touch the same applications table
+ * transitionApplication protects at manager+, so they carry the same bar;
+ * viewers browse, managers act). Fails closed on any ownership mismatch.
  */
 export async function shortlistTalent(formData: FormData) {
   const user = await requireUser("business");
@@ -29,9 +30,8 @@ export async function shortlistTalent(formData: FormData) {
     .trim()
     .slice(0, 200);
 
-  // Caller must be a member of the org.
-  const membership = await getMembership(user.id, orgId);
-  if (!membership) return;
+  // Caller must hold manager rank in the org (redirects away otherwise).
+  await requireOrgRole(user.id, orgId, "manager");
 
   const db = await getDb();
 
@@ -93,7 +93,8 @@ export async function shortlistTalent(formData: FormData) {
 /*
  * Talent scouting tracker (owner's call 2026-08-01): the org's private
  * watchlist, independent of applications. All four actions re-derive the
- * caller, verify membership through lib/tenancy, and verify the row's orgId
+ * caller, require MANAGER rank through lib/tenancy (audit 2026-08-02 —
+ * uniform bar with the pipeline actions), and verify the row's orgId
  * before touching it — fail closed on every mismatch.
  */
 
@@ -113,8 +114,7 @@ export async function trackTalent(formData: FormData) {
   const note = String(formData.get("note") ?? "").trim().slice(0, 200);
   if (!talentId || !orgId) return;
 
-  const membership = await getMembership(user.id, orgId);
-  if (!membership) return;
+  await requireOrgRole(user.id, orgId, "manager");
 
   const db = await getDb();
   const talentRows = await db
@@ -164,8 +164,7 @@ export async function advanceTrack(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "").trim();
   if (!trackId || !orgId) return;
 
-  const membership = await getMembership(user.id, orgId);
-  if (!membership) return;
+  await requireOrgRole(user.id, orgId, "manager");
 
   const db = await getDb();
   const rows = await db
@@ -196,8 +195,7 @@ export async function removeTrack(formData: FormData) {
   const orgId = String(formData.get("orgId") ?? "").trim();
   if (!trackId || !orgId) return;
 
-  const membership = await getMembership(user.id, orgId);
-  if (!membership) return;
+  await requireOrgRole(user.id, orgId, "manager");
 
   const db = await getDb();
   const rows = await db
@@ -230,8 +228,7 @@ export async function inviteTrackedToProject(formData: FormData) {
   const projectId = String(formData.get("projectId") ?? "").trim();
   if (!trackId || !orgId || !projectId) return;
 
-  const membership = await getMembership(user.id, orgId);
-  if (!membership) return;
+  await requireOrgRole(user.id, orgId, "manager");
 
   const db = await getDb();
 

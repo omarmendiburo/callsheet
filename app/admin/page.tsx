@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { Rule } from "@/components/ui";
+import { activeEngine, claudeKeyPresent } from "@/lib/ai/types";
+import { claudeUsageToday } from "@/lib/ai/claude";
 import { AdminShell } from "./_shell";
 import { getOverview, usd } from "./_data";
 
@@ -49,6 +51,32 @@ const APP_STATUSES = [
   "declined",
 ] as const;
 
+/* Which engine is live, plainly — the one binary fact the staff running the
+ * pilot needs. Reads lib/ai directly (same source /api/ai/health serves). */
+function AiEngineBand() {
+  const engine = activeEngine();
+  const usage = claudeUsageToday();
+  return (
+    <div className="mt-4 flex flex-col gap-2">
+      <div className="flex items-baseline gap-4">
+        <span className="fact border border-ink px-2 py-1.5">
+          engine · {engine}
+        </span>
+        <span className="fact-secondary">
+          {claudeKeyPresent()
+            ? `anthropic key present · ${usage.calls} of ${usage.cap} daily calls used`
+            : "no anthropic key · heuristic engine serves every surface"}
+        </span>
+      </div>
+      <p className="max-w-xl text-[13px] leading-relaxed text-secondary">
+        Claude activates on its own the moment ANTHROPIC_API_KEY lands. The
+        daily call cap is a code-level backstop per server instance; the real
+        budget is a human decision.
+      </p>
+    </div>
+  );
+}
+
 export default async function AdminOverview() {
   await requireUser("admin");
   const o = await getOverview();
@@ -96,6 +124,14 @@ export default async function AdminOverview() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="fact-secondary">ai engine</h2>
+        <div className="mt-4">
+          <Rule />
+        </div>
+        <AiEngineBand />
       </section>
 
       <section className="mt-10">

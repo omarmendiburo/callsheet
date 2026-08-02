@@ -67,7 +67,7 @@ export default async function ForgotPage({
   const emailConfigured = Boolean(process.env.RESEND_API_KEY);
   return (
     <>
-      <Nav />
+      <Nav primary={false} />
       <main className="mx-auto w-full max-w-md flex-1 px-6 py-10">
         <h1 className="headline mt-6 text-5xl">Reset it.</h1>
         {sent ? (

@@ -58,8 +58,14 @@ export default async function ProfilePage() {
     getDisciplines(profile.id),
     getMedia(profile.id),
   ]);
-  const pitch = media.find((m) => m.kind === "pitch");
-  const work = media.filter((m) => m.kind !== "pitch");
+  // This page previews what employers actually see, so only APPROVED media
+  // renders in the frames (audit 2026-08-02: the unfiltered read made removed
+  // or flagged work look live). Pending/flagged/removed pieces surface as a
+  // count with a path back to onboarding, where they are managed.
+  const approved = media.filter((m) => m.status === "approved");
+  const notLive = media.length - approved.length;
+  const pitch = approved.find((m) => m.kind === "pitch");
+  const work = approved.filter((m) => m.kind !== "pitch");
   const links = profile.links ?? [];
   const prompts = (profile.prompts ?? []).slice(0, 3);
 
@@ -72,8 +78,21 @@ export default async function ProfilePage() {
       </h1>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
         This is how employers see you after the reveal. Every block edits back
-        to its onboarding step.
+        to its onboarding step. Only approved work shows here, because only
+        approved work shows to them.
       </p>
+      {notLive > 0 ? (
+        <p className="fact-secondary mt-3">
+          {notLive} {notLive === 1 ? "piece" : "pieces"} not shown (awaiting
+          review, flagged, or removed) ·{" "}
+          <Link
+            className="underline underline-offset-4"
+            href="/talent/onboarding?step=2"
+          >
+            manage in onboarding
+          </Link>
+        </p>
+      ) : null}
 
       {/* ---------- BAND — PITCH ---------- */}
       <section className="mt-10">
@@ -134,7 +153,10 @@ export default async function ProfilePage() {
           <div>
             <div className="flex items-baseline justify-between">
               <h2 className="fact-secondary">disciplines</h2>
-              <EditLink href="/join" />
+              {/* No edit affordance yet: crafts are set at signup and a real
+                  edit surface is on the roadmap. Linking /join here dead-ended
+                  on the duplicate-email check (audit 2026-08-02). */}
+              <span className="fact-secondary">set at signup</span>
             </div>
             {disciplines.length === 0 ? (
               <p className="mt-4 text-[15px] text-secondary">None listed.</p>

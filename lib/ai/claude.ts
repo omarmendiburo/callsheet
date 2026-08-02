@@ -31,6 +31,41 @@ const ANTHROPIC_VERSION = "2023-06-01";
 const MAX_TOKENS = 1024; // modest — we ask for compact JSON only
 const TIMEOUT_MS = 20_000;
 
+/*
+ * Daily call ceiling (audit 2026-08-02): a code-level backstop so a stuck
+ * loop or a rapid-fire user cannot generate unbounded spend. Counter is
+ * in-memory per server instance — it resets on cold start, so it bounds
+ * runaway behavior rather than metering exact global spend. Omar + the
+ * founders set the real budget number; AI_DAILY_CALL_CAP overrides the
+ * default. Over the cap, every call quietly returns null and the product
+ * falls back to the heuristic engine (its designed failure mode).
+ */
+const DEFAULT_DAILY_CAP = 200;
+let capDay = "";
+let callsToday = 0;
+
+function dailyCap(): number {
+  const raw = Number.parseInt(process.env.AI_DAILY_CALL_CAP ?? "", 10);
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_DAILY_CAP;
+}
+
+function underDailyCap(): boolean {
+  const today = new Date().toISOString().slice(0, 10);
+  if (today !== capDay) {
+    capDay = today;
+    callsToday = 0;
+  }
+  if (callsToday >= dailyCap()) return false;
+  callsToday += 1;
+  return true;
+}
+
+/* Exposed for /api/ai/health and the admin overview. */
+export function claudeUsageToday(): { calls: number; cap: number } {
+  const today = new Date().toISOString().slice(0, 10);
+  return { calls: today === capDay ? callsToday : 0, cap: dailyCap() };
+}
+
 /* One scored candidate as returned by Claude, before validation. */
 export type ClaudeMatchRaw = {
   talentId: string;
@@ -45,6 +80,12 @@ async function callClaude(
 ): Promise<string | null> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return null;
+  if (!underDailyCap()) {
+    console.error(
+      `[ai/claude] daily call cap reached (${dailyCap()}); falling back to heuristic`,
+    );
+    return null;
+  }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);

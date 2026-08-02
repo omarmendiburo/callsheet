@@ -70,7 +70,8 @@ export default async function ProjectDetailPage({
       {/* Booked is the celebration state — plain, per DESIGN voice. */}
       {booked.length > 0 ? (
         <p className="fact mt-6 border border-ink px-3 py-3">
-          booked. the callsheet has a name on it.
+          booked. the callsheet has a name on it. HMNTY reaches out to
+          coordinate the introduction.
         </p>
       ) : null}
 
@@ -141,14 +142,27 @@ export default async function ProjectDetailPage({
       ) : null}
 
       <section className="mt-10">
-        <p className="fact-secondary">applications · {applications.length}</p>
+        <div className="flex items-baseline justify-between gap-4">
+          <p className="fact-secondary">applications · {applications.length}</p>
+          {/* Entry point into the AI ranking, pre-scoped to this project —
+              the ranking itself lives on the scout wall (suggested order). */}
+          <Link
+            className="fact-secondary underline underline-offset-4"
+            href={`/business/scout?org=${org.id}&project=${project.id}&rank=1`}
+          >
+            see suggested creatives
+          </Link>
+        </div>
         <div className="mt-4">
           <Rule />
         </div>
         {applications.length === 0 ? (
           <p className="mt-4 text-[15px] leading-relaxed">
             No applications yet.{" "}
-            <Link className="underline underline-offset-2" href="/business/scout">
+            <Link
+              className="underline underline-offset-2"
+              href={`/business/scout?org=${org.id}&project=${project.id}&rank=1`}
+            >
               scout talent
             </Link>{" "}
             to find people for this project.

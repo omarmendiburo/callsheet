@@ -60,8 +60,9 @@ export default async function NewProjectPage({
 
       <h1 className="headline mt-4 text-4xl sm:text-5xl">Post a project.</h1>
       <p className="mt-6 max-w-lg text-[15px] leading-relaxed">
-        Describe the work and the roles you need. It opens for applications the
-        moment you post it.
+        {org.verified
+          ? "Describe the work and the roles you need. It opens for applications the moment you post it."
+          : "Describe the work and the roles you need. It goes live to creatives once HMNTY verifies your organization; you can post it now."}
       </p>
 
       <form action={createProject} className="mt-10 flex flex-col gap-8">
