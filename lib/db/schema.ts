@@ -309,3 +309,25 @@ export const acceptances = pgTable("acceptances", {
   version: text("version").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+/* A creative bookmarks open projects to revisit (owner's ask 2026-08-02).
+ * Keyed by talent profile + project; one row = one saved job. */
+export const projectBookmarks = pgTable(
+  "project_bookmarks",
+  {
+    id: text("id").primaryKey(),
+    talentId: text("talent_id")
+      .notNull()
+      .references(() => talentProfiles.id),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("project_bookmarks_talent_project_idx").on(
+      t.talentId,
+      t.projectId,
+    ),
+  ],
+);

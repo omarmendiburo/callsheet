@@ -75,3 +75,46 @@ export async function applyToProject(formData: FormData) {
 
   revalidatePath("/talent/jobs");
 }
+
+/* Toggle a project bookmark (owner's ask 2026-08-02): a creative saves an open
+ * job to revisit. Own profile only; insert if absent, delete if present. */
+export async function toggleProjectBookmark(formData: FormData) {
+  const user = await requireUser("talent");
+  const profile = await getProfileByUserId(user.id);
+  if (!profile) return;
+  const projectId = String(formData.get("projectId") ?? "").trim();
+  if (!projectId) return;
+
+  const db = await getDb();
+  const existing = await db
+    .select({ id: schema.projectBookmarks.id })
+    .from(schema.projectBookmarks)
+    .where(
+      and(
+        eq(schema.projectBookmarks.talentId, profile.id),
+        eq(schema.projectBookmarks.projectId, projectId),
+      ),
+    )
+    .limit(1);
+
+  if (existing[0]) {
+    await db
+      .delete(schema.projectBookmarks)
+      .where(eq(schema.projectBookmarks.id, existing[0].id));
+  } else {
+    // Only bookmark a real open project.
+    const proj = await db
+      .select({ id: schema.projects.id })
+      .from(schema.projects)
+      .where(eq(schema.projects.id, projectId))
+      .limit(1);
+    if (proj[0]) {
+      await db.insert(schema.projectBookmarks).values({
+        id: newId("bm"),
+        talentId: profile.id,
+        projectId,
+      });
+    }
+  }
+  revalidatePath("/talent/jobs");
+}

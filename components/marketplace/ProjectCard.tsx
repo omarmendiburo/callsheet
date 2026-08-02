@@ -1,6 +1,7 @@
 import { Rule } from "@/components/ui";
 import type { Application, ProjectWithOrg } from "./_data";
 import { ApplyForm } from "./ApplyForm";
+import { toggleProjectBookmark } from "@/app/talent/jobs/_actions";
 
 /*
  * A job-board card (spec §4.3). Title is a BOLD INTER heading, not Anton —
@@ -52,9 +53,11 @@ function Fact({ label, value }: { label: string; value: string }) {
 export function ProjectCard({
   data,
   application,
+  bookmarked = false,
 }: {
   data: ProjectWithOrg;
   application: Application | null;
+  bookmarked?: boolean;
 }) {
   const { project, orgName } = data;
 
@@ -78,7 +81,21 @@ export function ProjectCard({
 
   return (
     <article className="border border-rule p-6">
-      <p className="fact-secondary">{project.type}</p>
+      <div className="flex items-start justify-between gap-4">
+        <p className="fact-secondary">{project.type}</p>
+        <form action={toggleProjectBookmark}>
+          <input type="hidden" name="projectId" value={project.id} />
+          <button
+            type="submit"
+            aria-pressed={bookmarked}
+            className={`fact underline underline-offset-4 transition-opacity duration-150 hover:opacity-70 ${
+              bookmarked ? "text-accent" : "text-secondary"
+            }`}
+          >
+            {bookmarked ? "saved" : "save"}
+          </button>
+        </form>
+      </div>
       <h2 className="mt-2 text-[19px] font-semibold leading-tight">
         {project.title}
       </h2>

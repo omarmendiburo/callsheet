@@ -9,6 +9,7 @@ import { FilterRow } from "@/components/marketplace/FilterRow";
 import { ProjectCard } from "@/components/marketplace/ProjectCard";
 import {
   getApplicationMap,
+  getBookmarkedProjectIds,
   getOpenProjects,
   type ProjectWithOrg,
 } from "@/components/marketplace/_data";
@@ -39,16 +40,20 @@ export default async function JobsPage({
   const params = await searchParams;
 
   const profile = await getProfileByUserId(user.id);
-  const [projects, appMap, myDisciplines] = await Promise.all([
+  const [projects, appMap, myDisciplines, bookmarks] = await Promise.all([
     getOpenProjects(),
     profile ? getApplicationMap(profile.id) : Promise.resolve(new Map()),
     profile ? getDisciplines(profile.id) : Promise.resolve([]),
+    profile
+      ? getBookmarkedProjectIds(profile.id)
+      : Promise.resolve(new Set<string>()),
   ]);
 
   const fDiscipline = one(params, "discipline");
   const fType = one(params, "type");
   const fRadius = one(params, "radius");
   const fMinRate = one(params, "minRate");
+  const fSaved = one(params, "saved") === "1";
 
   const radiusMi = fRadius ? Number.parseInt(fRadius, 10) : null;
   const minRate = fMinRate ? Number.parseInt(fMinRate, 10) : null;
@@ -68,6 +73,7 @@ export default async function JobsPage({
       return false;
     if (fType && project.type !== fType) return false;
     if (minRate != null && (project.dayRateOnset ?? 0) < minRate) return false;
+    if (fSaved && !bookmarks.has(project.id)) return false;
     if (radiusActive) {
       if (project.lat == null || project.lng == null) return false;
       const d = haversineMiles(
@@ -82,7 +88,7 @@ export default async function JobsPage({
   });
 
   const anyFilter = Boolean(
-    fDiscipline || fType || fRadius || fMinRate,
+    fDiscipline || fType || fRadius || fMinRate || fSaved,
   );
 
   // Recommendations ride the unfiltered view only — once the talent filters,
@@ -188,6 +194,7 @@ export default async function JobsPage({
                 key={p.project.id}
                 data={p}
                 application={appMap.get(p.project.id) ?? null}
+                bookmarked={bookmarks.has(p.project.id)}
               />
             ))}
           </div>
@@ -197,9 +204,21 @@ export default async function JobsPage({
       {/* ---------- BAND — RESULTS ---------- */}
       <section className="mt-10">
         <Rule />
-        <h2 className="fact-secondary mt-4">
-          {filtered.length} {filtered.length === 1 ? "project" : "projects"}
-        </h2>
+        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-4">
+          <h2 className="fact-secondary">
+            {filtered.length} {filtered.length === 1 ? "project" : "projects"}
+          </h2>
+          {bookmarks.size > 0 || fSaved ? (
+            <Link
+              className={`fact underline underline-offset-4 transition-opacity duration-150 hover:opacity-70 ${
+                fSaved ? "text-accent" : "text-secondary"
+              }`}
+              href={fSaved ? BASE : `${BASE}?saved=1`}
+            >
+              {fSaved ? "showing saved · clear" : `saved (${bookmarks.size})`}
+            </Link>
+          ) : null}
+        </div>
 
         {filtered.length === 0 ? (
           <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-secondary">
@@ -216,6 +235,7 @@ export default async function JobsPage({
                 key={p.project.id}
                 data={p}
                 application={appMap.get(p.project.id) ?? null}
+                bookmarked={bookmarks.has(p.project.id)}
               />
             ))}
           </div>

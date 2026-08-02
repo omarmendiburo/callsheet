@@ -96,6 +96,17 @@ export async function getApplicationMap(
   return new Map(rows.map((a: Application) => [a.projectId, a]));
 }
 
+export async function getBookmarkedProjectIds(
+  talentId: string,
+): Promise<Set<string>> {
+  const db = await getDb();
+  const rows: { projectId: string }[] = await db
+    .select({ projectId: schema.projectBookmarks.projectId })
+    .from(schema.projectBookmarks)
+    .where(eq(schema.projectBookmarks.talentId, talentId));
+  return new Set(rows.map((r: { projectId: string }) => r.projectId));
+}
+
 export async function getApplication(
   talentId: string,
   projectId: string,
