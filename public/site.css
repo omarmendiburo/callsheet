@@ -582,6 +582,18 @@ h1,h2,h3,p,figure,blockquote{margin:0}
 /* Owner's call 2026-08-02: the closing block is black like the rest of the page.
    The partner band is now the only inverted surface on the site, which is the
    point — one white band, and it is the one carrying somebody else's logos. */
+/* The homepage closer. It sits under the testimonials on the same black, so a
+   hairline separates them rather than a colour change, and it is centred: one
+   line and one button, nothing to scan past. */
+.lastcall{padding:clamp(52px,6.5vw,120px) var(--pad);text-align:center;
+  border-top:var(--border) solid var(--line)}
+/* wide enough to hold one line on a desktop; balance stops "FOR" being
+   orphaned on its own line when it does wrap */
+.lastcall .h2{max-width:26ch;margin:0 auto;text-wrap:balance}
+.lastcall .btn{margin-top:clamp(24px,2.8vw,46px);
+  height:clamp(56px,3.9vw,68px);padding:0 clamp(26px,2.6vw,46px);
+  font-size:clamp(13px,1vw,16px)}
+
 .close{background:var(--bg);color:var(--ink);padding:clamp(56px,7vw,140px) var(--pad)}
 .close .h2{max-width:16ch}
 .close p{margin-top:clamp(18px,1.8vw,34px);max-width:42ch;font-size:var(--body);
