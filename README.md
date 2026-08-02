@@ -50,7 +50,10 @@ gitignored). Everything is optional and activates on its own:
 | `AUTH_SECRET` | session cookie signing (REQUIRED in production; dev falls back to a dev-only secret) |
 | `ANTHROPIC_API_KEY` | AI flips from the heuristic engine to Claude (`lib/ai/claude.ts`, model `claude-sonnet-5`); verify via `GET /api/ai/health` or `pnpm exec tsx scripts/ai-smoke.ts` |
 | `AI_DAILY_CALL_CAP` | daily Claude call backstop per server instance (default 200; over cap falls back to heuristic) |
-| `RESEND_API_KEY` | password-reset emails send for real (until then: staff-assisted reset links from `/admin/users`) |
+| `RESEND_API_KEY` | transactional email sends for real: welcomes, application status, invites, job-filled, admin new-org alerts, seat credentials, password resets (`lib/email.ts` + `lib/notify.ts`). NOTE: the current key is in Resend test mode — mail only reaches the account owner until a domain is verified at resend.com/domains and `EMAIL_FROM` is set |
+| `EMAIL_FROM` | sender identity once a domain is verified, e.g. `Callsheet <callsheet@yourdomain.com>` (default: Resend's test sender) |
+| `APP_URL` | absolute link base used inside emails (default `https://callsheet.hmntystudios.com`) |
+| `BLOB_READ_WRITE_TOKEN` | video uploads (pitch/work) via Vercel Blob store `callsheet-media`; without it the upload door errors and the paste-a-link door still works |
 
 ## Gates (run before every commit)
 
