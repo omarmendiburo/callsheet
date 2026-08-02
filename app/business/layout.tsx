@@ -18,6 +18,7 @@ export default async function BusinessLayout({
   const links: ShellLink[] = [
     { href: "/business", label: "overview", icon: "dashboard" },
     { href: "/business/scout", label: "scout talent", icon: "scout" },
+    { href: "/business/crm", label: "pipeline", icon: "onboarding" },
   ];
   if (orgs.length === 1) {
     const orgId = orgs[0].org.id;

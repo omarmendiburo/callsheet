@@ -177,6 +177,26 @@ export default async function ScoutPage({
         made it.
       </p>
 
+      {/* View modes — the mockup's Reels / Gallery / CRM trio. */}
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <span className="fact-secondary">view</span>
+        <span className="fact border border-ink bg-ink px-2 py-1.5 text-paper">
+          gallery
+        </span>
+        <Link
+          className="fact border border-rule px-2 py-1.5 text-secondary transition-opacity duration-150 hover:opacity-70"
+          href={orgParam ? `/business/scout/reels?org=${org.id}` : "/business/scout/reels"}
+        >
+          reels
+        </Link>
+        <Link
+          className="fact border border-rule px-2 py-1.5 text-secondary transition-opacity duration-150 hover:opacity-70"
+          href={orgParam ? `/business/crm?org=${org.id}` : "/business/crm"}
+        >
+          crm
+        </Link>
+      </div>
+
       <div className="mt-8">
         <Rule />
       </div>
