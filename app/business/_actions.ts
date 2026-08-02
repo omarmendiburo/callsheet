@@ -199,7 +199,12 @@ export async function transitionApplication(formData: FormData) {
   if (!app) back();
 
   const current = app.status as AppStatus;
-  const allowed = target === "declined" || FORWARD[current] === target;
+  // Businesses "approve" straight off a fresh application (owner's report
+  // 2026-08-02): shortlist is reachable from applied as well as viewed.
+  const allowed =
+    target === "declined" ||
+    FORWARD[current] === target ||
+    (current === "applied" && target === "shortlisted");
   // "declined" is only reachable from a non-terminal state.
   const declinableFrom = current !== "booked" && current !== "declined";
   const ok = target === "declined" ? declinableFrom : allowed;

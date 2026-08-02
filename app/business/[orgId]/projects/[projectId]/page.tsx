@@ -17,14 +17,16 @@ import { transitionApplication } from "../../../_actions";
  * are manager+ only; viewers see the applications read-only.
  */
 
-const FORWARD_LABEL: Record<string, { target: string; label: string } | null> =
-  {
-    applied: { target: "viewed", label: "mark viewed" },
-    viewed: { target: "shortlisted", label: "shortlist" },
-    shortlisted: { target: "booked", label: "book" },
-    booked: null,
-    declined: null,
-  };
+const FORWARD_ACTIONS: Record<string, { target: string; label: string }[]> = {
+  applied: [
+    { target: "shortlisted", label: "shortlist" },
+    { target: "viewed", label: "mark viewed" },
+  ],
+  viewed: [{ target: "shortlisted", label: "shortlist" }],
+  shortlisted: [{ target: "booked", label: "book" }],
+  booked: [],
+  declined: [],
+};
 
 function fmtDate(d: Date | string | null): string {
   if (!d) return "—";
@@ -211,7 +213,7 @@ function ApplicationItem({
   projectId: string;
   canManage: boolean;
 }) {
-  const forward = FORWARD_LABEL[app.status];
+  const forwards = FORWARD_ACTIONS[app.status] ?? [];
   const canDecline = app.status !== "booked" && app.status !== "declined";
 
   return (
@@ -228,10 +230,16 @@ function ApplicationItem({
         <p className="max-w-2xl text-[15px] leading-relaxed">{app.note}</p>
       ) : null}
 
-      {canManage && (forward || canDecline) ? (
+      {canManage && (forwards.length > 0 || canDecline) ? (
         <div className="mt-1 flex flex-wrap items-center gap-x-6 gap-y-2">
-          {forward ? (
-            <form action={transitionApplication}>
+          <Link
+            className="fact underline underline-offset-4"
+            href={`/business/scout/${app.talentId}?org=${orgId}`}
+          >
+            view profile
+          </Link>
+          {forwards.map((forward) => (
+            <form action={transitionApplication} key={forward.target}>
               <input type="hidden" name="orgId" value={orgId} />
               <input type="hidden" name="projectId" value={projectId} />
               <input
@@ -247,7 +255,7 @@ function ApplicationItem({
                 {forward.label}
               </button>
             </form>
-          ) : null}
+          ))}
           {canDecline ? (
             <form action={transitionApplication}>
               <input type="hidden" name="orgId" value={orgId} />

@@ -112,6 +112,7 @@ export type ApplicationRow = {
   applicationId: string;
   status: (typeof schema.applications.status.enumValues)[number];
   note: string | null;
+  talentId: string;
   displayName: string;
   dayRate: number | null;
   isPlaceholder: boolean;
@@ -175,6 +176,7 @@ export async function getProjectApplications(
       applicationId: r.applicationId,
       status: r.status,
       note: r.note,
+      talentId: r.talentId,
       displayName: r.displayName,
       dayRate: r.dayRate,
       isPlaceholder: r.isPlaceholder,
