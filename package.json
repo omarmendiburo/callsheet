@@ -1,0 +1,36 @@
+{
+  "name": "callsheet",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "check:design": "bash scripts/check-design.sh",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx lib/db/migrate.ts",
+    "seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.3.6",
+    "drizzle-orm": "0.44.2",
+    "next": "16.2.12",
+    "postgres": "3.4.7",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "0.31.4",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.12",
+    "tailwindcss": "^4",
+    "tsx": "4.20.3",
+    "typescript": "^5"
+  }
+}

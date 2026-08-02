@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/*
+ * Callsheet design tokens — DESIGN.md is law.
+ * Black on white. Greys recede. No accent colour, ever.
+ * 0px radius everywhere. No shadows, no gradients, no icons.
+ * Motion is opacity only, 150ms.
+ */
+@theme inline {
+  --color-ink: #000000;
+  --color-secondary: #6b6b6b;
+  --color-paper: #ffffff;
+  --color-sunken: #f4f4f2;
+  --color-rule: #e4e4e2;
+  --color-frame: #0a0a0a;
+  --color-error: #b23b2e;
+
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-full: 0px;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* No default blue focus rings — 1px black outline instead. */
+:focus-visible {
+  outline: 1px solid var(--color-ink);
+  outline-offset: 0;
+  border-radius: 0;
+}
+
+/* Display voice: Anton, enormous and tight, never below 32px. */
+.headline {
+  font-family: var(--font-display);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Metadata voice: every fact is monospace, uppercase, tracked. */
+.fact {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fact-secondary {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
